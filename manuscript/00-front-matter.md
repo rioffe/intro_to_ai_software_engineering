@@ -1,8 +1,23 @@
 # Introduction to Software Engineering in the Age of AI
 
-*A hands-on introduction, built one working system at a time*
+<!-- *A hands-on introduction, built one working system at a time* -->
 
----
+```text
+
+
+
+
+
+
+
+```
+
+> *To my wife, Ellen,*
+> *for her patience and support.*
+
+```text
+
+```
 
 ## Who This Book Is For
 
@@ -45,3 +60,9 @@ Finally, permission to skip things: the Appendix covers tools and practices — 
 In the interest of finishing a book you'll actually complete, we left some real, valuable things out on purpose: Docker, continuous integration, static type checking, pre-commit automation, and a couple of others. None of them are missing by accident, and none of them are things we think you shouldn't eventually learn — they're just overhead this particular project, at this particular level, doesn't need yet. Each one gets a short, honest description in the Appendix: what it does, what it would have added here, and where to go looking when you're ready for it.
 
 That's the scope discipline this whole book tries to model, starting now, before Chapter 0 even begins: know what you're building, know what you're deliberately leaving out, and write both of those things down.
+
+— *Robert Ioffe*
+
+  Portland, Oregon
+
+  September 1, 2026

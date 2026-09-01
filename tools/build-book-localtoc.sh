@@ -50,7 +50,8 @@ cd "$ROOT"
 # Source dir of zero-padded manuscript files.  Overridable for other layouts.
 CURRIC="manuscript"
 OUT="${OUTPUT:-${1:-$ROOT/book.pdf}}"
-TITLE="${TITLE:-Introduction to AI Software Engineering}"
+TITLE="${TITLE:-Introduction to Software Engineering in the Age of AI}"
+SUBTITLE="${SUBTITLE:-A hands-on introduction, built one working system at a time}"
 AUTHOR="${AUTHOR:-}"
 DATE="${DATE:-$(date +%Y)}"
 
@@ -241,6 +242,7 @@ pandoc "$PROC" \
  --variable documentclass=book \
  --variable colorlinks=true \
  --metadata "title=$TITLE" \
+ --metadata "subtitle=$SUBTITLE" \
  --metadata "author=$AUTHOR" \
  --metadata "date=$DATE" \
  $mermaid_args \
