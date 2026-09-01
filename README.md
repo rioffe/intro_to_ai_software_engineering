@@ -59,7 +59,9 @@ from the Markdown in `manuscript/`.
   **two-level, clickable, paginated table of contents** (a short front-matter
   "Contents" listing the chapters, plus a compact per-chapter "Contents" page at
   the start of each chapter), a title page, and a per-page
-  `CC BY 4.0 · © 2026` footer.
+  `CC BY 4.0 · © 2026` footer. The first page is the cover image from
+  `assets/book_cover.png`, followed by the title page.
+- `assets/book_cover.png`: The cover image used as the first page of the generated PDF.
 - `Makefile`: The build driver — the normal way to generate the PDF (see below).
 - `tools/build-book-localtoc.sh`: Assembles `book.pdf` — concatenates every
   `manuscript/*.md` in order and runs pandoc once.
@@ -89,7 +91,7 @@ Mermaid/Chrome detection only so a future diagram chapter "just works."
 
 ```sh
 make                 # alias: build book.pdf (the default target)
-make book            # build book.pdf (two-level TOC, per-page license footer)
+make book            # build book.pdf (cover, two-level TOC, per-page license footer)
 make clean           # remove the generated book.pdf
 make help            # show the targets and overridable variables
 ```
@@ -109,7 +111,8 @@ make book FRONTMATTER=0           # give the front matter a per-chapter "Content
 ### Using `build-book-localtoc.sh` directly
 
 The `Makefile` target shells out to `tools/build-book-localtoc.sh`, which
-resolves paths relative to its own location, so it can also be run directly:
+resolves paths relative to its own location, so it can also be run directly.
+The generated PDF starts with `assets/book_cover.png`, followed by the title page:
 
 ```sh
 tools/build-book-localtoc.sh
