@@ -1,4 +1,4 @@
-# Chapter 11 — LLM Interface: A Second Model for a Second Job
+# Chapter 11 — LLM Interface: Enter A Second Model
 
 ## 11.1 Why This Chapter Exists
 
