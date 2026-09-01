@@ -1,0 +1,8 @@
+# The assembled book is tracked on purpose (see book.pdf at the repo root).
+# The per-chapter PDFs are build artifacts -- ignore those.
+manuscript/*.pdf
+
+# Editor / OS temp files
+*~
+*.swp
+.DS_Store
