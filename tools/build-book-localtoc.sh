@@ -57,6 +57,12 @@ DATE="${DATE:-$(date +%Y)}"
 # Depth of the per-chapter local TOC: 2 = sections only; 3 (default) =
 # sections + subsections (###).  Override via LOCAL_DEPTH env.
 LOCAL_DEPTH="${LOCAL_DEPTH:-3}"
+COVER_IMAGE="$ROOT/assets/book_cover.png"
+
+if [ ! -f "$COVER_IMAGE" ]; then
+ echo "build-book-localtoc: cover image not found: $COVER_IMAGE" >&2
+ exit 1
+fi
 
 # ---- ordered chapter source list: every manuscript/*.md in filename order ------
 # Files are zero-padded (00-, 01-, ...), so a lexical sort is numeric order.
@@ -101,9 +107,15 @@ trap 'rm -f "$SRC" "$PROC" "$LIST" "$ASMPY" "$HEADER"' EXIT
 
 # LaTeX preamble for the local TOC: load hyperref FIRST so etoc can attach
 # clickable links, then etoc.  pandoc adds "bookmark" + \hypersetup after this.
-printf '%s\n%s\n' \
+printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n' \
  '\usepackage[hidelinks=true]{hyperref}' \
- '\usepackage{etoc}' >"$HEADER"
+ '\usepackage{graphicx}' \
+ '\usepackage{eso-pic}' \
+ '\usepackage{etoc}' \
+ '\let\originalmaketitle\maketitle' \
+ '\renewcommand{\maketitle}{%' \
+ '\AddToShipoutPictureBG*{\AtPageLowerLeft{\includegraphics[width=\paperwidth,height=\paperheight]{assets/book_cover.png}}}\null\clearpage%' \
+ '\begingroup\let\cleardoublepage\clearpage\originalmaketitle\endgroup}' >"$HEADER"
 
 # The assembler reads the ordered chapter paths from LIST (argv[1]), the local
 # TOC depth from argv[2], and the single NOLOCAL front-matter path from argv[3]

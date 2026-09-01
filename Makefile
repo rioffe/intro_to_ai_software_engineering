@@ -18,6 +18,7 @@
 #   make book AUTHOR="Robert Ioffe"
 #   make book TITLE="..." DATE="..." LOCAL_DEPTH=2 OUTPUT=mybook.pdf
 #   make book FRONTMATTER=0            (give the first file a local "Contents" too)
+# The generated PDF starts with assets/book_cover.png, followed by the title page.
 # The shell scripts resolve paths relative to their own directory, so a single
 # broken step is reported but make still exits non-zero when the build fails.
 
@@ -42,6 +43,7 @@ help:
 	@echo "  make book LOCAL_DEPTH=2|3         Per-chapter local TOC depth (default 3: sections + subsections)."
 	@echo "  make book OUTPUT=mybook.pdf       Output PDF path (default: book.pdf at repo root)."
 	@echo "  make book FRONTMATTER=0           Give the first file a local \"Contents\" page too."
+	@echo "  Cover: assets/book_cover.png is added as the first PDF page."
 
 ## Remove the generated book
 clean:
