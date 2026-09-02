@@ -53,10 +53,11 @@ Often more useful than what's in scope. Explicitly naming what this project *won
 Applying the same "prompting as spec-writing" idea from Chapter 1.6, but at document scale rather than one-line scale:
 
 ```bash
-pi "Draft a SPEC.md for a fixed-rate mortgage calculator." \
-   "It should describe what the tool does, its inputs and" \
-   "outputs, what 'correct' means for it, and what's" \
-   "explicitly out of scope. Keep it under one page."
+pi "Draft a SPEC.md for a fixed-rate mortgage \
+    calculator. It should describe what the tool does, \
+    its inputs and outputs, what 'correct' means for it, \
+    and what's explicitly out of scope. Keep it under \
+    one page."
 ```
 
 ### 2.4.2 Reading Pi's Suggestions Critically
@@ -93,6 +94,16 @@ should equal the total amount paid over the life of the loan.
 ```
 
 If you're reading closely, you may already see what Chapter 4 is going to have to fix: "rate" doesn't say whether it's annual or periodic, "term" doesn't say what payment frequency it implies, and "the number of payments" is used before anything defines how it's calculated. Leave it as it is for now — the gaps are the point, and finding them with real domain knowledge in hand is more useful than getting them right by luck on a first pass.
+
+### 2.4.4 What You Might Actually See
+
+The illustrative draft above is intentionally simple, so the specific gaps Chapter 4 needs to catch stay easy to spot. Real output varies — sometimes a lot — depending on which model actually wrote it, and it's worth seeing that difference once, concretely, before you run this exercise yourself.
+
+Running the 2.4.1 prompt against **qwen3:8b** produced a noticeably different kind of draft. It added constraints nobody asked for — a $10,000 minimum loan amount, a rate capped at 0–100%, a term capped at 1–30 years — none of which trace back to anything in the prompt. That's exactly the risk 2.4.2 warned about: a plausible-sounding assumption filling a gap you never actually specified. It also introduced a "Rate Frequency" field ("Annual" or "Monthly," described as being for "effective annual rate calculations") that quietly conflates two genuinely different things — how often a rate is *quoted* versus how often payments are *made* — in a way that reads reasonably on a first pass and falls apart under the kind of scrutiny 4.3.2 asks you to apply.
+
+Running the same prompt against **qwen3.8:27b-mlx** produced something considerably more ambitious: not just a payment figure, but a full month-by-month amortization schedule, with explicit rules for where rounding error is allowed to land (the final period only) and a battery of correctness properties — `payment == principal_paid + interest_paid` on every row, the closing balance reaching exactly zero, and so on. This is careful, genuinely well-specified engineering. It's also scope the 2.4.1 prompt never asked for and this book's project never builds: every chapter from here forward computes a single fixed payment, not a schedule. A more capable model didn't just fill gaps more sensibly here — it expanded the project's scope without being asked to, which needs exactly the same scrutiny as the smaller model's unrequested minimum-loan-amount constraint, just dressed up better.
+
+Neither output is wrong to have produced — this is genuinely what real coding agents do, and it's part of why 2.4.2's instruction to read every sentence critically matters regardless of which model you're using. Your own first draft will very likely look like neither the illustrative version above nor either of these — which is fine. The skill this chapter is teaching isn't "get the spec Pi is supposed to produce"; it's "notice what you didn't actually ask for."
 
 ## 2.5 Committing the Spec
 
