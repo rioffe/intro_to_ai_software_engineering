@@ -8,6 +8,20 @@ Nothing gets built for the mortgage calculator in this chapter. That starts in C
 
 ## 1.2 What a Model Actually Is
 
+A language model, at a basic level, is a program trained on enormous amounts of text that has learned to predict what text comes next, given what came before. That's the whole definition this book needs. Everything below just unpacks what that prediction process implies in practice — and the diagram gives you the shape of it before the prose does:
+
+```mermaid
+flowchart TD
+    A[Language Model] --> B[Breaks input text into Tokens]
+    B --> C[Predicts the next token, one at a time]
+    C --> D["Context Window: how many tokens it can see at once"]
+    D --> E{Where does it run?}
+    E -->|Local| F[On your own machine]
+    E -->|Hosted| G[On someone else's servers]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
 ### 1.2.1 Tokens
 
 A language model doesn't read text the way you do. It breaks text into **tokens** — small chunks, sometimes whole words, sometimes fragments of words — and predicts, one token at a time, what's likely to come next. That's the entire mechanism underneath everything Pi does: read some tokens, predict the next ones, repeat. It's worth holding onto this plain description, because it's easy to start attributing more to a model than that description supports, and this book would rather you keep a clear, ungenerous picture of what's actually happening.
@@ -68,7 +82,13 @@ This book uses a Qwen3 variant as its running example for Pi's model, sized to r
 ollama pull qwen3:27b
 ```
 
-If your hardware supports it, the 27B variant gives Pi meaningfully better judgment on multi-file changes than the smaller 8B model from 1.3.2. If not, 1.4.3 below will help you decide where to land.
+**On macOS specifically**, pull the MLX-optimized variant instead — built for Apple Silicon rather than a generic cross-platform target:
+
+```bash
+ollama pull qwen3.8:27b-mlx
+```
+
+At roughly 18GB, it's a smaller download than the generic build, and runs noticeably better on Apple Silicon's unified memory architecture. Either variant gives Pi meaningfully better judgment on multi-file changes than the smaller 8B model from 1.3.2, if your hardware supports it. If not, 1.4.3 below will help you decide where to land.
 
 ### 1.4.3 A Hardware Gut-Check
 
@@ -101,28 +121,50 @@ pi --version
 
 ### 1.5.3 Pointing Pi at Your Local Model
 
-Configure Pi to use the Ollama model from 1.4 rather than a hosted default:
+Pi doesn't have a `pi config set` command for this — model selection lives directly in Pi's settings file, `~/.pi/agent/settings.json`. This is a good first real use for the vi skills from 0.5: open the file and edit the values by hand.
 
 ```bash
-pi config set model ollama/qwen3:27b
+vi ~/.pi/agent/settings.json
 ```
 
-(Exact configuration syntax may differ by Pi version — check `pi config --help` if this doesn't match what you see.)
+The fields that matter here are `defaultModel`, `defaultProvider`, and `defaultThinkingLevel`:
 
-### 1.5.4 Add-ons and Skills
+```json
+{
+  "defaultModel": "qwen3.8:27b-mlx",
+  "defaultProvider": "ollama",
+  "defaultThinkingLevel": "medium"
+}
+```
 
-Pi supports add-ons and skills — packaged extensions that give it additional capabilities or domain-specific instructions beyond its defaults. You don't need any for this book's core path, but it's worth knowing they exist: `pi skills list` shows what's available, and `pi skills add <name>` installs one. We'll flag it explicitly in later chapters if a particular skill would help with that chapter's task.
+Set `defaultModel` to whichever tag you pulled in 1.4.2, and `defaultProvider` to `ollama`. `defaultThinkingLevel` controls how much the model reasons before answering — `medium` is a reasonable default to start with. (Pi's settings file has a few more fields too — including a `packages` list for installed extensions — that you can safely ignore for now; this book doesn't need any of them.)
 
-### 1.5.5 Pointing Pi at the Repository
+### 1.5.4 Skills
 
-From inside your Chapter 0 project:
+Pi supports **skills** — packaged instructions that give it additional domain-specific guidance beyond its defaults. There's no `pi skills` command; skills are viewable and toggled through the same interactive screen `pi config` opens (Tab switches between scopes). Adding one is a matter of copying files rather than installing a package: a **global** skill goes in `~/.pi/agent/skills/`, available to every project; a **local** skill goes in `.pi/agent/skills/` inside a specific project, available only there. You don't need any skills for this book's core path — we'll flag it explicitly in later chapters if a particular skill would help with that chapter's task.
+
+### 1.5.5 Starting Pi in the Repository
+
+There's no separate `pi init` step. Pi's available commands, for reference:
+
+```
+pi install <source> [-l]     Install extension source and add to settings
+pi remove <source> [-l]      Remove extension source from settings
+pi uninstall <source> [-l]   Alias for remove
+pi update [source|self|pi]   Update pi, extensions, or model catalogs
+pi list                      List installed extensions from settings
+pi config [-l]               Open TUI to enable/disable package resources
+pi auth <command>            Print credentials or check provider readiness
+```
+
+Pointing Pi at your project is just a matter of being in it when you start it:
 
 ```bash
-cd mortgage-calculator
-pi init
+cd mortgage-calculator-book
+pi
 ```
 
-This tells Pi where your project lives and gives it the context it needs to start reading and proposing changes.
+Running `pi` with no arguments starts an interactive session using the current directory as its project context — nothing more to configure.
 
 ## 1.6 Your First Agent-Assisted Interaction
 
@@ -131,10 +173,22 @@ This tells Pi where your project lives and gives it the context it needs to star
 Before trusting Pi with anything that matters, give it something safe and easy to check:
 
 ```bash
-pi "Add a one-line docstring to the top of" \
-   "src/mortgage_calculator/__init__.py describing" \
-   "what this package is for."
+pi "Add a one-line docstring to the top of \
+    src/mortgage_calculator_book/__init__.py describing \
+    what this package is for."
 ```
+
+This launches Pi in interactive mode with that instruction as your first message — Pi will think, propose a change, and then wait for you inside the session rather than exiting on its own. Once you've reviewed what it did (1.6.2 below), exit with **Ctrl+D**.
+
+If you'd rather Pi run one instruction and exit immediately, without an interactive session, add `-p`:
+
+```bash
+pi -p "Add a one-line docstring to the top of \
+       src/mortgage_calculator_book/__init__.py describing \
+       what this package is for."
+```
+
+`-p` is short for "print": Pi runs the instruction, prints its response, and exits on its own — often more convenient for the small, self-contained tasks this book asks of it. The rest of this book shows Pi invocations in the plain form above; assume interactive mode and a Ctrl+D exit when you're done, unless a chapter says otherwise, and reach for `-p` yourself any time you'd rather skip the session entirely.
 
 ### 1.6.2 Reading the Diff
 
@@ -165,13 +219,20 @@ If Ollama is taking minutes to respond to a simple prompt, if your machine is sw
 
 ### 1.7.2 A Minimal Fallback
 
-You can point Pi at a hosted model instead, so you're not stuck before this book even really starts:
+You can point Pi at a hosted model instead, so you're not stuck before this book even really starts. The same settings file from 1.5.3 handles this too — there's no `pi config set` command here either:
 
 ```bash
-pi config set model openrouter/qwen/qwen3-27b
+vi ~/.pi/agent/settings.json
 ```
 
-This requires an OpenRouter account and API key — Chapter 11 covers that setup properly, including cost and usage tracking. For now, if you need this escape hatch, create a free OpenRouter account, generate a key, and set it as an environment variable:
+```json
+{
+  "defaultModel": "qwen/qwen3-27b",
+  "defaultProvider": "openrouter"
+}
+```
+
+This requires an OpenRouter account, an API key, and — since hosted calls cost real money per request — some actual credit sitting in the account; a fresh account with a zero balance will authenticate just fine and then fail the moment it tries to run anything. Chapter 11 covers this setup properly, including cost and usage tracking. For now, if you need this escape hatch: create an OpenRouter account, add a small amount of credit, generate a key, and set it as an environment variable:
 
 ```bash
 export OPENROUTER_API_KEY="your-key-here"
@@ -179,7 +240,7 @@ export OPENROUTER_API_KEY="your-key-here"
 
 ### 1.7.3 This Isn't Permanent
 
-Using a hosted model here doesn't lock you out of local models for the rest of the book — it just gets you moving today. Once you've read Chapter 1.4's hardware guidance more carefully, or found a smaller model that fits your machine, you can switch back at any point with the same `pi config set model` command.
+Using a hosted model here doesn't lock you out of local models for the rest of the book — it just gets you moving today. Once you've read Chapter 1.4's hardware guidance more carefully, or found a smaller model that fits your machine, you can switch back at any point by editing `defaultModel` and `defaultProvider` in `~/.pi/agent/settings.json` again.
 
 ## 1.8 Checkpoint
 
@@ -187,8 +248,8 @@ Before moving to Chapter 2, this should all be true:
 
 - [ ] Ollama is installed and a model has been pulled successfully
 - [ ] You've had at least one raw conversation with the model via `ollama run`
-- [ ] Pi is installed and configured to use either your local model or the Chapter 1.7 fallback
-- [ ] Pi is initialized against your `mortgage-calculator` repository
-- [ ] You've given Pi one small task, reviewed its diff, and committed the result
+- [ ] Pi is installed, and `~/.pi/agent/settings.json` points `defaultModel` and `defaultProvider` at either your local model or the Chapter 1.7 fallback
+- [ ] Running `pi` from inside `mortgage-calculator-book` starts a session with that project as its context
+- [ ] You've given Pi one small task, read its diff, exited cleanly (Ctrl+D or `-p`), and committed the result
 
 **What's next:** Chapter 2 turns the informal instruction-giving you just practiced into something more deliberate — a written SPEC.md that describes what the calculator is actually supposed to do, before any real code exists.
