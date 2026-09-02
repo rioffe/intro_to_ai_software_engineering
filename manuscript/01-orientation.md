@@ -382,7 +382,7 @@ Before moving to Chapter 1, this should all be true:
 - [ ] `ssh -T git@github.com` prints the "successfully authenticated" message
 - [ ] You can explain, in your own words, what a diff shows and why the `+`/`-` prefixes matter
 - [ ] You can open, edit, and save a file in vi without help, and verify the save with `cat`
-- [ ] `python3 --version` reports 3.12.x
+- [ ] `uv run python --version` reports 3.12.x
 - [ ] `uv run python -c "import mortgage_calculator_book; print('ok')"` prints `ok`
 - [ ] Your project has been committed and pushed, and you've confirmed the files are visible on github.com in a browser — not just assumed from a successful-looking terminal command
 
