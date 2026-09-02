@@ -54,6 +54,26 @@ This is deliberately narrow: `E` and `F` cover common style and correctness issu
 
 ### 3.4.3 Running It
 
+`uv add --dev ruff` installs Ruff into your project's virtual environment, `.venv/` — not globally on your system. If you try `ruff check .` right after installing it and get a `command not found` error, that's why: your shell doesn't yet know to look inside `.venv/`. Activate the environment:
+
+```bash
+source .venv/bin/activate
+```
+
+(On native Windows outside WSL, the equivalent is `.venv\Scripts\activate`.)
+
+Confirm it worked:
+
+```bash
+which ruff
+```
+
+You're looking for a path inside your project's `.venv/` — something like `.../mortgage-calculator-book/.venv/bin/ruff` — not a Ruff installed somewhere else on your system. This matters: if you happen to have a different Ruff on your machine already, `which ruff` is how you'd catch yourself accidentally running the wrong one.
+
+Once activated, this same terminal session can run `ruff`, `pytest`, and `python` bare, without prefixing every command with `uv run` — which is why later chapters show commands like `pytest -v` directly rather than `uv run pytest -v`. `uv run ruff check .` is the alternative that works either way, activated or not, since it always runs inside the project's environment regardless of your shell's current state — reach for it instead if you'd rather not activate manually, or you're running a one-off command in a fresh terminal that isn't activated.
+
+With Ruff actually runnable:
+
 ```bash
 ruff check .     # lint
 ruff format .    # format
@@ -61,12 +81,20 @@ ruff format .    # format
 
 `ruff check` reports problems; `ruff format` rewrites files to match the configured style. Run both — they check different things.
 
+Installing Ruff changed `pyproject.toml` and `uv.lock` — a real change, worth its own commit:
+
+```bash
+git add .
+git commit -m "Add Ruff as a dev dependency"
+git push
+```
+
 ## 3.5 Running Ruff Against Agent Output
 
 ### 3.5.1 Pointing It at Chapter 1's Change
 
 ```bash
-ruff check src/mortgage_calculator/__init__.py
+ruff check src/mortgage_calculator_book/__init__.py
 ```
 
 For a one-line docstring, this will likely come back clean — which is itself a useful first result: it tells you Ruff is wired up correctly, even though there was nothing to fix yet.
