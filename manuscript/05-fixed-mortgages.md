@@ -92,7 +92,7 @@ This is the example the rest of the book returns to repeatedly — commit these 
 
 | Quantity | Value |
 |---|---|
-| Principal ($P$) | \$200,000 |
+| Principal ($P$) | $200,000 |
 | Annual interest rate | 6% |
 | Payment frequency | Monthly (12/year) |
 | Periodic rate ($r$) | 0.005 |
@@ -120,9 +120,9 @@ Flag this explicitly: when Chapter 5 writes its first test, and Chapter 6 writes
 If you'd like a second check on the arithmetic above:
 
 ```bash
-pi "Verify this mortgage payment calculation by hand: " \
-   "principal $200,000, annual rate 6%, 30-year term, " \
-   "monthly payments. Show your work."
+pi "Verify this mortgage payment calculation by hand: \
+    principal \$200,000, annual rate 6%, 30-year term, \
+    monthly payments. Show your work."
 ```
 
 Read what comes back carefully rather than accepting it at face value. Models are not immune to arithmetic slips, and a subtly wrong intermediate step — the periodic rate conversion, in particular, is a common place for this to happen — can produce a final answer that looks plausible without being right. If Pi's answer disagrees with 4.5.2's, don't assume either one is automatically correct; redo the arithmetic yourself and find out which one made the mistake. That's not a wasted exercise — it's the same verification skill this book has been building since Chapter 1.6, applied to math instead of code.
@@ -181,7 +181,8 @@ Commit the revision on its own:
 
 ```bash
 git add SPEC.md
-git commit -m "Revise SPEC.md: define periodic rate, payment frequency, and n_payments"
+git commit -m "Revise SPEC.md: define periodic rate, \
+    payment frequency, and n_payments"
 git push
 ```
 
