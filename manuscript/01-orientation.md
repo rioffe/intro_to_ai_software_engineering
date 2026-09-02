@@ -132,7 +132,7 @@ If you let `gh auth login` generate a key for you in 0.4.2, this is already done
 ssh-keygen -t ed25519 -C "you@example.com"   # press enter through the defaults
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
-cat ~/.ssh/id_ed25519.pub                     # copy this output
+cat ~/.ssh/id_ed25519.pub                    # copy this output
 ```
 
 Then, in a browser: GitHub → Settings → SSH and GPG keys → New SSH key, and paste what you copied.
@@ -320,14 +320,14 @@ This book uses a **src layout**: your actual package lives inside a `src/` direc
 
 ```
 mortgage-calculator-book/
-├── pyproject.toml
-├── uv.lock
-├── README.md
-├── SPEC.md
-├── src/
-│   └── mortgage_calculator_book/
-│       └── __init__.py
-└── tests/
++-- pyproject.toml
++-- uv.lock
++-- README.md
++-- SPEC.md
++-- src/
+|   \-- mortgage_calculator_book/
+|       \-- __init__.py
+\-- tests/
 ```
 
 The reason: a src layout forces your code to be *installed* to be imported, the same way it would be for anyone else using it — which catches a whole class of "works on my machine because I happened to be in the right directory" bugs before they happen. It's a small amount of extra structure up front that pays for itself the moment you write your first test in Chapter 5.
