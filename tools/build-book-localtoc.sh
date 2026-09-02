@@ -31,25 +31,85 @@
 #   TITLE="..." AUTHOR="..." tools/build-book-localtoc.sh
 #   OUTPUT=book-local.pdf tools/build-book-localtoc.sh   (via the Makefile: OUTPUT=)
 #   LOCAL_DEPTH=2 tools/build-book-localtoc.sh           -> sections only (default 3)
+#   --margin 0.5in / MARGIN=0.5in                        -> page margins on all sides
 #
 # Why latexmk, not xelatex: a per-chapter \tableofcontents needs several LaTeX
 # passes for the cross-references (page numbers) to stabilise.  pandoc runs its
 # pdf engine only once, so we use the latexmk engine -- which iterates to a fixed
-# point -- via `--pdf-engine=latexmk`.  latexmk still runs inside pandoc's work
-# dir, so (had any chapter embedded mermaid) the mermaid-filter images resolve
-# exactly as in build-book.sh / md2pdf.sh.
+# points -- via `--pdf-engine=latexmk`.  latexmk still runs inside pandoc's work
+# dir, so the mermaid-filter images (ch.1 embeds a language-model flowchart)
+# resolve exactly as in build-book.sh / md2pdf.sh.
 #
-# Same math preprocessor ([ ... ] -> $$ ... $$) as md2pdf.sh / build-book.sh.
-# This manuscript embeds no mermaid diagrams, but the handling is kept verbatim
-# so a future mermaid chapter "just works".
+# Same FENCE-AWARE math preprocessor ([ ... ] -> $$ ... $$) as md2pdf.sh, shared
+# as tools/math-fence.awk and guarded by tests/test_math_fence.sh.  The build
+# defaults the mermaid output to a crisp VECTOR pdf (MERMAID_FILTER_FORMAT=pdf,
+# MERMAID_FILTER_SCALE=3) but always respects a user-set value -- as in
+# md2pdf.sh's "--mermaid diagrams crisp by default" learning.
 
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
+# ---- CLI args ------------------------------------------------------------
+# The first non-flag argument is the OUTPUT path, preserving the long-standing
+# `build-book-localtoc.sh out.pdf` usage.   --margin[=VAL] (also the MARGIN env
+# var; a CLI --margin wins over the env var) sets the page margin on all sides
+# via the LaTeX geometry package (e.g. 0.5in, 1cm).  The MARGIN env var means
+# `make book MARGIN=0.5in` works like the other overridable variables.
+usage() {
+ cat <<'EOF'
+Usage: build-book-localtoc.sh [OPTIONS] [OUTPUT]
+
+Options:
+   --margin MARGIN     Set page margins on all sides (e.g. 0.5in, 1cm, 0.3in).
+    --margin=MARGIN    Same, using the = form.
+   -h, --help          Show this help and exit.
+
+The OUTPUT path may also be given via OUTPUT= (default: book.pdf at the repo
+root).  MARGIN may also be given via the MARGIN environment variable.
+EOF
+}
+
+OUT=""
+MARGIN="${MARGIN:-}"
+while [ $# -gt 0 ]; do
+ case "$1" in
+ --margin)
+  shift
+  [ $# -gt 0 ] || {
+   echo "build-book-localtoc: --margin requires a value (e.g. 0.5in, 1cm, 0.3in)." >&2
+   exit 1
+  }
+  MARGIN="$1"
+  ;;
+ --margin=*)
+  MARGIN="${1#--margin=}"
+  ;;
+ -h | --help)
+  usage
+  exit 0
+  ;;
+ --)
+  shift
+  break
+  ;;
+ *)
+  if [ -n "$OUT" ]; then
+   echo "build-book-localtoc: ignoring extra argument: $1" >&2
+  else
+   OUT="$1"
+  fi
+  ;;
+ esac
+ shift
+done
+# An explicitly given OUTPUT env var wins over a positional argument, matching
+# the historical behaviour; otherwise fall back to the positional, then default.
+OUT="${OUTPUT:-$OUT}"
+[ -n "$OUT" ] || OUT="$ROOT/book.pdf"
+
 # Source dir of zero-padded manuscript files.  Overridable for other layouts.
 CURRIC="manuscript"
-OUT="${OUTPUT:-${1:-$ROOT/book.pdf}}"
 TITLE="${TITLE:-Introduction to Software Engineering in the Age of AI}"
 SUBTITLE="${SUBTITLE:-A hands-on introduction, built one working system at a time}"
 AUTHOR="${AUTHOR:-}"
@@ -108,7 +168,7 @@ trap 'rm -f "$SRC" "$PROC" "$LIST" "$ASMPY" "$HEADER"' EXIT
 
 # LaTeX preamble for the local TOC: load hyperref FIRST so etoc can attach
 # clickable links, then etoc.  pandoc adds "bookmark" + \hypersetup after this.
-printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n' \
+printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' \
  '\usepackage[hidelinks=true]{hyperref}' \
  '\usepackage{graphicx}' \
  '\usepackage{eso-pic}' \
@@ -117,6 +177,12 @@ printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n' \
  '\renewcommand{\maketitle}{%' \
  '\AddToShipoutPictureBG*{\AtPageLowerLeft{\includegraphics[width=\paperwidth,height=\paperheight]{assets/book_cover.png}}}\null\clearpage%' \
  '\begingroup\let\cleardoublepage\clearpage\originalmaketitle\endgroup}' >"$HEADER"
+
+# --margin: page margins on all sides via the geometry package (optional).
+# An empty MARGIN leaves pandoc's default page layout untouched.
+if [ -n "$MARGIN" ]; then
+ printf '\n\\usepackage[margin=%s]{geometry}\n' "$MARGIN" >>"$HEADER"
+fi
 
 # The assembler reads the ordered chapter paths from LIST (argv[1]), the local
 # TOC depth from argv[2], and the single NOLOCAL front-matter path from argv[3]
@@ -185,16 +251,34 @@ fi
 
 echo "build-book-localtoc: assembled $total chapters ($(wc -l <"$SRC") source lines); front matter (no local TOC): ${NOLOCAL:-<none>}"
 
-# ---- apply the SAME [ / ] -> $$ math preprocessor as md2pdf.sh -----------
-sed -e 's/^[[:space:]]*\[[[:space:]]*$/$$\n/' \
- -e 's/^[[:space:]]*\][[:space:]]*$/\n$$/' \
- "$SRC" >"$PROC"
+# ---- apply the SAME [ / ] -> $$ math fence preprocessor as md2pdf.sh -----------
+# FENCE-AWARE: the [ / ] math-fence convention must NOT fire on a lone '[' or ']'
+# line that lives INSIDE a fenced code block.   The program lives in
+# tools/math-fence.awk (shared with tests/test_math_fence.sh so the two cannot
+# drift); it toggles a state on every ``` / ~~~ fence and substitutes only
+# outside it -- a line that is only '[ ' opens a math fence; only ']' closes it.
+awk -f "$ROOT/tools/math-fence.awk" "$SRC" >"$PROC"
 
 # ---- decide on the mermaid-filter, then auto-detect a Chrome/Chromium -----
-# This manuscript embeds no mermaid, but keep the detection so a future chapter
-# with ```mermaid just works.
+# The manuscript DOES embed mermaid diagrams (e.g. ch.1's language-model
+# flowchart), so keep the detection AND the crisp-output defaults; a chapter with
+# no diagram simply skips this whole block.
 mermaid_args=""
 if grep -q '^```mermaid' "$SRC"; then
+ # mermaid-filter -> mmdc -> puppeteer needs a Chromium executable, and
+ # mermaid-filter's own default PNG (800px, scale=1) looks fuzzy in a PDF.
+ # Default to VECTOR output (crisp at any zoom) with a high-scale raster
+ # fallback -- but always respect a value the user already set, exactly like
+ # the reference md2pdf.sh.
+ if [ -z "${MERMAID_FILTER_FORMAT:-}" ]; then
+  MERMAID_FILTER_FORMAT="pdf"
+  echo "build-book-localtoc: defaulting MERMAID_FILTER_FORMAT=pdf (vector; crisp at any zoom)"
+ fi
+ if [ -z "${MERMAID_FILTER_SCALE:-}" ]; then
+  MERMAID_FILTER_SCALE="3"
+  echo "build-book-localtoc: defaulting MERMAID_FILTER_SCALE=3 (high-res raster fallback)"
+ fi
+ export MERMAID_FILTER_FORMAT MERMAID_FILTER_SCALE
  if [ -z "${PUPPETEER_EXECUTABLE_PATH:-}" ]; then
   for cand in \
    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \

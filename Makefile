@@ -42,6 +42,7 @@ help:
 	@echo "  make book DATE=\"...\"             Date on the title page (default: this year)."
 	@echo "  make book LOCAL_DEPTH=2|3         Per-chapter local TOC depth (default 3: sections + subsections)."
 	@echo "  make book OUTPUT=mybook.pdf       Output PDF path (default: book.pdf at repo root)."
+	@echo "  make book MARGIN=0.5in            Page margin on all sides (default: pandoc's layout; e.g. 1cm, 0.3in)."
 	@echo "  make book FRONTMATTER=0           Give the first file a local \"Contents\" page too."
 	@echo "  Cover: assets/book_cover.png is added as the first PDF page."
 

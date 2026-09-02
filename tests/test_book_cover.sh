@@ -12,5 +12,6 @@ trap 'rm -f "$output" "$images"' EXIT
 pdfimages -f 1 -l 1 -list "$output" >"$images"
 grep -Eq '^ *1 +[0-9]+ +image ' "$images"
 
-# The original title page must remain immediately after the cover.
-pdftotext -f 2 -l 2 "$output" - | grep -Fq 'Introduction to AI Software Engineering'
+# The title page must remain immediately after the cover.  (pdftotext wraps the
+# title across lines, so match a fragment guaranteed to sit on a single line.)
+pdftotext -f 2 -l 2 "$output" - | grep -Fq 'Introduction to Software Engineering in the Age'

@@ -104,6 +104,7 @@ make book TITLE="..."             # book title on the title page
 make book DATE="..."              # date on the title page
 make book LOCAL_DEPTH=2           # per-chapter local TOC depth (default 3: sections + subsections)
 make book OUTPUT=mybook.pdf       # output path (default: book.pdf at the repo root)
+make book MARGIN=0.5in             # page margin on all sides (default: pandoc's layout; e.g. 1cm, 0.3in)
 make book LICENSE=0               # omit the per-page license footer
 make book FRONTMATTER=0           # give the front matter a per-chapter "Contents" page too
 ```
@@ -117,6 +118,7 @@ The generated PDF starts with `assets/book_cover.png`, followed by the title pag
 ```sh
 tools/build-book-localtoc.sh
 AUTHOR="Robert Ioffe" tools/build-book-localtoc.sh out.pdf
+tools/build-book-localtoc.sh --margin 0.5in out.pdf
 ```
 
 ## License

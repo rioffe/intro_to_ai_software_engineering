@@ -2,6 +2,9 @@
 # The per-chapter PDFs are build artifacts -- ignore those.
 manuscript/*.pdf
 
+# mermaid-filter writes per-run diagnostics (.err) in cwd and next to outputs
+*.err
+
 # Editor / OS temp files
 *~
 *.swp
