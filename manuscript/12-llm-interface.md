@@ -38,7 +38,11 @@ Before wiring anything to the tool, talk to this model the same way you did in C
 ollama run qwen3:8b
 ```
 
-Ask it a mortgage-related question directly, with no tool available. It'll answer in general terms, or admit it can't compute an exact figure — useful context for appreciating what the tool wiring in section 11.4 actually adds.
+Ask it a mortgage-related question directly, with no tool available — the same $200,000/6%/30-year question from Chapter 4.5. One of two things happens, and it's worth being honest that the better-sounding one isn't actually the reassuring one.
+
+Sometimes the model answers in general terms, or admits it can't compute an exact figure — useful context on its own for appreciating what the tool wiring in section 11.4 adds.
+
+But a reasoning model like this one is just as likely to work through the whole amortization formula inside its own "thinking" output — converting the rate, computing $(1.005)^{360}$, dividing, multiplying — and land on **$1,199.10**, matching Chapter 4.5's answer exactly. If that's what you see, don't read it as evidence the tool is unnecessary. Read it the opposite way. Run it again with `--verbose` and look at what that correct answer actually cost: on ordinary consumer hardware, a real run of this exact question took **61.8 seconds** and **5,107 tokens** of reasoning to reach a number `calculate_payment` returns in about **0.3 microseconds** — not a rounding difference, but roughly 193 million times slower for the identical result. And ask yourself how you'd actually know if one of those 5,107 tokens had gotten the arithmetic slightly wrong along the way — the same question 4.6 and 5.6.4 already asked you to ask about any other model output. Getting it right once, watched closely by someone who already knew the answer, isn't the same claim as getting it right reliably, unwatched, for a question you didn't already know the answer to, in a minute instead of a fraction of a millionth of a second. That gap — not raw capability — is what section 11.4 is actually for.
 
 ## 11.4 Wiring the Local Model to the Chapter 10 Tool
 
@@ -52,17 +56,20 @@ The pattern this section implements has four steps: a user asks a question; the 
 uv add ollama
 ```
 
-In `src/mortgage_calculator/llm.py`:
+In `src/mortgage_calculator_book/llm.py`:
 
 ```python
 import ollama
 
-from mortgage_calculator.tool import call_tool, get_tool_definition
+from mortgage_calculator_book.tool import call_tool, get_tool_definition
 
 LOCAL_MODEL = "qwen3:8b"
 
 
 def ask_local(question: str) -> str:
+    # Ollama expects tools as a list of {"type": "function", ...}
+    # entries wrapping the exact name/description/parameters Chapter 10's
+    # get_tool_definition() already produces.
     tool_def = get_tool_definition()
     tools = [
         {
@@ -72,8 +79,12 @@ def ask_local(question: str) -> str:
                 "description": tool_def["description"],
                 "parameters": tool_def["parameters"],
             },
-        }]
+        }
+    ]
 
+    # First call: hand the model the question and the tool it's allowed
+    # to use. The model decides for itself whether calling it makes sense
+    # here — nothing forces it to.
     first = ollama.chat(
         model=LOCAL_MODEL,
         messages=[{"role": "user", "content": question}],
@@ -86,9 +97,15 @@ def ask_local(question: str) -> str:
         # The model chose to answer without calling the tool at all.
         return message["content"]
 
+    # Only one tool exists in this project, so only the first call
+    # matters — a project with several tools would need to loop here.
     call = tool_calls[0]
     result = call_tool(call["function"]["arguments"])
 
+    # Second call: replay the conversation so far (the question, then the
+    # model's own tool-call message), and append the tool's result as a
+    # "tool" message. str(result) turns the {"payment": ...} or {"error":
+    # ...} dict into text, since that's what this role expects here.
     second = ollama.chat(
         model=LOCAL_MODEL,
         messages=[
@@ -97,10 +114,39 @@ def ask_local(question: str) -> str:
             {"role": "tool", "content": str(result)},
         ],
     )
+    # The model reads the tool's result and turns it into a normal,
+    # plain-language answer — this is that final answer.
     return second["message"]["content"]
 ```
 
 *(Ollama's exact tool-calling response shape can differ slightly between versions — check `ollama.chat`'s current documentation if a field name here doesn't match what you see. The pattern — two chat calls, with the tool's result inserted between them — stays the same regardless.)*
+
+Try it now, the same way as every other piece of this project — a small, throwaway script, not just code on the page:
+
+```bash
+vi scratch_llm_local.py
+```
+
+```python
+from mortgage_calculator_book.llm import ask_local
+
+question = (
+    "What would my payment be on a $200,000 loan at 6% over 30 years?"
+)
+print(ask_local(question))
+```
+
+Run it:
+
+```bash
+uv run python scratch_llm_local.py
+```
+
+This calls the real local model, which means it's slower than anything else you've run so far — expect several seconds, not the instant response of a test suite. You're looking for a plain-language answer containing `$1,199.10`, matching Chapter 4.5's worked example. If you get something else — a refusal, a different number, no tool call at all — that's not necessarily wrong; it's 11.4.3's territory, coming up next. Delete the scratch file once you've seen it work:
+
+```bash
+rm scratch_llm_local.py
+```
 
 ### 11.4.3 When the Model Gets It Wrong
 
@@ -124,7 +170,7 @@ OPENROUTER_API_KEY=sk-or-v1-your-real-key-here
 Worth adding one more constant to `config.py` while you're there, since section 11.6 will need it:
 
 ```python
-HOSTED_MODEL = "qwen/qwen3-27b"
+HOSTED_MODEL = "qwen/qwen3.8-27b"
 ```
 
 Keeping the model name in config, rather than hardcoded inline, means switching models later is a one-line change.
@@ -151,18 +197,24 @@ OpenRouter exposes an OpenAI-compatible API, so the OpenAI Python library works 
 uv add openai
 ```
 
+Same file as 11.4.2, `src/mortgage_calculator_book/llm.py` — `ask_hosted` sits alongside `ask_local`, not replacing it:
+
 ```python
 import json
 
 from openai import OpenAI
 
-from mortgage_calculator.config import HOSTED_MODEL, OPENROUTER_API_KEY
-from mortgage_calculator.tool import call_tool, get_tool_definition
+from mortgage_calculator_book.config import HOSTED_MODEL, OPENROUTER_API_KEY
+from mortgage_calculator_book.tool import call_tool, get_tool_definition
 
+# One client, reused across every call — no need to reconnect per question.
 _client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
 
 
 def ask_hosted(question: str) -> str:
+    # Same tool shape as ask_local — OpenAI's format and Ollama's happen
+    # to agree here, which is part of why get_tool_definition() didn't
+    # need to change to support a second client.
     tool_def = get_tool_definition()
     tools = [
         {
@@ -172,7 +224,8 @@ def ask_hosted(question: str) -> str:
                 "description": tool_def["description"],
                 "parameters": tool_def["parameters"],
             },
-        }]
+        }
+    ]
 
     first = _client.chat.completions.create(
         model=HOSTED_MODEL,
@@ -184,10 +237,17 @@ def ask_hosted(question: str) -> str:
     if not message.tool_calls:
         return message.content
 
+    # Only the first tool call matters, same as ask_local — one tool, one
+    # call. Arguments arrive as a JSON string here, not a dict, so they
+    # need parsing before call_tool can use them.
     call = message.tool_calls[0]
     arguments = json.loads(call.function.arguments)
     result = call_tool(arguments)
 
+    # Two real differences from ask_local, easy to miss: OpenAI's API
+    # requires a tool_call_id on the reply, linking this result back to
+    # the specific call that requested it, and it expects the content as
+    # an actual JSON string (json.dumps), not Python's str().
     second = _client.chat.completions.create(
         model=HOSTED_MODEL,
         messages=[
@@ -201,14 +261,72 @@ def ask_hosted(question: str) -> str:
 
 Notice how closely this mirrors `ask_local` from 11.4.2 — same four-step shape, same `call_tool` function reused without modification. That's the tool contract from Chapter 10 doing exactly the job it was built for: one interface, usable from more than one model-calling client.
 
+Try it the same way as 11.4.2, with a scratch file of its own:
+
+```bash
+vi scratch_llm_hosted.py
+```
+
+```python
+from mortgage_calculator_book.llm import ask_hosted
+
+question = (
+    "What would my payment be on a $200,000 loan at 6% over 30 years?"
+)
+print(ask_hosted(question))
+```
+
+Run it:
+
+```bash
+uv run python scratch_llm_hosted.py
+```
+
+This one costs a small fraction of a cent and should return considerably faster than 11.4.2's local run — worth noticing directly, since 11.7 asks you to compare the two more formally in a moment. You're looking for the same answer as before, `$1,199.10`. Delete the scratch file once you've seen it work:
+
+```bash
+rm scratch_llm_hosted.py
+```
+
+`llm.py` has been sitting uncommitted since `ask_local` was first written in 11.4 — both functions are real and working now, worth a checkpoint:
+
+```bash
+git add src/mortgage_calculator_book/llm.py
+git commit -m "Add ask_local and ask_hosted"
+git push
+```
+
 ## 11.7 Comparing Local vs. Hosted, Informally
 
 ### 11.7.1 Running the Same Questions Through Both
 
+One more scratch file, this time running both paths back to back:
+
+```bash
+vi scratch_llm_compare.py
+```
+
 ```python
-question = "What would my monthly payment be on a $200,000 loan at 6% over 30 years?"
+from mortgage_calculator_book.llm import ask_hosted, ask_local
+
+question = (
+    "What would my monthly payment be on a $200,000 loan "
+    "at 6% over 30 years?"
+)
 print("Local: ", ask_local(question))
 print("Hosted:", ask_hosted(question))
+```
+
+Run it:
+
+```bash
+uv run python scratch_llm_compare.py
+```
+
+Expect a noticeable pause before the first line prints — the local call runs first and is the slower of the two, consistent with what 11.4.2's scratch run already showed you — then the hosted line follows more quickly. Both should land on `$1,199.10`, worded differently. Delete the scratch file once you've compared them:
+
+```bash
+rm scratch_llm_compare.py
 ```
 
 ### 11.7.2 What to Watch For
@@ -231,7 +349,7 @@ Live model calls are slow and, for the hosted path, cost real money — neither 
 # tests/test_llm.py
 from unittest.mock import MagicMock
 
-from mortgage_calculator.llm import ask_local
+from mortgage_calculator_book.llm import ask_local
 
 
 def test_ask_local_calls_tool_and_returns_answer(monkeypatch):
@@ -254,7 +372,7 @@ def test_ask_local_calls_tool_and_returns_answer(monkeypatch):
     }
 
     mock_chat = MagicMock(side_effect=[first_response, second_response])
-    monkeypatch.setattr("mortgage_calculator.llm.ollama.chat", mock_chat)
+    monkeypatch.setattr("mortgage_calculator_book.llm.ollama.chat", mock_chat)
 
     answer = ask_local("What would my payment be on a $200,000, 6%, 30 year loan?")
 
@@ -266,12 +384,54 @@ def test_ask_local_calls_tool_and_returns_answer(monkeypatch):
 
 ### 11.8.2 Prompting Pi, Reviewing the Diff
 
+`ask_hosted` already exists, fully written by hand back in 11.6.4 — same issue as Chapters 7.6, 8.6, and 9.6.2, and the same fix: set it aside first, so there's actually something for Pi to build rather than something to redundantly retype. It's committed as of 11.6.4, so removing it costs nothing. Delete just the `ask_hosted` function itself, and the imports only it needs (`json`, `OpenAI`, `HOSTED_MODEL`, `OPENROUTER_API_KEY`, the module-level `_client`) — `ask_local` and everything it depends on stays untouched:
+
 ```bash
-pi "Implement ask_hosted in src/mortgage_calculator/llm.py, mirroring" \
-   "the structure of ask_local but using the OpenAI client against OpenRouter."
+git add src/mortgage_calculator_book/llm.py
+git commit -m "Remove hand-written ask_hosted to redo via Pi"
 ```
 
-Review this one particularly closely — it's the most consequential integration in the book so far, and a subtle mistake (mismatched argument formats between the two APIs, a missing `tool_call_id`) could fail silently rather than crash outright.
+```bash
+pi "Implement ask_hosted in \
+    src/mortgage_calculator_book/llm.py, mirroring the \
+    structure of ask_local but using the OpenAI client \
+    against OpenRouter."
+```
+
+Review this one particularly closely — it's the most consequential integration in the book so far, and a subtle mistake (mismatched argument formats between the two APIs, a missing `tool_call_id`) could fail silently rather than crash outright. `ruff check .` will at least catch any import Pi's version no longer needs, or forgot to add.
+
+Verify it the same way as 11.6.4 did — recreate that scratch file, since it was deleted at the end of that section:
+
+```bash
+vi scratch_llm_hosted.py
+```
+
+```python
+from mortgage_calculator_book.llm import ask_hosted
+
+question = (
+    "What would my payment be on a $200,000 loan at 6% over 30 years?"
+)
+print(ask_hosted(question))
+```
+
+```bash
+uv run python scratch_llm_hosted.py
+```
+
+Same target as before, `$1,199.10`. Delete it again once confirmed:
+
+```bash
+rm scratch_llm_hosted.py
+```
+
+Once you're satisfied, commit Pi's version:
+
+```bash
+git add src/mortgage_calculator_book/llm.py
+git commit -m "Rebuild ask_hosted via Pi"
+git push
+```
 
 ## 11.9 Refactor and Ruff Pass
 
