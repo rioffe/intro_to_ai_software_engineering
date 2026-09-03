@@ -92,7 +92,7 @@ This is the example the rest of the book returns to repeatedly — commit these 
 
 | Quantity | Value |
 |---|---|
-| Principal ($P$) | $200,000 |
+| Principal ($P$) | \$200,000 |
 | Annual interest rate | 6% |
 | Payment frequency | Monthly (12/year) |
 | Periodic rate ($r$) | 0.005 |
@@ -141,7 +141,62 @@ Specifically:
 - **"term"** never said what payment frequency it implied, even though 4.3.3 showed frequency changes the total number of payments (and, as the biweekly aside noted, the total interest paid).
 - **"the number of payments"** was used in the "what correct means" section without ever being defined.
 
-### 4.7.3 The Revision
+### 4.7.3 Writing the Derivation Down
+
+There's a second problem here, subtler than the three gaps above: SPEC.md's revision is about to say "see [somewhere] for the full derivation" — but "somewhere" can't just mean this chapter. This book's prose isn't part of the git repository, and it never will be. Pi reads your project's files when it works; it doesn't read the book you're reading right now. "See Chapter 4.4" is perfectly good advice for you — it's a dead end for Pi, and not much better for a future maintainer who opens this repository years from now without this book on the shelf next to them.
+
+The fix is to write the derivation down *in the project*, not just in your head or in a book external to it. Create `docs/derivation.md`:
+
+```bash
+mkdir docs
+vi docs/derivation.md
+```
+
+```markdown
+# Fixed-Rate Mortgage Payment: Derivation
+
+## The formula
+
+    M = P * [r(1+r)^n] / [(1+r)^n - 1]
+
+M is the fixed periodic payment, P is the principal, r is the
+periodic rate (annual_rate / payments_per_year), and n is the
+total number of payments (term_years * payments_per_year).
+
+## Where it comes from
+
+At the end of the loan, what the lender is owed if nothing were
+ever paid -- P(1+r)^n -- must equal what's actually been paid,
+each payment M grown at rate r for however many periods remain
+after it: P(1+r)^n = M * [(1+r)^n - 1] / r. Solving for M gives
+the formula above.
+
+## Edge cases
+
+- Zero interest (r == 0): the formula divides by zero; payment is
+  simply P / n.
+- A single payment (n == 1): reduces to M = P(1+r), which the
+  general formula also produces correctly at n=1.
+
+## Answer key
+
+principal=200000, annual_rate=0.06, term_years=30,
+payments_per_year=12 -> payment = $1,199.10. Used throughout
+tests/test_core.py as the reference case every implementation is
+checked against.
+```
+
+Commit it on its own:
+
+```bash
+git add docs/derivation.md
+git commit -m "Add docs/derivation.md: the amortization formula"
+git push
+```
+
+Now SPEC.md's "see ... for the full derivation" can point somewhere Pi — and anyone else working in this repository — can actually read.
+
+### 4.7.4 The Revision
 
 ```markdown
 # SPEC.md — Fixed-Rate Mortgage Calculator
@@ -168,8 +223,8 @@ years, and a payment frequency.
 The computed payment, multiplied by n_payments, should equal the
 total amount paid over the life of the loan. For principal =
 $200,000, annual_rate = 0.06, term_years = 30, payments_per_year =
-12: payment should equal $1,199.10 (see Chapter 4.5 for the full
-derivation).
+12: payment should equal $1,199.10 (see docs/derivation.md for the
+full derivation).
 
 ## Out of scope
 - Variable-rate mortgages
@@ -195,6 +250,7 @@ Before moving to Chapter 5, this should all be true:
 - [ ] You can explain, in your own words, why the annual rate and the periodic rate are different numbers
 - [ ] You can derive the payment formula's shape (even loosely) from "what's owed equals what's paid"
 - [ ] You have the primary worked example's numbers ($200,000 / 6% / 30yr monthly → $1,199.10) recorded somewhere you'll return to
-- [ ] `SPEC.md` has been revised to define periodic rate, payment frequency, and n_payments, and the revision is committed
+- [ ] `docs/derivation.md` exists, committed, and actually contains the formula — not just a reference to this chapter
+- [ ] `SPEC.md` has been revised to define periodic rate, payment frequency, and n_payments, and points to `docs/derivation.md` rather than this book for the full derivation, and the revision is committed
 
 **What's next:** Chapter 5 turns this worked example into an executable test — the first one this project has had, and the first thing Chapter 6's implementation will need to satisfy.

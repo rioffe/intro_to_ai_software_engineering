@@ -128,7 +128,7 @@ import pytest
 
 @pytest.fixture
 def worked_example():
-    """The Chapter 4.5 answer key: $200,000 / 6% / 30yr monthly."""
+    """Answer key from docs/derivation.md: $200k/6%/30yr monthly."""
     return {
         "principal": 200_000,
         "annual_rate": 0.06,

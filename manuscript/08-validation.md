@@ -51,6 +51,14 @@ Unlike Ruff and pytest, this isn't a `--dev` dependency — the calculator needs
 
 ### 7.4.3 A First Minimal Model
 
+Try this directly rather than just reading it — and unlike 5.2.3 or 5.7.2, there's no file to create or delete here. This is small enough to try straight in Python's interactive prompt (its **REPL** — "read-eval-print loop": type an expression, see its result immediately, repeat). Start one inside your project's environment:
+
+```bash
+uv run python
+```
+
+You're now looking at a `>>>` prompt, running inside your project the same way `uv run` always does. Type this, pressing Enter after each line (a blank line after the `class` block runs it):
+
 ```python
 from pydantic import BaseModel
 
@@ -59,13 +67,33 @@ class Example(BaseModel):
     age: int
 ```
 
-`Example(name="Robert", age=40)` works. `Example(name="Robert", age="not a number")` raises a `ValidationError` automatically — Pydantic enforces the declared types without you writing a single `isinstance` check.
+Now try it with valid data:
+
+```python
+Example(name="Robert", age=40)
+```
+
+You should see `Example(name='Robert', age=40)` printed back — it worked, Pydantic accepted it. Now try something that doesn't match the declared type:
+
+```python
+Example(name="Robert", age="not a number")
+```
+
+This time Pydantic raises a `ValidationError` — a real, detailed error naming exactly which field failed and why, without you writing a single `isinstance` check yourself. Read what it prints; it's more informative than a typical Python `TypeError`, and it's the same style of error you'll be reading for the rest of this chapter.
+
+Exit the REPL when you're done — same key you used to leave Pi's interactive session back in 1.6.1:
+
+```python
+exit()
+```
+
+Nothing here needed saving or cleaning up; it never touched a file in the first place. Section 7.5 is where a version of this actually becomes part of the project.
 
 ## 7.5 Building the Input Model
 
 ### 7.5.1 The Model
 
-In `src/mortgage_calculator/validation.py`:
+In `src/mortgage_calculator_book/validation.py`:
 
 ```python
 from pydantic import BaseModel, field_validator
@@ -118,9 +146,28 @@ Each `@field_validator` runs after Pydantic's own type checking, and raises a pl
 
 The strings inside each `raise ValueError(...)` aren't incidental — they're what a user of Chapter 8's CLI or Chapter 9's UI will actually see when they enter something invalid. Write them the way you'd want to read them yourself: specific about what's wrong, not just "invalid input."
 
+Commit this, the same as every other real step in this project:
+
+```bash
+git add src/mortgage_calculator_book/validation.py
+git commit -m "Add MortgageInput validation model"
+git push
+```
+
 ## 7.6 Agent-Assisted TDD, Applied to Validation
 
-### 7.6.1 Writing the Failing Tests First
+7.5 had you type `MortgageInput` by hand, in full, before running a single test against it — useful for seeing the whole class at once, but not actually how this book has been building things since Chapter 5: tests first, then an implementation that has to earn a passing result. This section does it that way for real, which means setting aside the version you just wrote and committed.
+
+### 7.6.1 Setting Aside What You Just Built
+
+Because 7.5.3 committed that version, deleting it now doesn't lose anything — it's still sitting in git history if you want it later, including for a comparison at the end of this section:
+
+```bash
+git rm src/mortgage_calculator_book/validation.py
+git commit -m "Remove hand-written validation.py to redo via TDD"
+```
+
+### 7.6.2 Writing the Failing Tests First
 
 In `tests/test_validation.py`:
 
@@ -128,7 +175,7 @@ In `tests/test_validation.py`:
 import pytest
 from pydantic import ValidationError
 
-from mortgage_calculator.validation import MortgageInput
+from mortgage_calculator_book.validation import MortgageInput
 
 
 def test_valid_input_accepted():
@@ -149,7 +196,7 @@ def test_zero_principal_rejected():
 
 
 def test_zero_rate_accepted():
-    """Zero interest is a valid edge case (see Chapter 6.6.1), not an error."""
+    """Zero interest is valid (see docs/derivation.md), not an error."""
     result = MortgageInput(principal=12_000, annual_rate=0.0, term_years=1)
     assert result.annual_rate == 0.0
 
@@ -169,19 +216,49 @@ def test_zero_term_rejected():
         MortgageInput(principal=200_000, annual_rate=0.06, term_years=0)
 ```
 
-Run this before `validation.py` exists — red, for the familiar reason.
-
-### 7.6.2 Prompting Pi
+Run it:
 
 ```bash
-pi "Implement MortgageInput in src/mortgage_calculator/validation.py" \
-   "as a Pydantic model to make the tests in tests/test_validation.py pass." \
-   "Read SPEC.md first for what counts as valid input."
+pytest tests/test_validation.py -v
 ```
 
-### 7.6.3 Reviewing the Proposal
+One collection error, the same shape as Chapter 5.8.2's — `validation.py` genuinely doesn't exist now, so pytest can't import the file to reach any of these seven tests. That's real red this time, not something to take on faith.
+
+### 7.6.3 Prompting Pi
+
+```bash
+pi "Implement MortgageInput in \
+    src/mortgage_calculator_book/validation.py as a \
+    Pydantic model to make the tests in \
+    tests/test_validation.py pass. Read SPEC.md first \
+    for what counts as valid input."
+```
+
+Once Pi's proposal is applied, confirm it actually earns green before reviewing further:
+
+```bash
+pytest tests/test_validation.py -v
+```
+
+### 7.6.4 Reviewing the Proposal, and Comparing Notes
 
 Check specifically that the boundaries match SPEC.md and Chapter 7.3 exactly, not just "look reasonable" — a proposal that rejects `annual_rate = 0` would pass a casual read but silently break Chapter 6.6.1's zero-interest case the moment this validation layer gets wired in front of it.
+
+Worth doing once, now that two independent versions exist: compare Pi's proposal against the one you wrote by hand in 7.5, still sitting in git history.
+
+```bash
+git show HEAD~2:src/mortgage_calculator_book/validation.py
+```
+
+(`HEAD~2` is two commits back from wherever you are now — adjust the number if you've committed anything else in between; `git log --oneline` shows you exactly what's there if you're unsure.) Reading two independently correct implementations of the same four constraints side by side is a genuinely useful exercise on its own: where do they differ in approach, and does either version's error messages actually read better than the other's?
+
+Once you're satisfied, commit Pi's version the normal way:
+
+```bash
+git add src/mortgage_calculator_book/validation.py tests/test_validation.py
+git commit -m "Rebuild MortgageInput via agent-assisted TDD"
+git push
+```
 
 ## 7.7 Wiring Validation to the Core
 
@@ -190,8 +267,8 @@ Check specifically that the boundaries match SPEC.md and Chapter 7.3 exactly, no
 Add one more function to `validation.py`, or to a small new module, that connects the two:
 
 ```python
-from mortgage_calculator.core import calculate_payment
-from mortgage_calculator.validation import MortgageInput
+from mortgage_calculator_book.core import calculate_payment
+from mortgage_calculator_book.validation import MortgageInput
 
 
 def calculate_validated_payment(data: MortgageInput) -> float:

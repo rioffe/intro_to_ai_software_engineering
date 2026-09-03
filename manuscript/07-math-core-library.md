@@ -14,7 +14,7 @@ A function is **pure** if it does one thing: given the same inputs, it always re
 
 ### 6.2.2 The Rule for This Module
 
-Everything in `mortgage_calculator.core` follows this rule, with no exceptions. No `print()` statements for debugging left behind, no reading configuration, no formatting output for a human to read — that's the CLI's job in Chapter 8 and the UI's job in Chapter 9, not this module's.
+Everything in `mortgage_calculator_book.core` follows this rule, with no exceptions. No `print()` statements for debugging left behind, no reading configuration, no formatting output for a human to read — that's the CLI's job in Chapter 8 and the UI's job in Chapter 9, not this module's.
 
 > **Process concept: why purity matters more, not less, with an agent in the loop.** A pure function is a narrow, easily verified contract: given these inputs, this exact output. That's precisely the kind of task an agent can be checked against cheaply and completely — run the function, compare the result, done. The moment a function reaches out to the filesystem, the network, or global state, verifying an agent's implementation of it becomes considerably harder, because "correct" now depends on things outside the function's own signature. Keeping the core pure isn't just good architecture in the abstract — it's what makes Chapter 6.5's agent-assisted implementation actually checkable.
 
@@ -22,7 +22,7 @@ Everything in `mortgage_calculator.core` follows this rule, with no exceptions. 
 
 ### 6.3.1 Where This Lives
 
-Inside the `src/mortgage_calculator/` package from Chapter 0.7.3, create `core.py`. This is the only file this chapter touches.
+Inside the `src/mortgage_calculator_book/` package from Chapter 0.7.3, create `core.py`. This is the only file this chapter touches.
 
 ### 6.3.2 Naming Things to Match the Spec
 
@@ -84,10 +84,12 @@ Notice how closely this reads against the formula: `r * (1 + r) ** n` in the num
 If you'd rather have Pi draft this rather than typing it yourself:
 
 ```bash
-pi "Implement calculate_payment in src/mortgage_calculator/core.py" \
-   "to make the tests in tests/test_core.py pass. The formula is in" \
-   "SPEC.md and derived in Chapter 4.4 of the book. Keep the function" \
-   "pure — no I/O, no printing."
+pi "Implement calculate_payment in \
+    src/mortgage_calculator_book/core.py to make the \
+    tests in tests/test_core.py pass. The formula is in \
+    docs/derivation.md; SPEC.md defines what counts as \
+    correct output, not how to compute it. Keep the \
+    function pure — no I/O, no printing."
 ```
 
 ### 6.5.3 Reviewing Before Accepting
@@ -164,7 +166,7 @@ You may notice `calculate_payment` currently returns full floating-point precisi
 
 Before moving to Chapter 7, this should all be true:
 
-- [ ] `src/mortgage_calculator/core.py` contains `annual_rate_to_periodic`, `total_payments`, and `calculate_payment`
+- [ ] `src/mortgage_calculator_book/core.py` contains `annual_rate_to_periodic`, `total_payments`, and `calculate_payment`
 - [ ] All three tests from Chapter 5 pass: `pytest -v` shows three green
 - [ ] `calculate_payment` has no I/O, no printing, no dependencies outside its own arguments
 - [ ] You can explain, without looking at the code, what each of the three checks in 6.7.2 is guarding against
