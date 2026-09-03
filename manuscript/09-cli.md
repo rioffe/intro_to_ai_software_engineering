@@ -41,9 +41,12 @@ Having this shape settled before writing `argparse` code turns the implementatio
 ```python
 import argparse
 
-parser = argparse.ArgumentParser(description="Calculate a fixed mortgage payment.")
-parser.add_argument("--principal", type=float, required=True, help="Loan amount, in dollars")
-parser.add_argument("--annual-rate", type=float, required=True, help="Annual rate, e.g. 0.06 for 6%%")
+parser = argparse.ArgumentParser(
+    description="Calculate a fixed mortgage payment.")
+parser.add_argument("--principal", type=float,
+    required=True, help="Loan amount, in dollars")
+parser.add_argument("--annual-rate", type=float,
+    required=True, help="Annual rate, e.g. 0.06 for 6%%")
 ```
 
 `type=float` means argparse converts the string a user typed before your code ever sees it — `"200000"` arrives as `200000.0`, not a string you'd have to convert yourself. `required=True` means argparse handles the "you forgot an argument" error entirely on its own, with no code from you.
@@ -60,16 +63,23 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Calculate the fixed periodic payment for a fixed-rate mortgage."
     )
-    parser.add_argument("--principal", type=float, required=True, help="Loan amount, in dollars")
     parser.add_argument(
-        "--annual-rate", type=float, required=True, help="Annual interest rate, e.g. 0.06 for 6%%"
+        "--principal", type=float, required=True,
+        help="Loan amount, in dollars")
+    parser.add_argument(
+        "--annual-rate", type=float, required=True,
+        help="Annual interest rate, e.g. 0.06 for 6%%"
     )
-    parser.add_argument("--term-years", type=int, required=True, help="Loan term, in years")
     parser.add_argument(
-        "--payments-per-year", type=int, default=12, help="Payments per year (default: 12)"
+        "--term-years", type=int, required=True,
+        help="Loan term, in years")
+    parser.add_argument(
+        "--payments-per-year", type=int, default=12,
+        help="Payments per year (default: 12)"
     )
     parser.add_argument(
-        "--format", choices=["text", "json"], default="text", help="Output format"
+        "--format", choices=["text", "json"], default="text",
+        help="Output format"
     )
     return parser
 ```
@@ -270,7 +280,13 @@ from mortgage_calculator_book.cli import main
 
 
 def test_text_output(capsys):
-    exit_code = main(["--principal", "200000", "--annual-rate", "0.06", "--term-years", "30"])
+    exit_code = main(
+        [
+            "--principal", "200000",
+            "--annual-rate", "0.06",
+            "--term-years", "30"
+        ]
+    )
     captured = capsys.readouterr()
     assert exit_code == 0
     assert "1,199.10" in captured.out
@@ -292,7 +308,13 @@ def test_json_output(capsys):
 
 
 def test_invalid_input_returns_error(capsys):
-    exit_code = main(["--principal", "-1000", "--annual-rate", "0.06", "--term-years", "30"])
+    exit_code = main(
+        [
+            "--principal", "-1000",
+            "--annual-rate", "0.06",
+            "--term-years", "30"
+        ]
+    )
     captured = capsys.readouterr()
     assert exit_code == 1
     assert "Error" in captured.err
@@ -447,10 +469,12 @@ See `SPEC.md` for the full specification.
 
 ## Usage
 
-    uv run mortgage-calculator-book --principal 200000 --annual-rate 0.06 --term-years 30
+    uv run mortgage-calculator-book --principal 200000 \
+      --annual-rate 0.06 --term-years 30
     # Fixed periodic payment: $1,199.10
 
-    uv run mortgage-calculator-book --principal 200000 --annual-rate 0.06 --term-years 30 --format json
+    uv run mortgage-calculator-book --principal 200000 \
+      --annual-rate 0.06 --term-years 30 --format json
     # {"payment": 1199.1}
 ```
 
