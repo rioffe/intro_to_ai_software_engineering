@@ -161,7 +161,7 @@ This creates the repository on GitHub, and wires up your local repository's `ori
 
 <!-- SCREENSHOT: terminal output of `gh repo create ... --source . --remote origin` showing the confirmation URL it prints -->
 
-If you'd rather create the repository through the browser instead: go to [github.com/new](https://github.com/new), name it `mortgage-calculator-book`, and leave it empty — no README, no `.gitignore` (you'll add those yourself). Then connect it by hand:
+If you'd rather create the repository through the browser instead: go to [github.com/new](https://github.com/new), name it `mortgage-calculator-book`, and leave it empty — no README, no `.gitignore` (0.7.3 creates that one properly, before it's actually needed). Then connect it by hand:
 
 ```bash
 git remote add origin git@github.com:YOUR_USERNAME/mortgage-calculator-book.git
@@ -320,6 +320,7 @@ This book uses a **src layout**: your actual package lives inside a `src/` direc
 
 ```
 mortgage-calculator-book/
++-- .gitignore
 +-- pyproject.toml
 +-- uv.lock
 +-- README.md
@@ -331,6 +332,28 @@ mortgage-calculator-book/
 ```
 
 The reason: a src layout forces your code to be *installed* to be imported, the same way it would be for anyone else using it — which catches a whole class of "works on my machine because I happened to be in the right directory" bugs before they happen. It's a small amount of extra structure up front that pays for itself the moment you write your first test in Chapter 5.
+
+One more file belongs in this skeleton before the first commit: `.gitignore`. 0.4.4 deliberately left it out when the GitHub repository was created — this is where it actually gets built, and it needs to exist *before* anything below generates the files it's meant to exclude, not after:
+
+```bash
+vi .gitignore
+```
+
+```
+# Byte-compiled / cached Python files
+__pycache__/
+*.pyc
+*.pyo
+
+# Test and linter caches
+.pytest_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+```
+
+Every one of these gets created automatically as this project grows — `.venv/` by `uv` itself, starting with `uv add` in 0.7.4 just below; `__pycache__/` the first time any Python file actually runs; `.pytest_cache/` and `.ruff_cache/` once pytest and Ruff exist, in Chapters 5 and 3. None of them belong in git: they're regenerable, often large, and specific to your machine, not your project. Skip this file now, and a plain `git add .` in any later chapter will happily stage all of it.
 
 To check your own layout matches this at a glance, rather than reading through nested `ls` output by hand, either of these works:
 
@@ -361,7 +384,7 @@ This updates `pyproject.toml` and creates (or updates) `uv.lock` — a file that
 
 ### 0.7.5 The Skeleton You're Building Toward
 
-By the end of this chapter, your project should match the layout above, minus anything you haven't built yet — just `pyproject.toml`, `uv.lock`, an empty `README.md` and `SPEC.md`, and an empty `mortgage_calculator_book` package. Every later chapter adds to this same skeleton; nothing gets rebuilt from scratch.
+By the end of this chapter, your project should match the layout above, minus anything you haven't built yet — just `.gitignore`, `pyproject.toml`, `uv.lock`, an empty `README.md` and `SPEC.md`, and an empty `mortgage_calculator_book` package. Every later chapter adds to this same skeleton; nothing gets rebuilt from scratch.
 
 Confirm it works:
 
@@ -384,6 +407,7 @@ Before moving to Chapter 1, this should all be true:
 - [ ] You can open, edit, and save a file in vi without help, and verify the save with `cat`
 - [ ] `uv run python --version` reports 3.12.x
 - [ ] `uv run python -c "import mortgage_calculator_book; print('ok')"` prints `ok`
+- [ ] `.gitignore` exists and excludes `__pycache__/`, `.pytest_cache/`, `.ruff_cache/`, and `.venv/`
 - [ ] Your project has been committed and pushed, and you've confirmed the files are visible on github.com in a browser — not just assumed from a successful-looking terminal command
 
 **What's next:** Chapter 1 hands this repository to a coding agent for the first time — installing Pi, connecting it to a local model, and making your first small, reviewed, agent-assisted change.

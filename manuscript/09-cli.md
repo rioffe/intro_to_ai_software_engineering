@@ -17,14 +17,14 @@ By the end, you'll have a working CLI with both human-readable and JSON output, 
 Before writing code:
 
 ```bash
-mortgage-calculator --principal 200000 --annual-rate 0.06 --term-years 30
+mortgage-calculator-book --principal 200000 --annual-rate 0.06 --term-years 30
 # Fixed periodic payment: $1,199.10
 ```
 
 And with an invalid input:
 
 ```bash
-mortgage-calculator --principal -1000 --annual-rate 0.06 --term-years 30
+mortgage-calculator-book --principal -1000 --annual-rate 0.06 --term-years 30
 # Error: principal must be positive
 ```
 
@@ -42,17 +42,15 @@ Having this shape settled before writing `argparse` code turns the implementatio
 import argparse
 
 parser = argparse.ArgumentParser(description="Calculate a fixed mortgage payment.")
-parser.add_argument("--principal", type=float, required=True,
-                    help="Loan amount, in dollars")
-parser.add_argument("--annual-rate", type=float, required=True,
-                    help="Annual rate, e.g. 0.06 for 6%")
+parser.add_argument("--principal", type=float, required=True, help="Loan amount, in dollars")
+parser.add_argument("--annual-rate", type=float, required=True, help="Annual rate, e.g. 0.06 for 6%%")
 ```
 
 `type=float` means argparse converts the string a user typed before your code ever sees it — `"200000"` arrives as `200000.0`, not a string you'd have to convert yourself. `required=True` means argparse handles the "you forgot an argument" error entirely on its own, with no code from you.
 
 ### 8.3.3 A Minimal Working Parser
 
-In `src/mortgage_calculator/cli.py`:
+In `src/mortgage_calculator_book/cli.py`:
 
 ```python
 import argparse
@@ -62,23 +60,32 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Calculate the fixed periodic payment for a fixed-rate mortgage."
     )
-    parser.add_argument("--principal", type=float, required=True,
-                        help="Loan amount, in dollars")
+    parser.add_argument("--principal", type=float, required=True, help="Loan amount, in dollars")
     parser.add_argument(
-        "--annual-rate", type=float, required=True, 
-        help="Annual interest rate, e.g. 0.06 for 6%"
+        "--annual-rate", type=float, required=True, help="Annual interest rate, e.g. 0.06 for 6%%"
     )
-    parser.add_argument("--term-years", type=int, required=True,
-                        help="Loan term, in years")
+    parser.add_argument("--term-years", type=int, required=True, help="Loan term, in years")
     parser.add_argument(
-        "--payments-per-year", type=int, default=12,
-        help="Payments per year (default: 12)"
+        "--payments-per-year", type=int, default=12, help="Payments per year (default: 12)"
     )
     parser.add_argument(
         "--format", choices=["text", "json"], default="text", help="Output format"
     )
     return parser
 ```
+
+Notice `6%%`, not `6%`, in the annual-rate help text — that's not a typo. `argparse` runs every `help=` string through `%`-style formatting when it renders `--help`, so a bare `%` looks like the start of a format specifier and crashes with `ValueError: incomplete format` the moment someone actually runs `--help`, not when you define the parser. `%%` is how you write a literal percent sign in that formatting style; `argparse` collapses it back down to a single `%` in what it actually prints. Worth testing directly rather than trusting this description — `main` doesn't exist until 8.4.1, so this needs the REPL technique from 7.4.3 rather than an actual command:
+
+```bash
+uv run python
+```
+
+```python
+from mortgage_calculator_book.cli import build_parser
+build_parser().parse_args(["--help"])
+```
+
+This prints the full help text and then raises `SystemExit` — that's normal, expected `argparse` behavior for `--help`, not a bug. Confirm the annual-rate line shows a single `%`, not two. If you want to see the actual crash first, temporarily change `6%%` back to `6%`, rerun the two lines above, and watch it raise `ValueError: incomplete format` instead — then put the `%%` back.
 
 ### 8.3.4 Aside: Typer
 
@@ -88,14 +95,19 @@ Typer builds on Python type hints to generate a CLI with less boilerplate than `
 
 ### 8.4.1 The Full Pipeline, Assembled
 
+Same file, `src/mortgage_calculator_book/cli.py`, building on the `build_parser` function from 8.3.3 rather than replacing it. First, add these imports alongside the existing `import argparse` at the top of the file:
+
 ```python
 import sys
 
 from pydantic import ValidationError
 
-from mortgage_calculator.validation import MortgageInput, calculate_validated_payment
+from mortgage_calculator_book.validation import MortgageInput, calculate_validated_payment
+```
 
+Then add `main` below `build_parser`, calling it directly:
 
+```python
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -117,11 +129,64 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 ```
 
+At this point `cli.py` has two imports blocks worth of content (`argparse` from 8.3.3, plus the three above) and two functions (`build_parser`, then `main`) — nothing from 8.3.3 gets removed or replaced.
+
 Parsed arguments flow into `MortgageInput` (Chapter 7), which flows into `calculate_validated_payment` (also Chapter 7, which itself calls Chapter 6's `calculate_payment`) — three chapters of work, connected for the first time.
 
 ### 8.4.2 Handling Validation Failure Gracefully
 
-Notice what the `except ValidationError` block does *not* do: it doesn't let Pydantic's default error formatting — which is detailed, but written for developers, not end users — reach the terminal directly. It extracts just the message from each error and prints it the way a person asked to fix their input actually wants to read it. Try it with `--principal -1000` and compare the output to what you'd get without this handling (temporarily remove the `try`/`except` to see the difference, then put it back).
+Notice what the `except ValidationError` block does *not* do: it doesn't let Pydantic's default error formatting — which is detailed, but written for developers, not end users — reach the terminal directly. It extracts just the message from each error and prints it the way a person asked to fix their input actually wants to read it.
+
+### 8.4.3 Wiring Up the Command, and Trying It
+
+Chapter 0.7.2 mentioned a `[project.scripts]` entry in `pyproject.toml`, pointing at a placeholder `main` that didn't exist yet. It does now — point the entry at it:
+
+```bash
+vi pyproject.toml
+```
+
+```toml
+[project.scripts]
+mortgage-calculator-book = "mortgage_calculator_book.cli:main"
+```
+
+(It was `mortgage_calculator_book:main` — the package's top-level `__init__.py`, which has no `main` function. Now it points at the one you actually built, in `cli.py`.) Pick up the change:
+
+```bash
+uv sync
+```
+
+Run it for real, with the Chapter 4.5 worked example:
+
+```bash
+uv run mortgage-calculator-book \
+    --principal 200000 --annual-rate 0.06 --term-years 30
+```
+
+```
+Fixed periodic payment: $1,199.10
+```
+
+Matches every other front end this project will produce — the CLI is the first to confirm this number; Chapters 9 through 11 each confirm it again, a different way. Now try the error path from 8.4.2, as a real command instead of a description of one:
+
+```bash
+uv run mortgage-calculator-book \
+    --principal -1000 --annual-rate 0.06 --term-years 30
+```
+
+```
+Error: principal must be positive
+```
+
+That printed to `stderr`, not `stdout` — worth confirming for yourself (`... 2>/dev/null` should silence it; `... 1>/dev/null` shouldn't), since it's an easy detail to lose track of once the CLI just works and you stop looking closely.
+
+Commit the entry-point fix on its own:
+
+```bash
+git add pyproject.toml uv.lock
+git commit -m "Wire up the mortgage-calculator-book command"
+git push
+```
 
 ## 8.5 JSON Output
 
@@ -171,9 +236,28 @@ def main(argv: list[str] | None = None) -> int:
 
 The shape `{"payment": 1199.10}` isn't arbitrary — it's the same shape Chapter 10's tool interface will use as its output schema, so a language model calling the calculator later gets results structured the same way a script parsing this CLI's JSON output would.
 
+`cli.py` is feature-complete for this chapter now — commit it, since nothing has captured it yet:
+
+```bash
+git add src/mortgage_calculator_book/cli.py
+git commit -m "Add CLI: argument parsing, validation wiring, JSON output"
+git push
+```
+
 ## 8.6 Agent-Assisted Build, With Tests First
 
-### 8.6.1 CLI-Level Tests
+Sections 8.3 through 8.5 had you type `build_parser` and `main` by hand, growing the file a piece at a time, before running a single test against any of it. Useful for seeing each piece land on its own, but — same issue as Chapter 7.6 — not how this book has actually been building things since Chapter 5: tests first, then an implementation that has to earn a passing result. This section does it that way for real, which means setting aside the file you just wrote and committed.
+
+### 8.6.1 Setting Aside What You Just Built
+
+Because 8.5.4 committed it, deleting it now doesn't lose anything — it's in git history if you want it later, including for a comparison at the end of this section:
+
+```bash
+git rm src/mortgage_calculator_book/cli.py
+git commit -m "Remove hand-written cli.py to redo via TDD"
+```
+
+### 8.6.2 CLI-Level Tests
 
 In `tests/test_cli.py`:
 
@@ -182,27 +266,25 @@ import json
 
 import pytest
 
-from mortgage_calculator.cli import main
+from mortgage_calculator_book.cli import main
 
 
 def test_text_output(capsys):
-    exit_code = main([
-            "--principal", "200000",
-            "--annual-rate", "0.06",
-            "--term-years", "30"
-        ])
+    exit_code = main(["--principal", "200000", "--annual-rate", "0.06", "--term-years", "30"])
     captured = capsys.readouterr()
     assert exit_code == 0
     assert "1,199.10" in captured.out
 
 
 def test_json_output(capsys):
-    exit_code = main([
+    exit_code = main(
+        [
             "--principal", "200000",
             "--annual-rate", "0.06",
             "--term-years", "30",
             "--format", "json",
-        ])
+        ]
+    )
     captured = capsys.readouterr()
     assert exit_code == 0
     data = json.loads(captured.out)
@@ -210,11 +292,7 @@ def test_json_output(capsys):
 
 
 def test_invalid_input_returns_error(capsys):
-    exit_code = main([
-            "--principal", "-1000",
-            "--annual-rate", "0.06",
-            "--term-years", "30"
-        ])
+    exit_code = main(["--principal", "-1000", "--annual-rate", "0.06", "--term-years", "30"])
     captured = capsys.readouterr()
     assert exit_code == 1
     assert "Error" in captured.err
@@ -222,17 +300,53 @@ def test_invalid_input_returns_error(capsys):
 
 `capsys` is a built-in pytest fixture — following the same fixture mechanism from Chapter 5.4, just one pytest already provides — that captures anything printed during a test, so you can assert on it without the output actually appearing in your terminal.
 
-### 8.6.2 Prompting Pi
+Run it:
 
 ```bash
-pi "Implement build_parser and main in src/mortgage_calculator/cli.py" \
-   "to make the tests in tests/test_cli.py pass, wiring together" \
-   "MortgageInput and calculate_validated_payment from validation.py."
+pytest tests/test_cli.py -v
 ```
 
-### 8.6.3 Reviewing the Diff
+One collection error, same shape as Chapters 5.8.2 and 7.6.2's — `cli.py` genuinely doesn't exist right now, so pytest can't import it to reach any of these three tests.
+
+### 8.6.3 Prompting Pi
+
+```bash
+pi "Implement build_parser and main in \
+    src/mortgage_calculator_book/cli.py to make the \
+    tests in tests/test_cli.py pass, wiring together \
+    MortgageInput and calculate_validated_payment from \
+    validation.py."
+```
+
+Once Pi's proposal is applied, confirm it actually earns green:
+
+```bash
+pytest tests/test_cli.py -v
+```
+
+### 8.6.4 Reviewing the Diff, and Comparing Notes
 
 Same habit as every chapter since 1.6 — with one thing specific to this chapter worth checking closely: does the error-handling path actually write to `stderr`, not `stdout`? It's an easy detail for an agent (or a human) to get backwards, and `test_invalid_input_returns_error` above only catches it because it checks `captured.err` specifically rather than just checking that *some* output happened.
+
+Worth doing once more, the same way as 7.6.4: compare Pi's version against the one you wrote by hand across 8.3 through 8.5, still in git history.
+
+```bash
+git log --oneline -- src/mortgage_calculator_book/cli.py
+```
+
+This shows every commit that touched this file — the hand-written version is the one from 8.5.4, right before the `git rm` commit from 8.6.1. Grab its hash and look at it:
+
+```bash
+git show <hash>:src/mortgage_calculator_book/cli.py
+```
+
+Once you're satisfied, commit Pi's version:
+
+```bash
+git add src/mortgage_calculator_book/cli.py tests/test_cli.py
+git commit -m "Rebuild cli.py via agent-assisted TDD"
+git push
+```
 
 ## 8.7 Environment Variables and `.env`
 
@@ -246,7 +360,7 @@ Nothing in this chapter needs a secret. This section exists here anyway, deliber
 uv add python-dotenv
 ```
 
-Create `src/mortgage_calculator/config.py`:
+Create `src/mortgage_calculator_book/config.py`:
 
 ```python
 import os
@@ -262,17 +376,38 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 ### 8.7.3 Never Commit Your Secrets
 
-Create `.env.example` (committed, safe — no real values) and add `.env` itself to `.gitignore`:
+Create `.env.example` (committed, safe — no real values):
+
+```bash
+vi .env.example
+```
 
 ```
-# .env.example
 OPENROUTER_API_KEY=your-key-here
 ```
 
+Then add one more line to `.gitignore` — the one 0.7.3 created back in Chapter 0, not a new file:
+
+```bash
+vi .gitignore
 ```
-# .gitignore (add this line)
+
+```
+# Byte-compiled / cached Python files
+__pycache__/
+*.pyc
+*.pyo
+
+# Test and linter caches
+.pytest_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
 .env
 ```
+
+Only that last line, `.env`, is actually new here — everything above it should already be sitting in the file from 0.7.3; this just confirms what you're adding to, rather than asking you to retype the whole thing from memory.
 
 The rule this section wants you to leave with: `.env.example` is checked into git so anyone cloning the project knows what variables they need; `.env` itself, containing your actual key once you have one, never is. Confirm `.env` really is ignored before you ever put a real key in it:
 
@@ -312,16 +447,28 @@ See `SPEC.md` for the full specification.
 
 ## Usage
 
-    uv run mortgage-calculator --principal 200000 \
-           --annual-rate 0.06 --term-years 30
+    uv run mortgage-calculator-book --principal 200000 --annual-rate 0.06 --term-years 30
     # Fixed periodic payment: $1,199.10
 
-    uv run mortgage-calculator --principal 200000 \
-           --annual-rate 0.06 --term-years 30 --format json
+    uv run mortgage-calculator-book --principal 200000 --annual-rate 0.06 --term-years 30 --format json
     # {"payment": 1199.1}
 ```
 
 Write this now, not after the project is "finished" — there's no such moment in this book, and a README that only gets written at the end tends not to get written at all.
+
+### 8.8.4 Letting Pi Draft It Instead
+
+If you'd rather not write the README by hand, Pi can draft one from the project itself rather than from a blank page — point it at what actually exists, not just at the idea of a README:
+
+```bash
+pi "Draft README.md for this project. Read SPEC.md, \
+    pyproject.toml, and src/mortgage_calculator_book/cli.py \
+    first, and base the usage examples on the actual CLI \
+    flags and command name you find there rather than \
+    guessing at them."
+```
+
+Review it the same way as every other agent proposal, with one thing specific to documentation worth checking closely: does every command in it actually work, copy-pasted exactly as written? A README with a subtly wrong flag name or an invented example is worse than no README at all — it actively misleads the next person who trusts it, quite possibly you, in three weeks. Run each example yourself before accepting the diff. This is also where Pi is likeliest to invent a badge, a version number, or an installation step this project doesn't actually have; trim anything that describes a project slightly different from the one that exists.
 
 > **Process concept: documentation as a living artifact.** This is the same spirit as `SPEC.md` from Chapter 2, aimed at a different reader: the spec is written for a collaborator (including Pi) who needs to know what the system should do; the README is written for a new user who just needs to know how to run it. Both get revised as the project changes — this README will need another pass once Chapter 9 adds a second way to run the calculator.
 
@@ -331,15 +478,26 @@ Write this now, not after the project is "finished" — there's no such moment i
 ruff check . && ruff format .
 ```
 
+Same habit as every prior chapter — nothing new here, which is itself a small sign the habit has taken hold.
+
+Commit the README too — it's been sitting uncommitted since 8.8, the last real artifact this chapter produced:
+
+```bash
+git add README.md
+git commit -m "Add README"
+git push
+```
+
 ## 8.10 Checkpoint
 
 Before moving to Chapter 9, this should all be true:
 
-- [ ] `mortgage-calculator --principal ... --annual-rate ... --term-years ...` prints a correct, human-readable result
+- [ ] `pyproject.toml`'s `[project.scripts]` entry points at `mortgage_calculator_book.cli:main`, not the original placeholder
+- [ ] `mortgage-calculator-book --principal ... --annual-rate ... --term-years ...` prints a correct, human-readable result
 - [ ] `--format json` prints correctly structured JSON
 - [ ] Invalid input produces a clear error message on `stderr` and a non-zero exit code
 - [ ] `.env.example` is committed; `.env` is git-ignored and confirmed via `git check-ignore .env`
-- [ ] `README.md` describes setup and usage with real, working examples
+- [ ] `README.md` describes setup and usage with real, working examples, and is committed
 - [ ] All CLI tests pass alongside every earlier chapter's tests
 - [ ] `ruff check .` and `ruff format .` both pass
 

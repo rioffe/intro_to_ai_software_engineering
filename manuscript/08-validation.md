@@ -247,10 +247,16 @@ Check specifically that the boundaries match SPEC.md and Chapter 7.3 exactly, no
 Worth doing once, now that two independent versions exist: compare Pi's proposal against the one you wrote by hand in 7.5, still sitting in git history.
 
 ```bash
-git show HEAD~2:src/mortgage_calculator_book/validation.py
+git log --oneline -- src/mortgage_calculator_book/validation.py
 ```
 
-(`HEAD~2` is two commits back from wherever you are now — adjust the number if you've committed anything else in between; `git log --oneline` shows you exactly what's there if you're unsure.) Reading two independently correct implementations of the same four constraints side by side is a genuinely useful exercise on its own: where do they differ in approach, and does either version's error messages actually read better than the other's?
+This shows every commit that touched this file, most recent first — the hand-written version is the one from 7.5.3, right before the `git rm` commit from 7.6.1. Grab its hash and look at it:
+
+```bash
+git show <hash>:src/mortgage_calculator_book/validation.py
+```
+
+Reading two independently correct implementations of the same four constraints side by side is a genuinely useful exercise on its own: where do they differ in approach, and does either version's error messages actually read better than the other's?
 
 Once you're satisfied, commit Pi's version the normal way:
 
