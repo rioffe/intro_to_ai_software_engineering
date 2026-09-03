@@ -227,7 +227,7 @@ vi ~/.pi/agent/settings.json
 
 ```json
 {
-  "defaultModel": "qwen/qwen3-27b",
+  "defaultModel": "qwen/qwen3.8-27b",
   "defaultProvider": "openrouter"
 }
 ```
