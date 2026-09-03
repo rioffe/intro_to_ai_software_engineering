@@ -96,11 +96,13 @@ Nothing here needed saving or cleaning up; it never touched a file in the first 
 In `src/mortgage_calculator_book/validation.py`:
 
 ```python
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 
 
 class MortgageInput(BaseModel):
     """Validated input for a fixed-rate mortgage payment calculation."""
+
+    model_config = ConfigDict(extra="forbid")
 
     principal: float
     annual_rate: float
@@ -137,6 +139,8 @@ class MortgageInput(BaseModel):
             raise ValueError("payments_per_year must be positive")
         return v
 ```
+
+`model_config = ConfigDict(extra="forbid")` is easy to skip, since everything works without it — Pydantic's default is to silently *ignore* fields it doesn't recognize, not reject them. That's a real gap, not a hypothetical one: without this line, `MortgageInput(principal=200_000, annual_rate=0.06, term_years=30, something_unexpected="test")` succeeds silently, dropping `something_unexpected` without a word. Harmless-looking today, from a human typing a mistyped field name — considerably less harmless once Chapter 10 hands this same model a dictionary built from whatever a language model decided to send.
 
 ### 7.5.2 Custom Validators, Explained
 
@@ -214,6 +218,16 @@ def test_rate_above_one_rejected():
 def test_zero_term_rejected():
     with pytest.raises(ValidationError):
         MortgageInput(principal=200_000, annual_rate=0.06, term_years=0)
+
+
+def test_unexpected_field_rejected():
+    with pytest.raises(ValidationError):
+        MortgageInput(
+            principal=200_000,
+            annual_rate=0.06,
+            term_years=30,
+            extra_field="test",
+        )
 ```
 
 Run it:
@@ -222,7 +236,7 @@ Run it:
 pytest tests/test_validation.py -v
 ```
 
-One collection error, the same shape as Chapter 5.8.2's — `validation.py` genuinely doesn't exist now, so pytest can't import the file to reach any of these seven tests. That's real red this time, not something to take on faith.
+One collection error, the same shape as Chapter 5.8.2's — `validation.py` genuinely doesn't exist now, so pytest can't import the file to reach any of these eight tests. That's real red this time, not something to take on faith.
 
 ### 7.6.3 Prompting Pi
 
@@ -297,7 +311,7 @@ def calculate_validated_payment(data: MortgageInput) -> float:
 pytest -v
 ```
 
-Chapter 6's three tests, plus this chapter's seven, all green.
+Chapter 6's three tests, plus this chapter's eight, all green.
 
 ## 7.8 Refactor and Ruff Pass
 
@@ -315,7 +329,7 @@ Before moving to Chapter 8, this should all be true:
 - [ ] `MortgageInput` enforces every constraint from SPEC.md: positive principal, rate in `[0, 1)`, positive term, positive payment frequency
 - [ ] `test_zero_rate_accepted` passes — confirming validation didn't accidentally break Chapter 6's zero-interest case
 - [ ] `calculate_validated_payment` is the only path from raw input to a payment result
-- [ ] The full test suite (10 tests: 3 from Chapter 6, 7 from this chapter) is green
+- [ ] The full test suite (11 tests: 3 from Chapter 6, 8 from this chapter) is green
 - [ ] Everything is committed
 
 **What's next:** Chapter 8 gives this validated core its first real user-facing surface — a command-line interface a person can actually run.

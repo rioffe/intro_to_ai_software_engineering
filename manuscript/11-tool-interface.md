@@ -22,21 +22,76 @@ Chapter 7.2.3 flagged this moment directly: a Pydantic model is already most of 
 
 ### 10.3.1 Free JSON Schema
 
-Pydantic models can export their structure as JSON Schema — the same format most LLM tool-calling interfaces expect for describing valid arguments — with a single method call:
+What is a schema, exactly? A description of the *shape* data is expected to have — which fields exist, what type each one is, which are required — written so a program can read it, not just a person. It's not the data itself, any more than a form's blank fields are the answers someone eventually writes into them; it's a specification of what valid data looks like, checkable before anything is actually filled in. **JSON Schema** just means that description is itself written as JSON — which is exactly why it's the format most LLM tool-calling interfaces expect for describing valid arguments: a model needs to know a tool's expected shape before it can call it correctly.
 
-```python
-from mortgage_calculator.validation import MortgageInput
+Pydantic models can export their structure as JSON Schema with a single method call. Try it directly, the same REPL technique as 7.4.3:
 
-MortgageInput.model_json_schema()
+```bash
+uv run python
 ```
 
-This produces a dictionary describing every field's type, and — because your `field_validator`s already enforce them — you get the *shape* of the constraints (types, required fields) for free. The specific business rules inside your validators (positive principal, rate under 100%) aren't expressed in the exported schema itself, but they still run every time `MortgageInput` is constructed — which matters, because it means the tool can't be tricked into skipping validation just because the schema alone doesn't spell out every rule.
+```python
+from mortgage_calculator_book.validation import MortgageInput
+import json
+
+print(json.dumps(MortgageInput.model_json_schema(), indent=2))
+```
+
+You should see something close to this:
+
+```json
+{
+  "additionalProperties": false,
+  "properties": {
+    "principal": {
+      "title": "Principal",
+      "type": "number"
+    },
+    "annual_rate": {
+      "title": "Annual Rate",
+      "type": "number"
+    },
+    "term_years": {
+      "title": "Term Years",
+      "type": "integer"
+    },
+    "payments_per_year": {
+      "default": 12,
+      "title": "Payments Per Year",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "principal",
+    "annual_rate",
+    "term_years"
+  ],
+  "title": "MortgageInput",
+  "type": "object"
+}
+```
+
+Exit when you're done:
+
+```python
+exit()
+```
+
+This dictionary describes every field's type, and — because your `field_validator`s already enforce them — you got the *shape* of the constraints (types, required fields) for free, with no extra code. Now inspect it for what's just as tellingly *missing*: none of Chapter 7.5's actual business rules show up anywhere. `principal` just says `"type": "number"` — nothing here hints that it rejects zero or negative values, or that `annual_rate` has to stay under 1.0. The specific rules inside your validators aren't expressed in the exported schema itself, but they still run every time `MortgageInput` is constructed — which matters, because it means the tool can't be tricked into skipping validation just because the schema alone doesn't spell out every rule.
+
+One constraint *does* show up on its own, though, and it's worth noticing why: `"additionalProperties": false` appears at the top of the printed schema, correctly advertising that this model rejects fields it doesn't recognize — because Chapter 7.5.1's `model_config = ConfigDict(extra="forbid")` makes that true at runtime, and Pydantic reflects real runtime behavior into the generated schema automatically. Fix a constraint at the model, the one place this project defines what "valid" means, and both the enforcement and the advertisement of it come free from the same line — no separate schema to keep in sync by hand.
 
 ### 10.3.2 What Still Needs to Be Added
 
 A schema alone isn't a complete tool definition — a model also needs a **name** it can refer to, and a **description** written in prose that tells it what the tool is *for* and *when to use it*. Neither of those come from the Pydantic model; both are new content for this chapter.
 
 ## 10.4 Defining the Tool Contract
+
+Everything in this section goes into one new file — `src/mortgage_calculator_book/tool.py`, sitting alongside `cli.py` and `ui.py` as a peer front end, not folded into either. Create it now:
+
+```bash
+vi src/mortgage_calculator_book/tool.py
+```
 
 ### 10.4.1 Writing the Description
 
@@ -57,7 +112,7 @@ Notice the second sentence does real work: it's not just describing what the fun
 
 ### 10.4.2 The Output Schema
 
-Reusing the exact shape from Chapter 8.5.4's forward-note — `{"payment": 1199.10}` — rather than inventing a new one:
+Reusing the exact shape from Chapter 8.5.4's forward-note — `{"payment": 1199.10}` — rather than inventing a new one. Same file, appended below what's already there:
 
 ```python
 OUTPUT_SCHEMA = {
@@ -72,10 +127,6 @@ OUTPUT_SCHEMA = {
 }
 ```
 
-### 10.4.3 Where This Lives
-
-In `src/mortgage_calculator/tool.py` — a new module, sitting alongside `cli.py` and `ui.py` as a peer front end, not folded into either.
-
 ## 10.5 TDD the Contract Before Wiring Anything Up
 
 ### 10.5.1 Tests First, No Model Involved
@@ -84,7 +135,7 @@ In `src/mortgage_calculator/tool.py` — a new module, sitting alongside `cli.py
 # tests/test_tool.py
 import pytest
 
-from mortgage_calculator.tool import call_tool, get_tool_definition
+from mortgage_calculator_book.tool import call_tool, get_tool_definition
 
 
 def test_valid_call_returns_payment():
@@ -109,6 +160,7 @@ def test_tool_definition_has_name_and_description():
     assert definition["name"] == "calculate_mortgage_payment"
     assert "mortgage" in definition["description"].lower()
     assert "properties" in definition["parameters"]
+    assert "payment" in definition["output_schema"]["properties"]
 ```
 
 Note the second test's name specifically: `call_tool` must return an **error dictionary**, not raise an exception — a meaningfully different contract than Chapter 6's core or Chapter 7's validation, both of which are allowed to raise. A model-calling layer in Chapter 11 needs to hand *something* back to the model on bad input; an uncaught exception isn't something a model-calling loop can pass along gracefully.
@@ -120,9 +172,11 @@ This is worth stating as its own requirement, separate from "the function should
 ### 10.5.3 Agent-Assisted Implementation
 
 ```bash
-pi "Implement call_tool and get_tool_definition in src/mortgage_calculator/tool.py" \
-   "to make the tests in tests/test_tool.py pass. call_tool should never raise — " \
-   "catch validation errors and return an error dict instead."
+pi "Implement call_tool and get_tool_definition in \
+    src/mortgage_calculator_book/tool.py to make the \
+    tests in tests/test_tool.py pass. call_tool should \
+    never raise — catch validation errors and return an \
+    error dict instead."
 ```
 
 Review as always — this chapter's implementation:
@@ -132,7 +186,7 @@ from typing import Any
 
 from pydantic import ValidationError
 
-from mortgage_calculator.validation import MortgageInput, calculate_validated_payment
+from mortgage_calculator_book.validation import MortgageInput, calculate_validated_payment
 
 
 def get_input_schema() -> dict[str, Any]:
@@ -144,6 +198,7 @@ def get_tool_definition() -> dict[str, Any]:
         "name": TOOL_NAME,
         "description": TOOL_DESCRIPTION,
         "parameters": get_input_schema(),
+        "output_schema": OUTPUT_SCHEMA,
     }
 
 
@@ -184,7 +239,7 @@ Before Chapter 11 puts a real model in the driver's seat, confirm the tool works
 # scratch_verify_tool.py — not part of the test suite, just a manual check
 import json
 
-from mortgage_calculator.tool import call_tool
+from mortgage_calculator_book.tool import call_tool
 
 request = json.loads(
     '{"principal": 200000, "annual_rate": 0.06, "term_years": 30, "payments_per_year": 12}'
@@ -212,7 +267,7 @@ ruff check . && ruff format .
 
 Before moving to Chapter 11, this should all be true:
 
-- [ ] `get_tool_definition()` returns a name, a description, and a parameters schema derived from `MortgageInput`
+- [ ] `get_tool_definition()` returns a name, a description, a parameters schema derived from `MortgageInput`, and the output schema from 10.4.2
 - [ ] `call_tool()` returns `{"payment": ...}` on valid input and `{"error": ...}` on invalid input — and never raises
 - [ ] All tests in `tests/test_tool.py` pass
 - [ ] You've manually verified a JSON-in, JSON-out call against the Chapter 4.5 worked example

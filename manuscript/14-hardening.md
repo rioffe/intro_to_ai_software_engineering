@@ -97,9 +97,10 @@ What if the model returns neither a tool call nor any content — an empty respo
 For each seam above, the pattern is the same one this book has used throughout: write a failing test describing the bad input and the expected graceful behavior, then let Pi propose the handling, then review:
 
 ```bash
-pi "Add a test to tests/test_llm.py confirming ask_hosted_detailed" \
-   "handles malformed tool-call-argument JSON without raising, " \
-   "using a mocked client response."
+pi "Add a test to tests/test_llm.py confirming \
+    ask_hosted_detailed handles malformed \
+    tool-call-argument JSON without raising, using a \
+    mocked client response."
 ```
 
 ## 13.5 Structured Logging with loguru
@@ -116,7 +117,7 @@ uv add loguru
 
 loguru over the standard library's `logging` module specifically because it needs meaningfully less configuration to get something genuinely useful — one call to set up sensible output, rather than the standard library's handler/formatter/logger hierarchy, which is more powerful but considerably more ceremony for a project this size.
 
-In `src/mortgage_calculator/logging_config.py`:
+In `src/mortgage_calculator_book/logging_config.py`:
 
 ```python
 import sys
@@ -125,7 +126,7 @@ from loguru import logger
 
 logger.remove()
 logger.add(sys.stderr, level="INFO")
-logger.add("logs/mortgage_calculator.log", rotation="1 MB", level="DEBUG")
+logger.add("logs/mortgage_calculator_book.log", rotation="1 MB", level="DEBUG")
 ```
 
 Import this module once, early — in `cli.py`'s `main()` and `ui.py`'s `main()` are reasonable places — so logging is configured no matter which front end starts the program.
@@ -159,8 +160,8 @@ def call_tool(arguments: dict) -> dict:
 Deliberately trigger a failure, then read what got recorded:
 
 ```bash
-mortgage-calculator --principal -5000 --annual-rate 0.06 --term-years 30
-cat logs/mortgage_calculator.log
+mortgage-calculator-book --principal -5000 --annual-rate 0.06 --term-years 30
+cat logs/mortgage_calculator_book.log
 ```
 
 You should see the `WARNING` line from 13.5.3, with the actual rejected arguments and the validation error, timestamped. This is the payoff of this section: a real failure, diagnosed after the fact from a log file alone, the way you'd have to if a user reported a problem you weren't present to watch happen.
@@ -169,18 +170,22 @@ You should see the `WARNING` line from 13.5.3, with the actual rejected argument
 
 ### 13.6.1 Returning to SPEC.md
 
-Open the version last revised in Chapter 4.7.3. Read it fresh, as if you'd never seen the rest of this project, and ask: does this still describe what actually got built?
+Open the version last revised in Chapter 9.6.2. Read it fresh, as if you'd never seen the rest of this project, and ask: does this still describe what actually got built?
 
 ### 13.6.2 What's Drifted
 
-Two things stand out. First, section 13.4.1's new principal ceiling is a real constraint that exists in the code now but appears nowhere in the spec. Second, and larger: SPEC.md as it stands describes a calculation, full stop — nothing in it mentions that the system now has three separate interfaces (Chapter 8's CLI, Chapter 9's UI, and Chapter 10–11's tool/natural-language interface), which is a meaningfully bigger gap than a single missing constraint.
+Two things stand out. First, section 13.4.1's new principal ceiling is a real constraint that exists in the code now but appears nowhere in the spec. Second: the "Interfaces" section Chapter 9.6.2 added lists the CLI and the GUI, but not the tool interface from Chapters 10–11 — built after that section was written, and nobody ever came back to add the third line.
 
 Reconcile both:
 
 ```markdown
 ## Interfaces
 - Command-line interface (human-readable and JSON output)
-- Desktop GUI
+- Desktop GUI:
+  - Inputs: principal, annual rate, term (years), payments per year
+  - Actions: Calculate (computes and displays the payment), Clear
+    (resets all fields and the result)
+  - Invalid input shows an error message in place, not a crash
 - Tool interface for language-model use (see tool.py), supporting both
   local and hosted models
 
@@ -191,11 +196,14 @@ Reconcile both:
 - payments_per_year: number of payments per year (default: 12, monthly)
 ```
 
+Only the last bullet under "Interfaces" is actually new here — the CLI and GUI entries should already be sitting in your file from 9.6.2. This shows the whole section so you can confirm what's there against what's shown, not because all of it needs retyping.
+
 Commit the reconciliation on its own:
 
 ```bash
 git add SPEC.md
-git commit -m "Reconcile SPEC.md: add interfaces section, document principal ceiling"
+git commit -m "Reconcile SPEC.md: add tool interface, \
+    document principal ceiling"
 git push
 ```
 

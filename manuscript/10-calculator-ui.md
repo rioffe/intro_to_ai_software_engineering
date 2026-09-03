@@ -26,6 +26,12 @@ uv add pyqt5
 
 ### 9.3.2 The Smallest Possible Window
 
+Try this as a real, throwaway script — a GUI genuinely needs to be seen, not just read about. Create it:
+
+```bash
+vi scratch_window.py
+```
+
 ```python
 import sys
 
@@ -38,7 +44,21 @@ window.show()
 sys.exit(app.exec_())
 ```
 
+Run it:
+
+```bash
+uv run python scratch_window.py
+```
+
+A small, blank window titled "Hello, PyQt5" should appear. Nothing in it yet — that's expected; an empty `QWidget` is just a blank window, which is exactly what this checks: that PyQt5 is installed correctly and a window can actually open on your machine, before building anything real on top of it. Close the window the normal way for your platform — the script exits on its own once you do, since `app.exec_()` was waiting on exactly that.
+
 `QApplication` manages the application as a whole — there's exactly one per program. `QWidget` is the base building block for anything visible; an empty one, as above, is just a blank window. `.show()` makes it visible, and `app.exec_()` starts the **event loop** — the process that waits for and responds to user interaction (clicks, typing, resizing) until the window is closed.
+
+Delete the scratch file once you've seen it work — not part of the real project:
+
+```bash
+rm scratch_window.py
+```
 
 ### 9.3.3 Core Widgets for This Project
 
@@ -77,7 +97,7 @@ The field order and labels above are worth deciding deliberately, since they dir
 
 ### 9.5.1 The Full Window
 
-In `src/mortgage_calculator/ui.py`:
+In `src/mortgage_calculator_book/ui.py`:
 
 ```python
 import sys
@@ -93,7 +113,7 @@ from PyQt5.QtWidgets import (
 )
 from pydantic import ValidationError
 
-from mortgage_calculator.validation import MortgageInput, calculate_validated_payment
+from mortgage_calculator_book.validation import MortgageInput, calculate_validated_payment
 
 
 class MortgageCalculatorWindow(QWidget):
@@ -149,6 +169,14 @@ if __name__ == "__main__":
     main()
 ```
 
+Run it now, before moving on — a GUI is worth confirming the moment it exists, not several sections later:
+
+```bash
+uv run python -m mortgage_calculator_book.ui
+```
+
+The window from 9.4.1's sketch should appear, for real this time: four labeled fields, a Calculate button, an empty result area below them. Don't worry about entering real numbers and checking the math yet — that's 9.8's full walkthrough, once 9.5.2's error handling and 9.7's testing have actually been covered. For now, just confirm it launches, looks right, and closes cleanly.
+
 ### 9.5.2 Displaying Errors in the UI
 
 Notice `on_calculate` catches two different kinds of error: a plain `ValueError`, raised if `float(...)` or `int(...)` fails on genuinely non-numeric text (someone typing "abc" into the principal field), and `ValidationError`, raised by `MortgageInput` for numeric-but-invalid input (a negative principal, same as Chapter 8's CLI would reject). Both land in the same result label rather than crashing the application — a user typing garbage into a field should see a message, not watch the window disappear.
@@ -157,20 +185,126 @@ Notice `on_calculate` catches two different kinds of error: a plain `ValueError`
 
 `f"${payment:,.2f}"` — the same formatting used in Chapter 8's CLI, for the same reason: consistent presentation between front ends, even though the underlying `payment` value is unrounded until this exact point (Chapter 6.8.3).
 
-## 9.6 Where Agent Assistance Helps, and Where It Doesn't
-
-### 9.6.1 Good Delegation: Boilerplate Widget Wiring
-
-The widget-creation and layout code in 9.5.1 is exactly the kind of task worth handing to Pi:
+The window works end to end now — commit it:
 
 ```bash
-pi "Add a 'Clear' button next to Calculate that resets all " \
-   "four input fields and the result label."
+git add src/mortgage_calculator_book/ui.py
+git commit -m "Add calculator window wired to validation and the core"
+git push
 ```
 
-This is mechanical, has an obviously correct answer, and is fast to verify — run the app, click the button, confirm the fields clear.
+## 9.6 Where Agent Assistance Helps, and Where It Doesn't
 
-### 9.6.2 Poor Delegation: Layout and Visual Judgment
+### 9.6.1 Good Delegation, and a Trickier Request Bundled With It
+
+The widget-creation and layout code in 9.5.1 is exactly the kind of task worth handing to Pi. Start by updating 9.4.1's sketch — a second pass at a design is normal, the same way SPEC.md got revised once in Chapter 4 and again in Chapter 13:
+
+```
+Principal ($):           [____________]
+Annual rate (e.g. 0.06): [____________]
+Term (years):            [____________]
+Payments per year:       [____________]
+
+[ Calculate ]  [ Clear ]
+
+Fixed periodic payment: $1,199.10
+```
+
+Hand the updated sketch to Pi directly as the spec, and ask for tests in the same breath:
+
+```bash
+pi "Add a 'Clear' button next to Calculate that resets \
+    all four input fields and the result label, matching \
+    the updated layout in 9.4.1. Also add tests for it in \
+    tests/test_ui.py."
+```
+
+The GUI half is exactly as mechanical as it looks: run the app, click the new button, confirm all four fields and the result label actually clear. Read the diff first, as always, but there's not much to catch — button wiring like this has an obviously correct answer.
+
+The tests half is where this exercise earns its place. Watch for which of two very different directions Pi actually takes:
+
+- **A widget-level test** — instantiate the window, click Clear, assert the fields are now empty. Doing this for real needs a GUI testing tool this book never introduced, most commonly `pytest-qt`. If the proposal quietly adds it as a new dependency, that's worth noticing on its own: a test suite that only runs with tooling nobody decided to bring in is a bigger, less obvious version of the exact problem 9.6.3 is about to raise with "make this look nicer" — a plausible-looking addition that was never actually asked for.
+- **No test at all, with a note explaining why** — because unlike `parse_form_values` in 9.7.1, "clear four fields" has no logic to extract. `self.principal_input.clear()` four times over isn't a computation with a right answer to assert on; it's direct widget manipulation, indistinguishable in a test from the implementation itself. There's nothing a unit test buys here that clicking the button and looking doesn't already give you, faster.
+
+The second answer is the right one. If Pi proposes the first, this is a case for declining it outright rather than accepting it and cleaning it up afterward: reject the new dependency, keep the manual click-and-check, and don't write a test just because one was asked for. 9.7.2 called this "the judgment of not over-testing" in the abstract; this is what it looks like when an actual proposal tests that judgment directly — agreeing to "add tests for it" doesn't obligate you to accept tests that don't earn their place.
+
+`ui.py` has real, working changes since its last commit — commit them:
+
+```bash
+git add src/mortgage_calculator_book/ui.py
+git commit -m "Add Clear button"
+git push
+```
+
+### 9.6.2 Writing the Interface Into SPEC.md, Then Redoing It From There
+
+9.4.1's sketch is a real design artifact, but it lives in this book, not in the project — the same gap Chapter 4.7.3 found in the derivation, and for the same reason: Pi can only read what's actually in the repository. SPEC.md doesn't describe the GUI at all right now, or the CLI either, for that matter — nothing has ever gone back and added them. Fix both, in the spirit of Chapter 2.2.1's rule for what belongs here: *what* the interface must provide, not *how* it's built — no `QPushButton`, no `PyQt5`, just the required fields, actions, and behavior.
+
+```bash
+vi SPEC.md
+```
+
+```markdown
+## Interfaces
+- Command-line interface (human-readable and JSON output)
+- Desktop GUI:
+  - Inputs: principal, annual rate, term (years), payments per year
+  - Actions: Calculate (computes and displays the payment), Clear
+    (resets all fields and the result)
+  - Invalid input shows an error message in place, not a crash
+```
+
+Add this as its own section, near the top — right after "What it does" reads naturally. Commit it on its own:
+
+```bash
+git add SPEC.md
+git commit -m "Document CLI and GUI interfaces in SPEC.md"
+git push
+```
+
+Now delete `ui.py` and rebuild it from SPEC.md alone, the same shape as Chapters 7.6 and 8.6 — safe, since it's committed:
+
+```bash
+git rm src/mortgage_calculator_book/ui.py
+git commit -m "Remove hand-written ui.py to redo from SPEC.md"
+```
+
+```bash
+pi "Implement the GUI described in SPEC.md's Interfaces \
+    section, in src/mortgage_calculator_book/ui.py, \
+    wiring it to MortgageInput and \
+    calculate_validated_payment from validation.py."
+```
+
+There's no test suite driving this one red-then-green the way 7.6 and 8.6 were — 9.7.1 already established why a GUI like this isn't unit-tested directly. Verify by hand instead, the same way 9.5.1 and 9.6.1 already did: run it, enter the Chapter 4.5 worked example, confirm `$1,199.10`, click Clear, confirm everything resets, try invalid input, confirm it shows an error rather than crashing.
+
+```bash
+uv run python -m mortgage_calculator_book.ui
+```
+
+Worth comparing against what you had before, the same way as 7.6.4 and 8.6.4:
+
+```bash
+git log --oneline -- src/mortgage_calculator_book/ui.py
+```
+
+Grab the hash for "Add Clear button" — the most recent commit to this file before the delete — and look at it:
+
+```bash
+git show <hash>:src/mortgage_calculator_book/ui.py
+```
+
+A reasonable rebuild from this spec should land on something structurally close to what you had by hand — reading the fields, building a `MortgageInput`, catching `ValidationError`, displaying the result — since that's the only obvious way to satisfy what SPEC.md now asks for. If Pi's version differs in some real way rather than just naming or ordering, that's worth understanding before moving on; section 9.7's extraction below assumes a shape like the original, and if what you actually have looks meaningfully different, adapt it rather than forcing a mismatch.
+
+Once you're satisfied:
+
+```bash
+git add src/mortgage_calculator_book/ui.py
+git commit -m "Rebuild ui.py from SPEC.md's Interfaces section"
+git push
+```
+
+### 9.6.3 Poor Delegation: Layout and Visual Judgment
 
 Asking Pi to "make this look nicer" invites a much harder review problem: "nicer" isn't a test you can run, and accepting a layout change sight-unseen means trusting an aesthetic judgment you haven't actually checked. Reviewing a UI diff correctly here means *running the application and looking at it* — reading the code alone won't tell you whether a change actually improved anything.
 
@@ -221,7 +355,7 @@ Now `parse_form_values` is a plain function, testable with no `QApplication` inv
 # tests/test_ui.py
 import pytest
 
-from mortgage_calculator.ui import parse_form_values
+from mortgage_calculator_book.ui import parse_form_values
 
 
 def test_parses_valid_form_values():
@@ -239,16 +373,24 @@ def test_raises_on_non_numeric_principal():
         parse_form_values("not a number", "0.06", "30", "12")
 ```
 
+Run it:
+
+```bash
+pytest tests/test_ui.py -v
+```
+
+Both pass — this file needed no GUI, no window, no `QApplication`, to genuinely verify. That's the whole point of pulling `parse_form_values` out on its own in the first place.
+
 ### 9.7.2 The Judgment of Not Over-Testing
 
-Notice what's deliberately absent here: no test clicks the actual button, no test checks the actual label text on screen. That's not laziness — it's a decision that the layout and widget-wiring code isn't worth the tooling cost of testing directly, given how cheaply it can be checked by hand (9.6.2). Knowing where to stop testing is as much a skill as knowing where to start.
+Notice what's deliberately absent here: no test clicks the actual button, no test checks the actual label text on screen. That's not laziness — it's a decision that the layout and widget-wiring code isn't worth the tooling cost of testing directly, given how cheaply it can be checked by hand (9.6.3). Knowing where to stop testing is as much a skill as knowing where to start.
 
 ## 9.8 Running the App
 
 ### 9.8.1 A Walkthrough
 
 ```bash
-uv run python -m mortgage_calculator.ui
+uv run python -m mortgage_calculator_book.ui
 ```
 
 Enter the Chapter 4.5 worked example — `200000`, `0.06`, `30`, `12` — click Calculate, and confirm the window shows `$1,199.10`, matching every other front end this project has produced so far.
@@ -263,15 +405,29 @@ Turning this into a double-clickable application (a `.app` on macOS, an `.exe` o
 ruff check . && ruff format .
 ```
 
+If `ruff check` reports anything, `ruff check --fix .` (3.4.3) is usually the fastest way to clear it before looking at whatever's left by hand.
+
+`parse_form_values` and `tests/test_ui.py` from 9.7 have been sitting uncommitted since they were written — the last loose end from this chapter:
+
+```bash
+git add src/mortgage_calculator_book/ui.py tests/test_ui.py
+git commit -m "Extract parse_form_values and test it"
+git push
+```
+
 ## 9.10 Checkpoint
 
 Before moving to Chapter 10, this should all be true:
 
 - [ ] The PyQt5 window opens and displays four labeled input fields, a Calculate button, and a result area
+- [ ] The Clear button (9.6.1) resets all four fields and the result label, verified by clicking it — not by an added GUI-testing dependency
+- [ ] `SPEC.md` has an "Interfaces" section documenting both the CLI and the GUI, committed (9.6.2)
+- [ ] `ui.py` was rebuilt from that spec via Pi and re-verified by hand, not left as the original hand-written version
 - [ ] Entering the Chapter 4.5 worked example produces `$1,199.10`
 - [ ] Invalid input (non-numeric text, or values `MortgageInput` rejects) shows an error message instead of crashing
 - [ ] `parse_form_values` exists as a standalone, tested function
 - [ ] No mortgage math or validation logic is duplicated anywhere in `ui.py` — it all still lives in `core.py` and `validation.py`
 - [ ] `ruff check .` and `ruff format .` both pass
+- [ ] Everything from this chapter is committed and pushed — `ui.py`, `SPEC.md`, and `test_ui.py` alike, not just the pieces that felt like real commits at the time
 
 **What's next:** Chapter 10 builds a third front end — not for a human this time, but for a language model, exposing the same validated core as a callable tool.

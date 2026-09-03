@@ -24,7 +24,13 @@ pre-commit automates exactly the habit Chapters 3.6.1 and 6.8.2 asked you to bui
 
 Chapter 8.3.4 flagged this in passing: Typer builds a CLI from Python type hints directly, producing less boilerplate and friendlier help output than the `argparse` this book actually used. What would change if you swapped it in: mostly ergonomics — nicer `--help` text, less manual parser configuration — not architecture. Because Chapter 8's CLI already sits cleanly on top of `MortgageInput` and `calculate_validated_payment` (Chapter 7), replacing `argparse` with Typer touches `cli.py` alone; nothing about validation or the core would need to change. A reasonable exercise once you've finished this book, if you want to feel the difference directly.
 
-## A.7 Beyond This Book
+## A.7 Direct PyQt5 Widget Testing
+
+Chapter 9.7 pulled `parse_form_values` out of the UI specifically so it could be tested without a running window, and stopped there rather than testing the widget itself. Worth being precise about why: not because it's impossible, and not because it needs a new dependency. PyQt5 can drive a widget directly — instantiate it, call `.click()` on a button, emit a signal like `returnPressed`, and check what changed — inside a `QApplication` running in offscreen mode (`QT_QPA_PLATFORM=offscreen`, set before the application is created), with nothing beyond `pytest` and `PyQt5` already in this project. A session-scoped fixture holding one shared `QApplication` is the only new piece, and it's a handful of lines, not a new tool.
+
+What holds it out of the main chapters is concept load, not setup cost: an offscreen platform plugin, a singleton application shared across tests, and the idea of driving a widget without a real display are three new things at once, on top of everything else Chapter 9 was already teaching. Worth trying directly if you want to feel how close it actually is — write one test that builds the calculator window, sets its fields, calls `.click()` on Calculate, and asserts on the result label. If it passes on the first real try, that's the whole technique.
+
+## A.8 Beyond This Book
 
 Strip away the mortgage-specific details and what's left is a pattern that has nothing to do with mortgages at all: a pure, human-verified core; a validation layer wrapping it; multiple front ends built on top — some for humans, one for a model; an evaluation discipline that checks the model-facing layer honestly rather than anecdotally; and a hardening pass that assumes the world outside your code is messier than your tests. That pattern is reusable well beyond a fixed-rate payment calculation.
 
