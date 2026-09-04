@@ -41,10 +41,10 @@ A full eval set for this project should run 15–25 questions deep; the set belo
 For each question: should the tool be called, and if so, with which arguments? Store this as data, in `data/eval_set.json`:
 
 ```json
- [{
+[
+  {
     "id": "basic-1",
-    "question": "What would my monthly payment be on a $200,000 loan" \
-                "at 6% interest over 30 years?",
+    "question": "What would my monthly payment be on a $200,000 loan at 6% interest over 30 years?",
     "expected_tool_call": true,
     "expected_arguments": {
       "principal": 200000,
@@ -55,8 +55,7 @@ For each question: should the tool be called, and if so, with which arguments? S
   },
   {
     "id": "zero-interest-1",
-    "question": "If I borrow $12,000 interest-free and pay it back" \
-                "monthly over a year, what's my payment?",
+    "question": "If I borrow $12,000 interest-free and pay it back monthly over a year, what's my payment?",
     "expected_tool_call": true,
     "expected_arguments": {
       "principal": 12000,
@@ -67,8 +66,7 @@ For each question: should the tool be called, and if so, with which arguments? S
   },
   {
     "id": "single-payment-1",
-    "question": "I want to pay off a $10,000 loan at 6% in one single" \
-                "payment a year from now. How much would that be?",
+    "question": "I want to pay off a $10,000 loan at 6% in one single payment a year from now. How much would that be?",
     "expected_tool_call": true,
     "expected_arguments": {
       "principal": 10000,
@@ -79,8 +77,7 @@ For each question: should the tool be called, and if so, with which arguments? S
   },
   {
     "id": "frequency-1",
-    "question": "Same $200,000 loan at 6% for 30 years, but if I paid" \
-                "biweekly instead of monthly, what would each payment be?",
+    "question": "Same $200,000 loan at 6% for 30 years, but if I paid biweekly instead of monthly, what would each payment be?",
     "expected_tool_call": true,
     "expected_arguments": {
       "principal": 200000,
@@ -114,7 +111,8 @@ For each question: should the tool be called, and if so, with which arguments? S
     "id": "ambiguous-1",
     "question": "How much would I pay each month?",
     "expected_tool_call": false
-  }]
+  }
+]
 ```
 
 Note `missing-frequency-1` and `out-of-scope-2` in particular: the first checks that the model correctly defaults to monthly payments when frequency isn't mentioned (matching `MortgageInput`'s own default from Chapter 7.5.1); the second checks that a question about refinancing — explicitly out of scope since Chapter 2.3.4 — doesn't get forced through the calculator anyway.
@@ -133,6 +131,8 @@ Chapter 11's `ask_local` and `ask_hosted` return only a final text answer — no
 # in llm.py, replacing the body of ask_local:
 
 def ask_local_detailed(question: str) -> dict:
+    # Same tool shape as Chapter 11.4.2 — one entry, wrapping
+    # get_tool_definition()'s name/description/parameters.
     tool_def = get_tool_definition()
     tools = [
         {
@@ -142,7 +142,8 @@ def ask_local_detailed(question: str) -> dict:
                 "description": tool_def["description"],
                 "parameters": tool_def["parameters"],
             },
-        }]
+        }
+    ]
 
     first = ollama.chat(
         model=LOCAL_MODEL,
@@ -155,6 +156,7 @@ def ask_local_detailed(question: str) -> dict:
     if not tool_calls:
         return {"answer": message["content"], "tool_called": False, "arguments": None}
 
+    # Only the first call matters — still one tool, same as 11.4.2.
     call = tool_calls[0]
     arguments = call["function"]["arguments"]
     result = call_tool(arguments)
@@ -167,50 +169,156 @@ def ask_local_detailed(question: str) -> dict:
             {"role": "tool", "content": str(result)},
         ],
     )
-    return {"answer": second["message"]["content"],
-            "tool_called": True, "arguments": arguments}
+    # arguments is returned here too now — the whole reason for this
+    # refactor, since scoring needs to see what the model actually sent,
+    # not just the final answer.
+    return {"answer": second["message"]["content"], "tool_called": True, "arguments": arguments}
 
 
 def ask_local(question: str) -> str:
     return ask_local_detailed(question)["answer"]
 ```
 
-The same restructuring applies to `ask_hosted` / `ask_hosted_detailed`. This is a small, real example of what Chapter 6.8's "refactor" step looks like several chapters later: existing behavior preserved exactly (`ask_local`'s signature and return type haven't changed), with new capability added underneath it.
+The same restructuring applies to `ask_hosted`, written out in full since the hosted client's shape differs enough from Ollama's to be worth seeing rather than assuming:
+
+```python
+# in llm.py, replacing the body of ask_hosted:
+
+def ask_hosted_detailed(question: str) -> dict:
+    tool_def = get_tool_definition()
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": tool_def["name"],
+                "description": tool_def["description"],
+                "parameters": tool_def["parameters"],
+            },
+        }
+    ]
+
+    first = _client.chat.completions.create(
+        model=HOSTED_MODEL,
+        messages=[{"role": "user", "content": question}],
+        tools=tools,
+    )
+    message = first.choices[0].message
+
+    if not message.tool_calls:
+        return {
+            "answer": message.content,
+            "tool_called": False,
+            "arguments": None,
+        }
+
+    # Same two differences from the local path as 11.6.4 noted: a
+    # tool_call_id to thread through, and arguments arriving as a JSON
+    # string rather than a dict.
+    call = message.tool_calls[0]
+    arguments = json.loads(call.function.arguments)
+    result = call_tool(arguments)
+
+    second = _client.chat.completions.create(
+        model=HOSTED_MODEL,
+        messages=[
+            {"role": "user", "content": question},
+            message,
+            {
+                "role": "tool",
+                "tool_call_id": call.id,
+                "content": json.dumps(result),
+            },
+        ],
+    )
+    return {
+        "answer": second.choices[0].message.content,
+        "tool_called": True,
+        "arguments": arguments,
+    }
+
+
+def ask_hosted(question: str) -> str:
+    return ask_hosted_detailed(question)["answer"]
+```
+
+This is a small, real example of what Chapter 6.8's "refactor" step looks like several chapters later: existing behavior preserved exactly (both wrappers' signatures and return types are unchanged from Chapter 11), with new capability added underneath.
 
 ### 12.5.2 Scoring
 
-In `src/mortgage_calculator/eval.py`:
+In `src/mortgage_calculator_book/eval.py`:
 
 ```python
 import json
 from pathlib import Path
 from typing import Any, Callable
 
-EVAL_SET_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "eval_set.json"
+# From eval.py's own location (src/mortgage_calculator_book/), climb three
+# levels to the project root, then into data/ -- the same file every eval
+# question comes from.
+EVAL_SET_PATH = (
+    Path(__file__).resolve().parent.parent.parent
+    / "data" / "eval_set.json"
+)
 
 
 def load_eval_set() -> list[dict[str, Any]]:
     return json.loads(EVAL_SET_PATH.read_text())
 
 
-def score_case(case: dict[str, Any], ask_fn: Callable[[str], dict]) -> dict[str, Any]:
+def score_case(
+    case: dict[str, Any], ask_fn: Callable[[str], dict]
+) -> dict[str, Any]:
+    # ask_fn is ask_local_detailed or ask_hosted_detailed (12.5.1) --
+    # whichever model this run is scoring.
     result = ask_fn(case["question"])
 
+    # First check: did the model call the tool when it should have (or
+    # correctly not call it, for an out-of-scope question)? Wrong either
+    # way is an automatic fail -- no need to look at arguments at all.
     if result["tool_called"] != case["expected_tool_call"]:
-        return {"id": case["id"], "passed": False, "reason": "tool_called mismatch"}
+        return {
+            "id": case["id"],
+            "passed": False,
+            "reason": "tool_called mismatch",
+        }
 
+    # Second check, only when a call was actually expected: does each
+    # argument this case cares about match what the model actually sent?
+    # Comparing as floats with a small tolerance avoids false failures
+    # from harmless formatting differences like "12" vs "12.0".
     if case["expected_tool_call"] and "expected_arguments" in case:
         for key, expected in case["expected_arguments"].items():
+            # arguments is None when no call happened; "or {}" keeps
+            # .get() from raising in that case instead of masking it.
             actual = (result["arguments"] or {}).get(key)
-            if actual is None or abs(float(actual) - float(expected)) > 0.001:
-                return {"id": case["id"], "passed": False, 
-                        "reason": f"argument mismatch: {key}"}
+            if (
+                actual is None
+                or abs(float(actual) - float(expected)) > 0.001
+            ):
+                return {
+                    "id": case["id"],
+                    "passed": False,
+                    "reason": f"argument mismatch: {key}",
+                }
 
     return {"id": case["id"], "passed": True, "reason": None}
 
 
-def run_eval(ask_fn: Callable[[str], dict]) -> list[dict[str, Any]]:
-    return [score_case(case, ask_fn) for case in load_eval_set()]
+def run_eval(
+    ask_fn: Callable[[str], dict], verbose: bool = True
+) -> list[dict[str, Any]]:
+    # One case at a time, not a list comprehension, so progress can be
+    # reported as each one finishes -- worth having, given how long a
+    # real run over real models actually takes (12.6.1).
+    cases = load_eval_set()
+    results = []
+    for i, case in enumerate(cases, start=1):
+        result = score_case(case, ask_fn)
+        if verbose:
+            status = "PASS" if result["passed"] else "FAIL"
+            print(f"[{i}/{len(cases)}] {case['id']}: {status}")
+        results.append(result)
+    return results
 
 
 def summarize(results: list[dict[str, Any]]) -> str:
@@ -220,13 +328,15 @@ def summarize(results: list[dict[str, Any]]) -> str:
 
 Deliberately simple pass/fail scoring — no partial credit, no weighting. At this scale, that's a feature, not a limitation: results stay easy to read and easy to reason about.
 
+Worth noticing that `run_eval` prints, unlike `calculate_payment` back in Chapter 6.2 — not a contradiction of that chapter's purity rule, just a different kind of function. `calculate_payment` is the domain core, meant to be composed into a CLI, a UI, and a tool interface without dragging any of them along; `run_eval` already isn't that pure, since `ask_fn` itself does real network I/O every time it's called. Given that, reporting progress on an operation that can take minutes is a reasonable, honest thing for this specific function to do — set `verbose=False` if you want the old silent behavior back.
+
 ### 12.5.3 Testing the Scoring Logic Itself
 
 The scoring function is plain code, and plain code gets tested the normal way — no model required:
 
 ```python
 # tests/test_eval.py
-from mortgage_calculator.eval import score_case
+from mortgage_calculator_book.eval import score_case
 
 
 def _fake_ask_correct(question: str) -> dict:
@@ -265,9 +375,22 @@ def test_score_case_fails_when_tool_not_called_but_expected():
 
 ### 12.6.1 Running the Full Set Against Both
 
+Both pieces of this section belong in the same file, since the second depends on variables the first defines:
+
+```bash
+vi scratch_eval_compare.py
+```
+
 ```python
-from mortgage_calculator.eval import load_eval_set, run_eval, summarize
-from mortgage_calculator.llm import ask_local_detailed, ask_hosted_detailed
+from mortgage_calculator_book.eval import (
+    load_eval_set,
+    run_eval,
+    summarize,
+)
+from mortgage_calculator_book.llm import (
+    ask_local_detailed,
+    ask_hosted_detailed,
+)
 
 local_results = run_eval(ask_local_detailed)
 hosted_results = run_eval(ask_hosted_detailed)
@@ -276,9 +399,21 @@ print("Local: ", summarize(local_results))
 print("Hosted:", summarize(hosted_results))
 ```
 
+Run it:
+
+```bash
+uv run python scratch_eval_compare.py
+```
+
+This takes noticeably longer than anything else you've run so far — eight real questions, against two real models, not the mocked responses from 11.8.1's tests. `run_eval`'s progress lines (12.5.2) print as each case finishes, so you'll see `[1/8] basic-1: PASS`-style output scrolling by before the two summary lines at the end. Expect something like `Local: 6/8 passed` and `Hosted: 8/8 passed`; your actual numbers will differ, and that's fine — the point is having real numbers at all, not matching these ones.
+
 ### 12.6.2 Reading the Results Side by Side
 
-Print each case's individual result, not just the summary, and look specifically at *where* the two diverge:
+Print each case's individual result, not just the summary, and look specifically at *where* the two diverge. Add this to the bottom of the same file:
+
+```bash
+vi scratch_eval_compare.py
+```
 
 ```python
 for local, hosted in zip(local_results, hosted_results):
@@ -286,7 +421,17 @@ for local, hosted in zip(local_results, hosted_results):
         print(f"{local['id']}: local={local['passed']} hosted={hosted['passed']}")
 ```
 
-A case where local fails and hosted passes is informative in a way an aggregate score alone isn't — it might mean local reliably struggles with, say, the `ambiguous-1` case specifically (calling the tool with guessed numbers rather than declining), which tells you something concrete and actionable about that model's behavior, not just "hosted scored higher."
+Run the same command again:
+
+```bash
+uv run python scratch_eval_compare.py
+```
+
+A case where local fails and hosted passes is informative in a way an aggregate score alone isn't — it might mean local reliably struggles with, say, the `ambiguous-1` case specifically (calling the tool with guessed numbers rather than declining), which tells you something concrete and actionable about that model's behavior, not just "hosted scored higher." Delete the scratch file once you've read through the output:
+
+```bash
+rm scratch_eval_compare.py
+```
 
 ### 12.6.3 From Impression to Evidence
 

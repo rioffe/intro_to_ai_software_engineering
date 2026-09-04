@@ -357,20 +357,15 @@ def test_ask_local_calls_tool_and_returns_answer(monkeypatch):
         "function": {
             "name": "calculate_mortgage_payment",
             "arguments": {
-                "principal": 200000,
-                "annual_rate": 0.06,
-                "term_years": 30,
-                "payments_per_year": 12,
+                "principal": 200000, "annual_rate": 0.06,
+                "term_years": 30, "payments_per_year": 12,
             },
         }
     }
     first_response = {
-        "message": {"role": "assistant", "content": "", "tool_calls": [tool_call]}
+        "message": {"content": "", "tool_calls": [tool_call]}
     }
-    second_response = {
-        "message": {"role": "assistant", "content": "Your payment would be $1,199.10."}
-    }
-
+    second_response = {"message": {"content": "Payment: $1,199.10."}}
     mock_chat = MagicMock(side_effect=[first_response, second_response])
     monkeypatch.setattr("mortgage_calculator_book.llm.ollama.chat", mock_chat)
 
@@ -433,13 +428,154 @@ git commit -m "Rebuild ask_hosted via Pi"
 git push
 ```
 
-## 11.9 Refactor and Ruff Pass
+## 11.9 Connecting This to the CLI and UI
+
+Everything so far has proven `ask_local` and `ask_hosted` work — but only from scratch files nobody else will ever run. The two front ends a real user would actually reach for, Chapter 8's CLI and Chapter 9's UI, still know nothing about either function. Close that gap now, the same way as everything else that's touched more than one file in this project: design it, write it down, then build it.
+
+### 11.9.1 The CLI: A Natural-Language Flag
+
+The shape: a new `--ask` flag that takes a question directly, bypassing `--principal`/`--annual-rate`/`--term-years` entirely, with an optional `--hosted` flag choosing `ask_hosted` over the local default. The three structured flags need to become optional rather than required, since `--ask` is now a second, independent way to use this command — enforced by checking after parsing, not by `argparse` itself.
+
+```bash
+pi "Add an --ask flag to the CLI in \
+    src/mortgage_calculator_book/cli.py. When --ask \
+    'question text' is given, call ask_local (or \
+    ask_hosted if --hosted is also passed) from llm.py \
+    and print the returned answer, skipping the normal \
+    principal/annual-rate/term-years flow entirely. Make \
+    those three flags optional, and enforce after parsing \
+    that they're required whenever --ask isn't used."
+```
+
+Review the same way as every agent-assisted change since 1.6 — specifically confirm the old, structured usage from Chapter 8 still works unchanged; this is meant to add a mode, not replace one. Verify the new one:
+
+```bash
+uv run mortgage-calculator-book --ask \
+    "What would my payment be on a $200,000 loan at 6% over 30 years?"
+```
+
+You're looking for a plain-language answer containing `$1,199.10`.
+
+### 11.9.2 The UI: Sketching and Documenting the Addition
+
+A new section below the existing form: a single-line question field, an "Ask" button, and an answer area.
+
+```
+Principal ($):           [____________]
+Annual rate (e.g. 0.06): [____________]
+Term (years):            [____________]
+Payments per year:       [____________]
+
+[ Calculate ]  [ Clear ]
+
+Fixed periodic payment: $1,199.10
+
+----------------------------------------
+
+Ask a question:  [________________________________]  [ Ask ]
+
+Answer:
+```
+
+Same lesson as Chapter 4's `docs/derivation.md`: a sketch that lives only in this book is invisible to Pi, which reads the project, not the pages you're reading right now. Write this one down for real, in a file that's never actually existed until this sentence:
+
+```bash
+vi docs/ui.md
+```
+
+```markdown
+# Calculator UI Layout
+
+The current window, as built through Chapter 11.9:
+
+    Principal ($):           [____________]
+    Annual rate (e.g. 0.06): [____________]
+    Term (years):            [____________]
+    Payments per year:       [____________]
+
+    [ Calculate ]  [ Clear ]
+
+    Fixed periodic payment: $1,199.10
+
+    ----------------------------------------
+
+    Ask a question:  [________________________________]  [ Ask ]
+
+    Answer:
+
+## Behavior
+- Calculate / Clear: as specified in SPEC.md's Interfaces section.
+- Ask: sends the typed question to ask_local (Chapter 11), and
+  displays the returned plain-language answer below the field.
+  Uses the same MortgageInput / calculate_validated_payment path
+  as everything else in this project, by way of the Chapter 10
+  tool interface — never a separate calculation.
+```
+
+Commit it, then bring SPEC.md's Interfaces section (9.6.2, extended in 13.6.2) up to date alongside it:
+
+```bash
+git add docs/ui.md
+git commit -m "Add docs/ui.md, documenting the calculator's UI layout"
+```
+
+```bash
+vi SPEC.md
+```
+
+```markdown
+## Interfaces
+- Command-line interface (human-readable and JSON output; --ask
+  for a natural-language question, answered via the tool interface)
+- Desktop GUI (see docs/ui.md for the current layout):
+  - Inputs: principal, annual rate, term (years), payments per year
+  - Actions: Calculate, Clear, and Ask (a natural-language question,
+    answered via the tool interface)
+  - Invalid input shows an error message in place, not a crash
+- Tool interface for language-model use (see tool.py), supporting both
+  local and hosted models
+```
+
+```bash
+git add SPEC.md
+git commit -m "Document the --ask flag and UI Ask button in SPEC.md"
+git push
+```
+
+### 11.9.3 Building It, via Pi
+
+```bash
+pi "Add an 'Ask a question' section to the calculator \
+    window in src/mortgage_calculator_book/ui.py, \
+    matching docs/ui.md: a single-line input, an Ask \
+    button, and an answer area below it. Clicking Ask \
+    should call ask_local from llm.py with the typed \
+    text and display the returned answer."
+```
+
+Review it the same way as 9.6 — this one's mechanical (a field, a button, a label) plus one real integration point (the call to `ask_local`) worth checking closely: does it handle a slow response without freezing the whole window in a way that looks broken? A multi-second pause with no feedback at all is a rough edge worth noticing, even if fixing it properly (threading, a progress indicator) is more than this project needs.
+
+Run it and try the new field with the same question as 11.9.1's CLI check:
+
+```bash
+uv run python -m mortgage_calculator_book.ui
+```
+
+Confirm the answer shows `$1,199.10`, then commit:
+
+```bash
+git add src/mortgage_calculator_book/ui.py
+git commit -m "Add natural-language Ask button to the UI"
+git push
+```
+
+## 11.10 Refactor and Ruff Pass
 
 ```bash
 ruff check . && ruff format .
 ```
 
-## 11.10 Checkpoint
+## 11.11 Checkpoint
 
 Before moving to Chapter 12, this should all be true:
 
@@ -448,6 +584,10 @@ Before moving to Chapter 12, this should all be true:
 - [ ] `.env` holds a real `OPENROUTER_API_KEY` and is confirmed git-ignored
 - [ ] Tests for both paths pass using mocked model responses — no live model call or API cost required to run the suite
 - [ ] You've run the same question through both `ask_local` and `ask_hosted` and compared the results
+- [ ] `mortgage-calculator-book --ask "..."` returns a correct plain-language answer, and the original structured flags still work unchanged
+- [ ] The UI's Ask button returns the same worked-example answer as every other front end
+- [ ] `docs/ui.md` exists, matches the actual UI, and is committed
+- [ ] `SPEC.md`'s Interfaces section mentions the natural-language capability for both the CLI and the UI
 - [ ] `ruff check .` and `ruff format .` both pass
 
 **What's next:** Chapter 12 turns this section's informal local-vs-hosted comparison into a real, repeatable evaluation.
