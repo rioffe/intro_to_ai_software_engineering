@@ -532,8 +532,6 @@ vi SPEC.md
   - Actions: Calculate, Clear, and Ask (a natural-language question,
     answered via the tool interface)
   - Invalid input shows an error message in place, not a crash
-- Tool interface for language-model use (see tool.py), supporting both
-  local and hosted models
 ```
 
 ```bash
