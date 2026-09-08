@@ -24,7 +24,7 @@ Notice the shape of what you're about to build: a declarative description of wha
 
 ### 7.3.1 Revisiting SPEC.md's Inputs
 
-From Chapter 4.7.3's revised spec: `principal`, `annual_rate`, `term_years`, `payments_per_year`. Each needs a definition of "valid" beyond just "the right type":
+From Chapter 4.7.4's revised spec: `principal`, `annual_rate`, `term_years`, `payments_per_year`. Each needs a definition of "valid" beyond just "the right type":
 
 - `principal` — must be positive; a loan of zero or negative dollars isn't a loan.
 - `annual_rate` — must be a plausible rate. Zero is valid (Chapter 6.6.1's edge case); something like 1.5 (150%) almost certainly represents a typo, not a real mortgage.
@@ -81,11 +81,7 @@ Example(name="Robert", age="not a number")
 
 This time Pydantic raises a `ValidationError` — a real, detailed error naming exactly which field failed and why, without you writing a single `isinstance` check yourself. Read what it prints; it's more informative than a typical Python `TypeError`, and it's the same style of error you'll be reading for the rest of this chapter.
 
-Exit the REPL when you're done — same key you used to leave Pi's interactive session back in 1.6.1:
-
-```python
-exit()
-```
+Exit the REPL when you're done — same key you used to leave Pi's interactive session back in 1.6.1: **Ctrl+D**.
 
 Nothing here needed saving or cleaning up; it never touched a file in the first place. Section 7.5 is where a version of this actually becomes part of the project.
 

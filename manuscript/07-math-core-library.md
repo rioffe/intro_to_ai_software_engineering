@@ -26,7 +26,7 @@ Inside the `src/mortgage_calculator_book/` package from Chapter 0.7.3, create `c
 
 ### 6.3.2 Naming Things to Match the Spec
 
-Function names in this module should read as a direct translation of `SPEC.md`'s "Derived quantities" and "Outputs" sections from Chapter 4.7.3 — not because it's required, but because it means anyone (or anything) reading the spec and the code side by side can match them up on sight.
+Function names in this module should read as a direct translation of `SPEC.md`'s "Derived quantities" and "Outputs" sections from Chapter 4.7.4 — not because it's required, but because it means anyone (or anything) reading the spec and the code side by side can match them up on sight.
 
 ## 6.4 Implementing the Periodic Rate and Payment-Count Helpers
 

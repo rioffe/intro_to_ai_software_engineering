@@ -28,7 +28,7 @@ Given a correct tool result, did the model report it accurately in plain languag
 
 ### 12.3.3 Refusal and Clarification Behavior
 
-Not every question should trigger a tool call. A question outside SPEC.md's scope (Chapter 2.3.4 and 4.7.3's "Out of scope" section: variable-rate mortgages, refinancing, multiple currencies) should be recognized as such, not forced through the calculator anyway. A question that's *in* scope but missing information — "how much would I pay each month?" with no principal, rate, or term given — should prompt for what's missing, not invent plausible-sounding numbers and call the tool with them.
+Not every question should trigger a tool call. A question outside SPEC.md's scope (Chapter 2.3.4 and 4.7.4's "Out of scope" section: variable-rate mortgages, refinancing, multiple currencies) should be recognized as such, not forced through the calculator anyway. A question that's *in* scope but missing information — "how much would I pay each month?" with no principal, rate, or term given — should prompt for what's missing, not invent plausible-sounding numbers and call the tool with them.
 
 ## 12.4 Building a Small Eval Set
 

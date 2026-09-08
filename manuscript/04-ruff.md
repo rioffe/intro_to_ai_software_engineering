@@ -79,7 +79,7 @@ ruff check .     # lint
 ruff format .    # format
 ```
 
-`ruff check` reports problems; `ruff format` rewrites files to match the configured style. Run both — they check different things. If `ruff check` reports anything, try `ruff check --fix .` first — it automatically fixes whatever it's confident about (unused imports, several formatting-adjacent issues) and leaves only what genuinely needs a human decision. Not everything is auto-fixable; read and fix whatever's left by hand, the same as any other error message.
+`ruff check` reports problems; `ruff format` rewrites files to match the configured style. Run both — they check different things. If `ruff check` reports anything, try `ruff check --fix .` first — it automatically fixes whatever it's confident about (unused imports, several formatting-adjacent issues) and leaves only what genuinely needs a human decision. (One exception worth knowing about: Ruff treats `__init__.py` specially and won't auto-remove an unused import there, even with `--fix`, since an unused-looking import in that particular file is often an intentional re-export rather than a mistake — that one you'd remove by hand, if you ever actually want it gone.) Not everything is auto-fixable; read and fix whatever's left by hand, the same as any other error message.
 
 Installing Ruff changed `pyproject.toml` and `uv.lock` — a real change, worth its own commit:
 

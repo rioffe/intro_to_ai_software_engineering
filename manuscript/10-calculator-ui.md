@@ -197,7 +197,7 @@ git push
 
 ### 9.6.1 Good Delegation, and a Trickier Request Bundled With It
 
-The widget-creation and layout code in 9.5.1 is exactly the kind of task worth handing to Pi. Start by updating 9.4.1's sketch — a second pass at a design is normal, the same way SPEC.md got revised once in Chapter 4 and again in Chapter 13:
+The widget-creation and layout code in 9.5.1 is exactly the kind of task worth handing to Pi. Start by updating 9.4.1's sketch — a second pass at a design is normal, the same way SPEC.md gets revised more than once across this book, including right here in 9.6.2 below:
 
 ```
 Principal ($):           [____________]
@@ -223,7 +223,7 @@ The GUI half is exactly as mechanical as it looks: run the app, click the new bu
 
 The tests half is where this exercise earns its place. Watch for which of two very different directions Pi actually takes:
 
-- **A widget-level test** — instantiate the window, click Clear, assert the fields are now empty. Doing this for real needs a GUI testing tool this book never introduced, most commonly `pytest-qt`. If the proposal quietly adds it as a new dependency, that's worth noticing on its own: a test suite that only runs with tooling nobody decided to bring in is a bigger, less obvious version of the exact problem 9.6.3 is about to raise with "make this look nicer" — a plausible-looking addition that was never actually asked for.
+- **A widget-level test** — instantiate the window, click Clear, assert the fields are now empty. This doesn't strictly need a new dependency — PyQt5 itself can drive a widget directly in an offscreen `QApplication`, no `pytest-qt` required — but it does need real setup: an offscreen environment variable, a session-scoped fixture, a widget built just to click one button and check four fields are empty. If the proposal reaches for that machinery, or worse, quietly adds `pytest-qt` anyway without needing to, that's worth noticing: meaningfully more scaffolding than a Clear button warrants is a bigger, less obvious version of the exact problem 9.6.3 is about to raise with "make this look nicer" — more than was actually asked for, dressed up as thoroughness.
 - **No test at all, with a note explaining why** — because unlike `parse_form_values` in 9.7.1, "clear four fields" has no logic to extract. `self.principal_input.clear()` four times over isn't a computation with a right answer to assert on; it's direct widget manipulation, indistinguishable in a test from the implementation itself. There's nothing a unit test buys here that clicking the button and looking doesn't already give you, faster.
 
 The second answer is the right one. If Pi proposes the first, this is a case for declining it outright rather than accepting it and cleaning it up afterward: reject the new dependency, keep the manual click-and-check, and don't write a test just because one was asked for. 9.7.2 called this "the judgment of not over-testing" in the abstract; this is what it looks like when an actual proposal tests that judgment directly — agreeing to "add tests for it" doesn't obligate you to accept tests that don't earn their place.
@@ -314,7 +314,7 @@ Asking Pi to "make this look nicer" invites a much harder review problem: "nicer
 
 ### 9.7.1 What's Testable Without a Full GUI Framework
 
-Testing PyQt5 windows directly — simulating clicks, reading rendered widget state — requires additional tooling this book doesn't cover, and for a project this size, the payoff doesn't justify the setup cost. What *is* cheap to test is the parsing logic hiding inside `on_calculate`. Pull it out as its own function in `ui.py`:
+Testing PyQt5 windows directly — simulating clicks, reading rendered widget state — is possible without a new dependency: PyQt5 itself can drive a widget in an offscreen `QApplication`, no `pytest-qt` needed. But doing it properly — a session fixture, an offscreen environment variable, one test per interesting interaction — is real setup for a project this size, the same kind of scope call the Appendix makes for Docker or CI/CD: genuinely achievable, not what this book spends its pages on. Appendix A.7 sketches the technique directly, if you're curious now rather than later. What *is* cheap, regardless of that choice, is the parsing logic hiding inside `on_calculate`. Pull it out as its own function in `ui.py`:
 
 ```python
 def parse_form_values(
@@ -383,7 +383,7 @@ Both pass — this file needed no GUI, no window, no `QApplication`, to genuinel
 
 ### 9.7.2 The Judgment of Not Over-Testing
 
-Notice what's deliberately absent here: no test clicks the actual button, no test checks the actual label text on screen. That's not laziness — it's a decision that the layout and widget-wiring code isn't worth the tooling cost of testing directly, given how cheaply it can be checked by hand (9.6.3). Knowing where to stop testing is as much a skill as knowing where to start.
+Notice what's deliberately absent here: no test clicks the actual button, no test checks the actual label text on screen. That's not laziness, and it's not because it can't be done — 9.7.1 already showed it's achievable without a new dependency. It's a decision that the setup cost (an offscreen `QApplication`, a session fixture) isn't worth it for this project, given how cheaply the same thing can be checked by hand (9.6.3). Knowing where to stop testing is as much a skill as knowing where to start.
 
 ## 9.8 Running the App
 

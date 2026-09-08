@@ -384,7 +384,7 @@ git commit -m "Reconcile SPEC.md: add tool interface, \
 git push
 ```
 
-> **Process concept: closing the loop.** Chapter 2 opened with the idea that a spec is a living document, expected to be wrong in places. Chapter 4 caught and fixed the first round of gaps, once real domain math existed. This is the same check, run one more time, now that the *entire* system exists — and it found exactly the kind of drift this book has been warning about since Chapter 2.2.2: not a mistake, just reality moving faster than the document describing it, caught because someone deliberately went looking.
+> **Process concept: closing the loop.** Chapter 2 opened with the idea that a spec is a living document, expected to be wrong in places. Chapter 4 caught and fixed the first round of gaps, once real domain math existed; Chapters 9 and 11 each added more as new interfaces arrived. This is the same check, run one more time, now that the *entire* system exists — and it found exactly the kind of drift this book has been warning about since Chapter 2.2.2: not a mistake, just reality moving faster than the document describing it, caught because someone deliberately went looking.
 
 ### 13.6.3 Reconciling README.md
 

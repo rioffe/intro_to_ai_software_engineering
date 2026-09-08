@@ -14,7 +14,7 @@ A spec, as this book uses the term, is a description of what a system should do,
 
 ### 2.2.2 Living, Not Fixed
 
-The most important thing to understand about SPEC.md before you write a word of it: it will be wrong in places, and that's expected. You'll revise it in Chapter 4 once real mortgage math enters the picture, and again in Chapter 13 once the whole system exists and you can check the spec against what actually got built. A spec that never changes usually means nobody's been checking it against reality.
+The most important thing to understand about SPEC.md before you write a word of it: it will be wrong in places, and that's expected. You'll revise it in Chapter 4 once real mortgage math enters the picture, again in Chapters 9 and 11 as new interfaces get added, and a final time in Chapter 13 once the whole system exists and you can check the spec against what actually got built. A spec that never changes usually means nobody's been checking it against reality.
 
 ### 2.2.3 Three Readers, One Document
 

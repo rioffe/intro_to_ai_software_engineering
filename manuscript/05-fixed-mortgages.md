@@ -88,7 +88,7 @@ Both of these become explicit tests in Chapter 5, and explicit branches in Chapt
 
 ### 4.5.1 The Numbers
 
-This is the example the rest of the book returns to repeatedly — commit these numbers to memory or bookmark this page, because Chapters 5, 6, 8, 9, and 12 all check themselves against it.
+This is the example the rest of the book returns to repeatedly — commit these numbers to memory or bookmark this page, because Chapters 5, 6, 8, 9, 10, 11, and 12 all check themselves against it.
 
 | Quantity | Value |
 |---|---|
@@ -103,13 +103,13 @@ This is the example the rest of the book returns to repeatedly — commit these 
 
 $$M = 200{,}000 \cdot \frac{0.005 \times (1.005)^{360}}{(1.005)^{360} - 1}$$
 
-$(1.005)^{360} \approx 6.022359$. Substituting:
+$(1.005)^{360} \approx 6.022575$. Substituting:
 
-$$M \approx 200{,}000 \cdot \frac{0.005 \times 6.022359}{6.022359 - 1} \approx 200{,}000 \times 0.0059955 \approx \$1{,}199.10$$
+$$M \approx 200{,}000 \cdot \frac{0.005 \times 6.022575}{6.022575 - 1} \approx 200{,}000 \times 0.0059955 \approx \$1{,}199.10$$
 
 **Fixed periodic payment: $1,199.10** (more precisely, $1,199.1010503... before rounding to the cent).
 
-From here, two more figures worth having on hand: total paid over the life of the loan is $1{,}199.10 \times 360 = \$431{,}676.38$, and total interest paid is that total minus the original principal: $\$231{,}676.38$ — more than the principal itself, which is a genuinely useful thing for a first-year reader to sit with for a moment before moving on.
+From here, two more figures worth having on hand: total paid over the life of the loan is the *unrounded* payment times 360 — $1{,}199.1010503\ldots \times 360 \approx \$431{,}676.38$ (the rounded $1,199.10 times 360 instead gives $431,676.00 — a few cents off, once 360 payments each a fraction of a cent smaller add up) — and total interest paid is that total minus the original principal: $\$231{,}676.38$ — more than the principal itself, which is a genuinely useful thing for a first-year reader to sit with for a moment before moving on.
 
 ### 4.5.3 This Is the Answer Key
 

@@ -25,7 +25,7 @@ And with an invalid input:
 
 ```bash
 mortgage-calculator-book --principal -1000 --annual-rate 0.06 --term-years 30
-# Error: principal must be positive
+# Error: Value error, principal must be positive
 ```
 
 Having this shape settled before writing `argparse` code turns the implementation into a matter of matching a known target, the same discipline Chapter 5 established for the core library.
@@ -185,7 +185,7 @@ uv run mortgage-calculator-book \
 ```
 
 ```
-Error: principal must be positive
+Error: Value error, principal must be positive
 ```
 
 That printed to `stderr`, not `stdout` — worth confirming for yourself (`... 2>/dev/null` should silence it; `... 1>/dev/null` shouldn't), since it's an easy detail to lose track of once the CLI just works and you stop looking closely.
