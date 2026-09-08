@@ -79,7 +79,7 @@ Not every model is good at the same things. A model tuned for open-ended convers
 This book uses a Qwen3 variant as its running example for Pi's model, sized to run well on typical development hardware while still handling code-focused tasks competently:
 
 ```bash
-ollama pull qwen3:27b
+ollama pull qwen3.8:27b
 ```
 
 **On macOS specifically**, pull the MLX-optimized variant instead — built for Apple Silicon rather than a generic cross-platform target:

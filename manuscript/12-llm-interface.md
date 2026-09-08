@@ -14,7 +14,7 @@ Two different local language models will exist in this project by the end of thi
 
 A model chosen for coding assistance is judged on things like how well it reads and reasons about source code across multiple files. A model chosen for this chapter's job is judged on something narrower and more specific: how reliably it calls a tool with correctly formatted arguments, and how sensibly it responds once it has a result back. A model that's excellent at one of these isn't guaranteed to be excellent at the other — which is exactly why this chapter pulls a second model rather than reusing Pi's.
 
-> **Process concept: naming the distinction once both models exist.** Chapter 1.4.3's hardware gut-check flagged that a second model job was coming, without saying much more about it. Now that both models actually exist side by side in this project, the distinction is concrete rather than theoretical: one model's job is understanding *your code*; the other's job is understanding *your users' questions*.
+> **Process concept: naming the distinction once both models exist.** Chapter 1.2.3 flagged that a second model job was coming, without saying much more about it. Now that both models actually exist side by side in this project, the distinction is concrete rather than theoretical: one model's job is understanding *your code*; the other's job is understanding *your users' questions*.
 
 ## 11.3 Choosing a Local Model for the Intelligence Engine
 
@@ -532,6 +532,8 @@ vi SPEC.md
   - Actions: Calculate, Clear, and Ask (a natural-language question,
     answered via the tool interface)
   - Invalid input shows an error message in place, not a crash
+- Tool interface for language-model use (see tool.py), supporting both
+  local and hosted models
 ```
 
 ```bash
