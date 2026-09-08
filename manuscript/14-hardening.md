@@ -40,7 +40,7 @@ flowchart LR
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
 
-Three of the four seams (CLI, UI, tool-call arguments) converge on the same validation boundary — `MortgageInput` doesn't care which front end an input came from. The fourth, the model's raw output, is caught one step earlier: before tool-call arguments even exist, the model's response has to be parsed, and that parsing step is where "malformed JSON" or "no tool call when one was expected" (13.4.3) gets handled, separately from anything `MortgageInput` itself does.
+CLI and UI arguments converge directly on the same validation boundary — `MortgageInput` doesn't care which front end an input came from. The model's path is different: its raw output has to be parsed before tool-call arguments even exist, and that one parsing step has two distinct ways to go wrong — malformed JSON (13.4.2) or no tool call at all (13.4.3) — before whatever survives parsing reaches that same boundary too.
 
 ### 13.3.2 Why Each Needs Different Handling
 
@@ -272,7 +272,7 @@ Every chapter from 0 through 13 ended with its own checklist. Run through the wh
 
 - [ ] The project is git-tracked, pushed to GitHub, with a clean commit history (Ch. 0)
 - [ ] Pi is configured and every agent-proposed change in this project's history was reviewed before being committed (Ch. 1)
-- [ ] `SPEC.md` accurately describes the system as it exists today, including all three interfaces and the principal ceiling (Ch. 2, revised Ch. 4 and 13)
+- [ ] `SPEC.md` accurately describes the system as it exists today, including all three interfaces and the principal ceiling (Ch. 2, revised Ch. 4, 9, 11, and 13)
 - [ ] `ruff check .` and `ruff format .` pass cleanly across the whole project (Ch. 3)
 - [ ] The Chapter 4.5 worked example ($200,000 / 6% / 30yr → $1,199.10) is verified correct through every front end: CLI, UI, and the tool interface (Ch. 4, 6, 8, 9, 10)
 - [ ] The full test suite passes: core, validation, CLI, UI logic, tool, LLM wiring (mocked), and eval scoring (Ch. 5–12)
