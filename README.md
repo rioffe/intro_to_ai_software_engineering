@@ -44,18 +44,18 @@ from the Markdown in `manuscript/`.
 
 ### Back matter
 
-- [Appendix — Where to Go Next](manuscript/15-appendix.md)
-- [Closing](manuscript/16-closing.md)
+- [Closing](manuscript/15-closing.md)
+- [Appendix — Where to Go Next](manuscript/16-appendix.md)
 - [License](manuscript/17-license.md)
 
 ## Repository layout
 
 - `manuscript/`: The source of the book as a flat, zero-padded `NN-*.md`
   sequence — `00-front-matter.md` (Introduction), `01`–`16` (chapters 0–13, the
-  Appendix, and the Closing), and `17-license.md` (the license page). File order
+  Closing, and the Appendix), and `17-license.md` (the license page). File order
   is the book order.
 - [`book.pdf`](book.pdf): The full assembled book — front matter, all chapters,
-  the Appendix, the Closing, and the License page, in one PDF, with a
+  the Closing, the Appendix, and the License page, in one PDF, with a
   **two-level, clickable, paginated table of contents** (a short front-matter
   "Contents" listing the chapters, plus a compact per-chapter "Contents" page at
   the start of each chapter), a title page, and a per-page

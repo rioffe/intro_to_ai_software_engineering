@@ -11,7 +11,7 @@ Underneath everything — the terminal commands, the Pydantic models, the agent-
 ## C.3 What Was Hand-Written vs. AI-Assisted, Chapter by Chapter
 
 | Chapter | Pi's role | What stayed yours |
-|---|---|---|
+| --- | --- | --- |
 | 0 — Orientation | None yet | Everything — pure setup |
 | 1 — Meet Your Coding Agent | First delegated task (a docstring) | Configuration, review, the habit of reading every diff |
 | 2 — Writing SPEC.md | Drafted initial structure | Catching the gaps it papered over (rate vs. periodic rate, unstated frequency) |
