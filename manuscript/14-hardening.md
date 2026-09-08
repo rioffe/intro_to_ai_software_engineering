@@ -20,6 +20,28 @@ Docker, CI/CD, and the rest of Appendix A remain out of scope here too — harde
 
 Four places in this system currently receive input from something outside your own tested code: the CLI (Chapter 8), the UI (Chapter 9), tool-call arguments arriving from a model (Chapter 10–11), and the model's own raw output (Chapter 11). Each is a **seam** — a place where this project's trusted, tested code meets something less predictable.
 
+```mermaid
+flowchart LR
+    subgraph Seams[" Seams: untrusted input "]
+        CLI[CLI arguments]
+        UI[UI fields]
+        MODEL["Model's raw output"]
+    end
+
+    CLI --> V[MortgageInput validation]
+    UI --> V
+    MODEL --> PARSE[Parse tool call]
+    PARSE --> TC[Tool-call arguments]
+    TC --> V
+
+    V --> CORE[calculate_payment]
+    CORE --> R[Result]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Three of the four seams (CLI, UI, tool-call arguments) converge on the same validation boundary — `MortgageInput` doesn't care which front end an input came from. The fourth, the model's raw output, is caught one step earlier: before tool-call arguments even exist, the model's response has to be parsed, and that parsing step is where "malformed JSON" or "no tool call when one was expected" (13.4.3) gets handled, separately from anything `MortgageInput` itself does.
+
 ### 13.3.2 Why Each Needs Different Handling
 
 A bad float typed into the UI (Chapter 9) is already caught by `MortgageInput`'s validation — that seam is largely handled. A model producing malformed JSON where valid tool arguments were expected (Chapter 11) is a genuinely different failure, at a different layer, and nothing built so far specifically guards against it. Treating every seam as if it needed the same fix would miss what's actually still exposed.
@@ -64,11 +86,15 @@ Chapter 10's `call_tool` already handles the case where arguments are present bu
     try:
         arguments = json.loads(call.function.arguments)
     except json.JSONDecodeError:
-        logger.warning("Malformed tool-call JSON from model: {}", 
-                       call.function.arguments)
+        logger.warning(
+            "Malformed tool-call JSON from model: {}",
+            call.function.arguments,
+        )
         return {
-            "answer": "I had trouble understanding those loan details" \
-                      " — could you restate them?",
+            "answer": (
+                "I had trouble understanding those loan "
+                "details — could you restate them?"
+            ),
             "tool_called": True,
             "arguments": None,
         }
@@ -84,9 +110,9 @@ What if the model returns neither a tool call nor any content — an empty respo
 
 ```python
     if not tool_calls:
+        fallback = "I wasn't able to generate a response — try rephrasing."
         return {
-            "answer": message.get("content") or "I wasn't able to generate" \
-                      "a response — please try rephrasing.",
+            "answer": message.get("content") or fallback,
             "tool_called": False,
             "arguments": None,
         }
@@ -126,8 +152,20 @@ from loguru import logger
 
 logger.remove()
 logger.add(sys.stderr, level="INFO")
-logger.add("logs/mortgage_calculator_book.log", rotation="1 MB", level="DEBUG")
+logger.add(
+    "logs/mortgage_calculator_book.log", rotation="1 MB", level="DEBUG"
+)
 ```
+
+```mermaid
+flowchart LR
+    LOG[logger call] --> STDERR["sys.stderr, level=INFO"]
+    LOG --> FILE["logs file, level=DEBUG, rotation=1MB"]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+One call, two destinations, two different filters: everything INFO and above also goes to your terminal as it happens; everything DEBUG and above, which is everything, goes to the file, capped at 1MB per file before rotating. That's why 13.5.4's log-reading exercise finds a warning in the file that a casual glance at the terminal might have scrolled past.
 
 Import this module once, early — in `cli.py`'s `main()` and `ui.py`'s `main()` are reasonable places — so logging is configured no matter which front end starts the program.
 
@@ -168,23 +206,40 @@ You should see the `WARNING` line from 13.5.3, with the actual rejected argument
 
 ## 13.6 Final Spec Check
 
+This is the fourth time in the book SPEC.md has been opened and found wanting — worth seeing the whole pattern at once before adding to it again:
+
+```mermaid
+timeline
+    title SPEC.md's Revision History
+    Chapter 2 : First draft, deliberately gappy
+    Chapter 4.7 : Rate, frequency, and n_payments fixed
+    Chapter 9.6.2 : Interfaces section added (CLI, GUI)
+    Chapter 11.9.2 : Extended with --ask and Ask button
+    Chapter 13.6 : Tool interface and principal ceiling added
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Not five unrelated edits — one document, checked against reality at five different points as the project grew past what it originally described. This is the last of those checks in this book, not because SPEC.md becomes perfect after it, but because the book does.
+
 ### 13.6.1 Returning to SPEC.md
 
-Open the version last revised in Chapter 9.6.2. Read it fresh, as if you'd never seen the rest of this project, and ask: does this still describe what actually got built?
+Open the version last revised in Chapter 11.9.2. Read it fresh, as if you'd never seen the rest of this project, and ask: does this still describe what actually got built?
 
 ### 13.6.2 What's Drifted
 
-Two things stand out. First, section 13.4.1's new principal ceiling is a real constraint that exists in the code now but appears nowhere in the spec. Second: the "Interfaces" section Chapter 9.6.2 added lists the CLI and the GUI, but not the tool interface from Chapters 10–11 — built after that section was written, and nobody ever came back to add the third line.
+Two things stand out. First, section 13.4.1's new principal ceiling is a real constraint that exists in the code now but appears nowhere in the spec. Second: the "Interfaces" section Chapter 9.6.2 started and Chapter 11.9.2 extended lists the CLI, the GUI, and the natural-language additions to both — but not the tool interface those additions actually depend on, from Chapters 10–11. The section describes what a user sees without ever naming the mechanism underneath it.
 
 Reconcile both:
 
 ```markdown
 ## Interfaces
-- Command-line interface (human-readable and JSON output)
-- Desktop GUI:
+- Command-line interface (human-readable and JSON output; --ask
+  for a natural-language question, answered via the tool interface)
+- Desktop GUI (see docs/ui.md for the current layout):
   - Inputs: principal, annual rate, term (years), payments per year
-  - Actions: Calculate (computes and displays the payment), Clear
-    (resets all fields and the result)
+  - Actions: Calculate, Clear, and Ask (a natural-language question,
+    answered via the tool interface)
   - Invalid input shows an error message in place, not a crash
 - Tool interface for language-model use (see tool.py), supporting both
   local and hosted models
@@ -196,7 +251,7 @@ Reconcile both:
 - payments_per_year: number of payments per year (default: 12, monthly)
 ```
 
-Only the last bullet under "Interfaces" is actually new here — the CLI and GUI entries should already be sitting in your file from 9.6.2. This shows the whole section so you can confirm what's there against what's shown, not because all of it needs retyping.
+Only the last bullet under "Interfaces" is actually new here — everything above it should already be sitting in your file from 9.6.2 and 11.9.2. This shows the whole section so you can confirm what's there against what's shown, not because all of it needs retyping.
 
 Commit the reconciliation on its own:
 
