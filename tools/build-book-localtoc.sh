@@ -319,6 +319,7 @@ echo "build-book-localtoc: master TOC depth=1 (chapters); per-chapter local TOC 
 # shellcheck disable=SC2086
 pandoc "$PROC" \
  --toc --toc-depth=1 \
+ --lua-filter="$ROOT/tools/crossref-links.lua" \
  --pdf-engine=latexmk \
  --pdf-engine-opt="-xelatex" \
  --pdf-engine-opt="-interaction=nonstopmode" \
