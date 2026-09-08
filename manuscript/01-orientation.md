@@ -42,7 +42,7 @@ Paths can be **relative** (`cd Documents`, starting from where you are) or **abs
 mkdir mortgage-calculator-book  # make a new directory
 touch notes.txt                 # create an empty file
 cat notes.txt                   # print a file's contents
-rm notes.txt                    # delete a file — there is no trash can, no undo
+rm notes.txt                    # delete a file
 ```
 
 That last one deserves its own line: **`rm` does not ask twice, and it does not go to a recycle bin.** Get in the habit of double-checking what you're about to delete, especially once wildcards enter the picture (`rm *.txt` deletes *every* `.txt` file in the current directory, no confirmation).
@@ -129,7 +129,7 @@ Every push to GitHub needs to prove it's really you. SSH keys are how: a matched
 If you let `gh auth login` generate a key for you in 0.4.2, this is already done — skip to the verification command below. If you'd rather set it up by hand, or want to see what `gh` did automatically, here's the manual version:
 
 ```bash
-ssh-keygen -t ed25519 -C "you@example.com"  # press enter through the defaults
+ssh-keygen -t ed25519 -C "you@example.com"  # accept the defaults
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
 cat ~/.ssh/id_ed25519.pub                   # copy this output
@@ -164,13 +164,14 @@ This creates the repository on GitHub, and wires up your local repository's `ori
 If you'd rather create the repository through the browser instead: go to [github.com/new](https://github.com/new), name it `mortgage-calculator-book`, and leave it empty — no README, no `.gitignore` (0.7.3 creates that one properly, before it's actually needed). Then connect it by hand:
 
 ```bash
-git remote add origin git@github.com:YOUR_USERNAME/mortgage-calculator-book.git
+git remote add origin \
+    git@github.com:YOUR_USERNAME/mortgage-calculator-book.git
 ```
 
 Either path, finish by making sure your branch is named `main` and pushing:
 
 ```bash
-git branch -M main            # only needed if `git branch` shows something else
+git branch -M main            # only needed if not already on main
 git push -u origin main
 ```
 

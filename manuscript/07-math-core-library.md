@@ -35,7 +35,9 @@ Function names in this module should read as a direct translation of `SPEC.md`'s
 The conversion flagged repeatedly since Chapter 4.3.2, as its own small, independently testable function:
 
 ```python
-def annual_rate_to_periodic(annual_rate: float, payments_per_year: int) -> float:
+def annual_rate_to_periodic(
+    annual_rate: float, payments_per_year: int
+) -> float:
     """Convert an annual interest rate to the rate for a single period."""
     return annual_rate / payments_per_year
 ```

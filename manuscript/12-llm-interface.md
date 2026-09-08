@@ -208,7 +208,9 @@ from mortgage_calculator_book.config import HOSTED_MODEL, OPENROUTER_API_KEY
 from mortgage_calculator_book.tool import call_tool, get_tool_definition
 
 # One client, reused across every call — no need to reconnect per question.
-_client = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY)
+_client = OpenAI(
+    base_url="https://openrouter.ai/api/v1", api_key=OPENROUTER_API_KEY
+)
 
 
 def ask_hosted(question: str) -> str:
@@ -253,7 +255,11 @@ def ask_hosted(question: str) -> str:
         messages=[
             {"role": "user", "content": question},
             message,
-            {"role": "tool", "tool_call_id": call.id, "content": json.dumps(result)},
+            {
+                "role": "tool",
+                "tool_call_id": call.id,
+                "content": json.dumps(result),
+            },
         ],
     )
     return second.choices[0].message.content
@@ -367,9 +373,13 @@ def test_ask_local_calls_tool_and_returns_answer(monkeypatch):
     }
     second_response = {"message": {"content": "Payment: $1,199.10."}}
     mock_chat = MagicMock(side_effect=[first_response, second_response])
-    monkeypatch.setattr("mortgage_calculator_book.llm.ollama.chat", mock_chat)
+    monkeypatch.setattr(
+        "mortgage_calculator_book.llm.ollama.chat", mock_chat
+    )
 
-    answer = ask_local("What would my payment be on a $200,000, 6%, 30 year loan?")
+    answer = ask_local(
+        "What would my payment be on a $200,000, 6%, 30 year loan?"
+    )
 
     assert "1,199.10" in answer
     assert mock_chat.call_count == 2

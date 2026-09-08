@@ -102,9 +102,9 @@ TOOL_NAME = "calculate_mortgage_payment"
 
 TOOL_DESCRIPTION = (
     "Calculate the fixed periodic payment for a fixed-rate mortgage, given "
-    "a principal amount, an annual interest rate, a loan term in years, and "
-    "how many payments are made per year. Use this whenever the user asks "
-    "about a mortgage payment amount for a fixed-rate loan."
+    "a principal amount, an annual interest rate, a loan term in years, "
+    "and how many payments are made per year. Use this whenever the user "
+    "asks about a mortgage payment amount for a fixed-rate loan."
 )
 ```
 
@@ -151,7 +151,9 @@ def test_valid_call_returns_payment():
 
 
 def test_invalid_call_returns_error_dict_not_exception():
-    result = call_tool({"principal": -1000, "annual_rate": 0.06, "term_years": 30})
+    result = call_tool(
+        {"principal": -1000, "annual_rate": 0.06, "term_years": 30}
+    )
     assert "error" in result
 
 
@@ -186,7 +188,10 @@ from typing import Any
 
 from pydantic import ValidationError
 
-from mortgage_calculator_book.validation import MortgageInput, calculate_validated_payment
+from mortgage_calculator_book.validation import (
+    MortgageInput,
+    calculate_validated_payment,
+)
 
 
 def get_input_schema() -> dict[str, Any]:
@@ -242,7 +247,8 @@ import json
 from mortgage_calculator_book.tool import call_tool
 
 request = json.loads(
-    '{"principal": 200000, "annual_rate": 0.06, "term_years": 30, "payments_per_year": 12}'
+    '{"principal": 200000, "annual_rate": 0.06, '
+    '"term_years": 30, "payments_per_year": 12}'
 )
 response = call_tool(request)
 print(json.dumps(response))

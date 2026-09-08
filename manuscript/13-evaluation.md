@@ -154,7 +154,11 @@ def ask_local_detailed(question: str) -> dict:
     tool_calls = message.get("tool_calls")
 
     if not tool_calls:
-        return {"answer": message["content"], "tool_called": False, "arguments": None}
+        return {
+            "answer": message["content"],
+            "tool_called": False,
+            "arguments": None,
+        }
 
     # Only the first call matters — still one tool, same as 11.4.2.
     call = tool_calls[0]
@@ -172,7 +176,11 @@ def ask_local_detailed(question: str) -> dict:
     # arguments is returned here too now — the whole reason for this
     # refactor, since scoring needs to see what the model actually sent,
     # not just the final answer.
-    return {"answer": second["message"]["content"], "tool_called": True, "arguments": arguments}
+    return {
+        "answer": second["message"]["content"],
+        "tool_called": True,
+        "arguments": arguments,
+    }
 
 
 def ask_local(question: str) -> str:
@@ -353,7 +361,11 @@ def _fake_ask_correct(question: str) -> dict:
 
 
 def _fake_ask_no_call(question: str) -> dict:
-    return {"answer": "I'm not sure.", "tool_called": False, "arguments": None}
+    return {
+        "answer": "I'm not sure.",
+        "tool_called": False,
+        "arguments": None,
+    }
 
 
 def test_score_case_passes_on_matching_call():
@@ -361,13 +373,19 @@ def test_score_case_passes_on_matching_call():
         "id": "basic-1",
         "question": "irrelevant here",
         "expected_tool_call": True,
-        "expected_arguments": {"principal": 200000, "annual_rate": 0.06, "term_years": 30},
+        "expected_arguments": {
+            "principal": 200000, "annual_rate": 0.06, "term_years": 30
+        },
     }
     assert score_case(case, _fake_ask_correct)["passed"] is True
 
 
 def test_score_case_fails_when_tool_not_called_but_expected():
-    case = {"id": "basic-1", "question": "irrelevant here", "expected_tool_call": True}
+    case = {
+        "id": "basic-1",
+        "question": "irrelevant here",
+        "expected_tool_call": True,
+    }
     assert score_case(case, _fake_ask_no_call)["passed"] is False
 ```
 
@@ -418,7 +436,10 @@ vi scratch_eval_compare.py
 ```python
 for local, hosted in zip(local_results, hosted_results):
     if local["passed"] != hosted["passed"]:
-        print(f"{local['id']}: local={local['passed']} hosted={hosted['passed']}")
+        print(
+            f"{local['id']}: local={local['passed']} "
+            f"hosted={hosted['passed']}"
+        )
 ```
 
 Run the same command again:

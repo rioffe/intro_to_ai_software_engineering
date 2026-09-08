@@ -160,7 +160,9 @@ def test_matches_worked_example(worked_example):
         term_years=worked_example["term_years"],
         payments_per_year=worked_example["payments_per_year"],
     )
-    assert payment == pytest.approx(worked_example["expected_payment"], abs=0.01)
+    assert payment == pytest.approx(
+        worked_example["expected_payment"], abs=0.01
+    )
 ```
 
 Note `pytest.approx(..., abs=0.01)` rather than a plain `==`. Chapter 4.5 computed the exact payment as `1199.1010503...` before rounding — comparing floating-point results with plain equality is a reliable way to get bitten by a rounding difference in the fifteenth decimal place that has nothing to do with whether your code is actually correct. `abs=0.01` means "correct to the cent," which is the precision that actually matters for currency here. You don't need `import pytest` twice — add it to the top of the file alongside the `calculate_payment` import.

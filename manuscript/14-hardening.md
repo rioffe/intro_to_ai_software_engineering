@@ -318,7 +318,8 @@ def call_tool(arguments: dict) -> dict:
 Deliberately trigger a failure, then read what got recorded:
 
 ```bash
-mortgage-calculator-book --principal -5000 --annual-rate 0.06 --term-years 30
+mortgage-calculator-book \
+    --principal -5000 --annual-rate 0.06 --term-years 30
 cat logs/mortgage_calculator_book.log
 ```
 

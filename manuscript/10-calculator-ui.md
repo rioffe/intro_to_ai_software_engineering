@@ -113,7 +113,10 @@ from PyQt5.QtWidgets import (
 )
 from pydantic import ValidationError
 
-from mortgage_calculator_book.validation import MortgageInput, calculate_validated_payment
+from mortgage_calculator_book.validation import (
+    MortgageInput,
+    calculate_validated_payment,
+)
 
 
 class MortgageCalculatorWindow(QWidget):
@@ -155,7 +158,9 @@ class MortgageCalculatorWindow(QWidget):
             return
 
         payment = calculate_validated_payment(data)
-        self.result_label.setText(f"Fixed periodic payment: ${payment:,.2f}")
+        self.result_label.setText(
+            f"Fixed periodic payment: ${payment:,.2f}"
+        )
 
 
 def main() -> None:
@@ -346,7 +351,9 @@ And update `on_calculate` to call it:
             return
 
         payment = calculate_validated_payment(data)
-        self.result_label.setText(f"Fixed periodic payment: ${payment:,.2f}")
+        self.result_label.setText(
+            f"Fixed periodic payment: ${payment:,.2f}"
+        )
 ```
 
 Now `parse_form_values` is a plain function, testable with no `QApplication` involved at all:
