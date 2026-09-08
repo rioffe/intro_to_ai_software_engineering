@@ -248,8 +248,16 @@ from loguru import logger
             payments_per_year=args.payments_per_year,
         )
     except ValidationError as exc:
+        submitted = {
+            "principal": args.principal,
+            "annual_rate": args.annual_rate,
+            "term_years": args.term_years,
+            "payments_per_year": args.payments_per_year,
+        }
         for error in exc.errors():
-            logger.warning("CLI input rejected: {}", error["msg"])
+            logger.warning(
+                "CLI input rejected: {} ({})", submitted, error["msg"]
+            )
             print(f"Error: {error['msg']}", file=sys.stderr)
         return 1
 

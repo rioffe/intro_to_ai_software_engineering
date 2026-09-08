@@ -385,7 +385,7 @@ def test_ask_local_calls_tool_and_returns_answer(monkeypatch):
     assert mock_chat.call_count == 2
 ```
 
-`monkeypatch` — another built-in pytest fixture, alongside `capsys` from Chapter 8.6.1 — temporarily replaces `ollama.chat` with a fake that returns exactly the two scripted responses above, in order. This tests the *wiring* — does `ask_local` correctly extract arguments, call `call_tool`, and pass the result back — without ever touching a real model.
+`monkeypatch` — another built-in pytest fixture, alongside `capsys` from Chapter 8.6.2 — temporarily replaces `ollama.chat` with a fake that returns exactly the two scripted responses above, in order. This tests the *wiring* — does `ask_local` correctly extract arguments, call `call_tool`, and pass the result back — without ever touching a real model.
 
 ### 11.8.2 Prompting Pi, Reviewing the Diff
 
@@ -542,8 +542,6 @@ vi SPEC.md
   - Actions: Calculate, Clear, and Ask (a natural-language question,
     answered via the tool interface)
   - Invalid input shows an error message in place, not a crash
-- Tool interface for language-model use (see tool.py), supporting both
-  local and hosted models
 ```
 
 ```bash

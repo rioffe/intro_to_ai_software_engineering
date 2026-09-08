@@ -24,7 +24,7 @@ Did the model call the tool at all, when it should have? And when it did, were t
 
 ### 12.3.2 Answer Quality
 
-Given a correct tool result, did the model report it accurately in plain language? A model that calls the tool correctly but then misreads or mangles the result in its final answer has failed just as thoroughly as one that never called the tool.
+Given a correct tool result, did the model report it accurately in plain language? A model that calls the tool correctly but then misreads or mangles the result in its final answer has failed just as thoroughly as one that never called the tool. Flagged here, but not scored automatically by this chapter's harness (12.5.2): judging whether a sentence of prose accurately reports a number is a harder problem than comparing two numbers, needing either a human reader or another model as a judge. This project's `score_case` stays intentionally narrower — tool-call correctness and refusal behavior only — and leaves answer quality to a manual read of the transcripts, the same spot-check 11.7 already had you do.
 
 ### 12.3.3 Refusal and Clarification Behavior
 

@@ -11,7 +11,7 @@ Underneath everything — the terminal commands, the Pydantic models, the agent-
 ## C.3 What Was Hand-Written vs. AI-Assisted, Chapter by Chapter
 
 | Chapter | Pi's role | What stayed yours |
-| --- | --- | --- |
+|---|---|---|
 | 0 — Orientation | None yet | Everything — pure setup |
 | 1 — Meet Your Coding Agent | First delegated task (a docstring) | Configuration, review, the habit of reading every diff |
 | 2 — Writing SPEC.md | Drafted initial structure | Catching the gaps it papered over (rate vs. periodic rate, unstated frequency) |
@@ -24,8 +24,8 @@ Underneath everything — the terminal commands, the Pydantic models, the agent-
 | 9 — Calculator UI | Boilerplate widget wiring | Layout judgment, the decision not to test the GUI directly |
 | 10 — Tool Interface | Implementation draft | `TOOL_DESCRIPTION`'s wording — the one piece of this project that's really prompt engineering |
 | 11 — LLM Interface | Drafted `ask_hosted` from `ask_local`'s pattern | `ask_local` itself, the two-model distinction, the closest review in the book |
-| 12 — Evaluation | Test-writing assistance | Every eval question and its expected outcome — the actual judgment the whole chapter rests on |
-| 13 — Hardening | Proposed handling per seam | Identifying the seams themselves, the logging policy, the final spec and README reconciliation |
+| 12 — Evaluation | None — the eval set is entirely hand-authored | Every eval question and its expected outcome — the actual judgment the whole chapter rests on |
+| 13 — Hardening | Proposed handling per seam, drafted the README update | Identifying the seams themselves, the logging policy, the final spec and README reconciliation |
 
 ## C.4 Why the Boundary Sat Where It Did
 

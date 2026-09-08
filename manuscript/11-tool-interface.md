@@ -42,6 +42,7 @@ You should see something close to this:
 ```json
 {
   "additionalProperties": false,
+  "description": "Validated input for a fixed-rate mortgage payment calculation.",
   "properties": {
     "principal": {
       "title": "Principal",
@@ -71,11 +72,7 @@ You should see something close to this:
 }
 ```
 
-Exit when you're done:
-
-```python
-exit()
-```
+Exit when you're done: **Ctrl+D**.
 
 This dictionary describes every field's type, and — because your `field_validator`s already enforce them — you got the *shape* of the constraints (types, required fields) for free, with no extra code. Now inspect it for what's just as tellingly *missing*: none of Chapter 7.5's actual business rules show up anywhere. `principal` just says `"type": "number"` — nothing here hints that it rejects zero or negative values, or that `annual_rate` has to stay under 1.0. The specific rules inside your validators aren't expressed in the exported schema itself, but they still run every time `MortgageInput` is constructed — which matters, because it means the tool can't be tricked into skipping validation just because the schema alone doesn't spell out every rule.
 
