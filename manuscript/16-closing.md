@@ -2,11 +2,11 @@
 
 ## C.1 Why This Chapter Exists
 
-Thirteen chapters is a lot of ground covered one small step at a time. This chapter is a deliberate pause — not a new build step, but a chance to look back at what all those steps actually added up to, before you close the book.
+Fourteen chapters is a lot of ground covered one small step at a time. This chapter is a deliberate pause — not a new build step, but a chance to look back at what all those steps actually added up to, before you close the book.
 
 ## C.2 What Got Built
 
-Underneath everything — the terminal commands, the Pydantic models, the agent-reviewed diffs — one system exists now: a pure mathematical core (Chapter 6), wrapped in a validation layer that enforces what SPEC.md says is valid (Chapter 7), reachable through three genuinely different front ends that all share that same core without duplicating a line of its logic — a command line (Chapter 8), a graphical window (Chapter 9), and a language model that can operate it on a user's behalf (Chapters 10–11). Around all of that: an evaluation discipline that checks the model-facing layer honestly rather than anecdotally (Chapter 12), and a hardening pass that assumes the world outside your code is messier than your tests ever were (Chapter 13). One core, three front ends, held together by a spec that got checked against reality twice and corrected both times.
+Underneath everything — the terminal commands, the Pydantic models, the agent-reviewed diffs — one system exists now: a pure mathematical core (Chapter 6), wrapped in a validation layer that enforces what SPEC.md says is valid (Chapter 7), reachable through three genuinely different front ends that all share that same core without duplicating a line of its logic — a command line (Chapter 8), a graphical window (Chapter 9), and a language model that can operate it on a user's behalf (Chapters 10–11). Around all of that: an evaluation discipline that checks the model-facing layer honestly rather than anecdotally (Chapter 12), and a hardening pass that assumes the world outside your code is messier than your tests ever were (Chapter 13). One core, three front ends, held together by a spec that got checked against reality four times and corrected every time.
 
 ## C.3 What Was Hand-Written vs. AI-Assisted, Chapter by Chapter
 
@@ -25,7 +25,7 @@ Underneath everything — the terminal commands, the Pydantic models, the agent-
 | 10 — Tool Interface | Implementation draft | `TOOL_DESCRIPTION`'s wording — the one piece of this project that's really prompt engineering |
 | 11 — LLM Interface | Drafted `ask_hosted` from `ask_local`'s pattern | `ask_local` itself, the two-model distinction, the closest review in the book |
 | 12 — Evaluation | Test-writing assistance | Every eval question and its expected outcome — the actual judgment the whole chapter rests on |
-| 13 — Hardening | Proposed handling per seam | Identifying the seams themselves, the logging policy, the final spec reconciliation |
+| 13 — Hardening | Proposed handling per seam | Identifying the seams themselves, the logging policy, the final spec and README reconciliation |
 
 ## C.4 Why the Boundary Sat Where It Did
 

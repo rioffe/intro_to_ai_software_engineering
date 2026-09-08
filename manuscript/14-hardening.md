@@ -412,10 +412,12 @@ A reasonable addition looks like this:
 ```markdown
 ## Usage
 
-    uv run mortgage-calculator-book --principal 200000 --annual-rate 0.06 --term-years 30
+    uv run mortgage-calculator-book \
+        --principal 200000 --annual-rate 0.06 --term-years 30
     # Fixed periodic payment: $1,199.10
 
-    uv run mortgage-calculator-book --principal 200000 --annual-rate 0.06 --term-years 30 --format json
+    uv run mortgage-calculator-book \
+        --principal 200000 --annual-rate 0.06 --term-years 30 --format json
     # {"payment": 1199.1}
 
     uv run mortgage-calculator-book --ask \
@@ -476,4 +478,4 @@ Before moving to the Closing chapter, this should all be true:
 - [ ] `README.md` has been reconciled with the system as it actually exists, including the GUI and the `--ask` flag
 - [ ] The full checklist in 13.7.1 has been run against the whole project, not just this chapter's changes
 
-**What's next:** the Closing chapter looks back across all thirteen chapters — what was hand-written, what was agent-assisted, and why that boundary sat where it did throughout.
+**What's next:** the Closing chapter looks back across all fourteen chapters — what was hand-written, what was agent-assisted, and why that boundary sat where it did throughout.

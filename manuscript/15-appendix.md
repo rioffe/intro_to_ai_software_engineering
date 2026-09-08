@@ -2,7 +2,7 @@
 
 ## A.1 Why This Appendix Exists
 
-Thirteen chapters back, the front matter promised a note on what this book deliberately left out, and why leaving it out was a choice rather than an oversight. This is that note, expanded. Each entry below gets a paragraph: what the tool or practice solves, why it stayed out of scope here, and where it would slot into a project like this one if you decided to add it later. Nothing here is a tutorial — think of it as a map for your next project, not homework for this one.
+Fourteen chapters back, the front matter promised a note on what this book deliberately left out, and why leaving it out was a choice rather than an oversight. This is that note, expanded. Each entry below gets a paragraph: what the tool or practice solves, why it stayed out of scope here, and where it would slot into a project like this one if you decided to add it later. Nothing here is a tutorial — think of it as a map for your next project, not homework for this one.
 
 ## A.2 Docker
 
@@ -34,4 +34,4 @@ What holds it out of the main chapters is concept load, not setup cost: an offsc
 
 Strip away the mortgage-specific details and what's left is a pattern that has nothing to do with mortgages at all: a pure, human-verified core; a validation layer wrapping it; multiple front ends built on top — some for humans, one for a model; an evaluation discipline that checks the model-facing layer honestly rather than anecdotally; and a hardening pass that assumes the world outside your code is messier than your tests. That pattern is reusable well beyond a fixed-rate payment calculation.
 
-Worth sitting with before you close this book: what other domain do you already understand well enough to write a Chapter 4-style primer for — one you could hand-derive a formula from, hand-verify an example against, and build the same nine-chapter shape around? That's the actual transferable skill this book was trying to teach, more than any individual formula or tool.
+Worth sitting with before you close this book: what other domain do you already understand well enough to write a Chapter 4-style primer for — one you could hand-derive a formula from, hand-verify an example against, and build the same fourteen-chapter shape around? That's the actual transferable skill this book was trying to teach, more than any individual formula or tool.
