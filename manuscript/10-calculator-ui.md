@@ -404,7 +404,7 @@ Enter the Chapter 4.5 worked example — `200000`, `0.06`, `30`, `12` — click 
 
 ### 9.8.2 Packaging, Briefly
 
-Turning this into a double-clickable application (a `.app` on macOS, an `.exe` on Windows) is a real, separate topic — tools like PyInstaller handle it, but it's genuinely out of scope for this book. Flagged here, and named properly in the Appendix, rather than left as a mystery.
+Turning this into a double-clickable application (a `.app` on macOS, an `.exe` on Windows) is a real, separate topic — tools like PyInstaller handle it, but it's genuinely out of scope for this book. Flagged here, and covered properly in Appendix A.8, rather than left as a mystery.
 
 ## 9.9 Refactor and Ruff Pass
 

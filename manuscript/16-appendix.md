@@ -30,7 +30,11 @@ Chapter 9.7 pulled `parse_form_values` out of the UI specifically so it could be
 
 What holds it out of the main chapters is concept load, not setup cost: an offscreen platform plugin, a singleton application shared across tests, and the idea of driving a widget without a real display are three new things at once, on top of everything else Chapter 9 was already teaching. Worth trying directly if you want to feel how close it actually is — write one test that builds the calculator window, sets its fields, calls `.click()` on Calculate, and asserts on the result label. If it passes on the first real try, that's the whole technique.
 
-## A.8 Beyond This Book
+## A.8 Packaging with PyInstaller
+
+PyInstaller bundles a Python application — the interpreter, every dependency, your own code — into a single distributable file: a `.app` on macOS, an `.exe` on Windows, a standalone binary on Linux. What it solves that `uv run python -m mortgage_calculator_book.ui` doesn't: handing the calculator to someone who has never heard of Python, never installed `uv`, and shouldn't have to — someone who just wants to double-click something and see a window open. It was left out because every front end in this book assumes its reader is already following along in a terminal, with the project's dependencies already set up the way Chapter 0 left them; packaging solves a distribution problem this book's reader doesn't have yet, not a technical one standing in the way of finishing the project. If you wanted to add it, the natural place is the GUI specifically (Chapter 9) — the CLI and tool interface are already comfortable living inside a terminal, and Docker (A.2) is the better fit if either of those ever needs to run as a standalone service; a desktop window double-clicked into existence is the one front end here a packaged binary actually suits.
+
+## A.9 Beyond This Book
 
 Strip away the mortgage-specific details and what's left is a pattern that has nothing to do with mortgages at all: a pure, human-verified core; a validation layer wrapping it; multiple front ends built on top — some for humans, one for a model; an evaluation discipline that checks the model-facing layer honestly rather than anecdotally; and a hardening pass that assumes the world outside your code is messier than your tests. That pattern is reusable well beyond a fixed-rate payment calculation.
 
