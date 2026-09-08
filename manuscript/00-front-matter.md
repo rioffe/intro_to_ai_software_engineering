@@ -53,7 +53,7 @@ Before Chapter 0, you need one thing: a computer capable of running a local lang
 
 A note on pacing: every chapter ends at a checkpoint, and every checkpoint describes exactly what should be true about your project at that point. If something's not working, that checkpoint is there so you can compare against a known-good state instead of debugging in isolation, wondering how far back the problem goes. Use it.
 
-Finally, permission to skip things: the Appendix covers tools and practices — Docker, CI/CD, type checking, and a few others — that are genuinely useful but not required to finish this book. Skip it entirely on your first pass. It'll still be there when a future project actually needs it.
+Finally, permission to skip things: the Appendix covers tools and practices — Docker, CI/CD, type checking, and a couple of others — that are genuinely useful but not required to finish this book. Skip it entirely on your first pass. It'll still be there when a future project actually needs it.
 
 ## A Note on What This Book Doesn't Cover
 

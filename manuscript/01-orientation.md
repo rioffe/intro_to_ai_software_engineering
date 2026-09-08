@@ -21,9 +21,9 @@ Whichever you use, you should end up looking at a mostly-empty window with a bli
 Three commands get you almost everywhere:
 
 ```bash
-pwd        # print working directory — "where am I?"
-ls         # list what's in the current directory
-cd Documents   # change directory — "go here"
+pwd           # print working directory — "where am I?"
+ls            # list what's in the current directory
+cd Documents  # change directory — "go here"
 ```
 
 A few navigation shortcuts worth knowing immediately:
@@ -39,10 +39,10 @@ Paths can be **relative** (`cd Documents`, starting from where you are) or **abs
 ### 0.2.3 File Basics
 
 ```bash
-mkdir mortgage-calculator-book   # make a new directory
-touch notes.txt                  # create an empty file
-cat notes.txt                    # print a file's contents
-rm notes.txt                     # delete a file — there is no trash can, no undo
+mkdir mortgage-calculator-book  # make a new directory
+touch notes.txt                 # create an empty file
+cat notes.txt                   # print a file's contents
+rm notes.txt                    # delete a file — there is no trash can, no undo
 ```
 
 That last one deserves its own line: **`rm` does not ask twice, and it does not go to a recycle bin.** Get in the habit of double-checking what you're about to delete, especially once wildcards enter the picture (`rm *.txt` deletes *every* `.txt` file in the current directory, no confirmation).
@@ -78,11 +78,11 @@ Remember these two values — they resurface sooner than you'd expect. Section 0
 
 ```bash
 cd mortgage-calculator-book
-git init                       # start tracking this directory
-git status                     # what's changed since the last commit?
-git add SPEC.md                # stage a specific file
-git add .                      # stage everything that's changed
-git commit -m "Initial commit" # save a checkpoint, with a message
+git init                        # start tracking this directory
+git status                      # what's changed since the last commit?
+git add SPEC.md                 # stage a specific file
+git add .                       # stage everything that's changed
+git commit -m "Initial commit"  # save a checkpoint, with a message
 ```
 
 `git status` is the command you'll run constantly — more than any other in this book. It tells you what's staged, what's changed but unstaged, and what git doesn't know about yet. Run it often; there's no penalty for checking.
@@ -129,10 +129,10 @@ Every push to GitHub needs to prove it's really you. SSH keys are how: a matched
 If you let `gh auth login` generate a key for you in 0.4.2, this is already done — skip to the verification command below. If you'd rather set it up by hand, or want to see what `gh` did automatically, here's the manual version:
 
 ```bash
-ssh-keygen -t ed25519 -C "you@example.com"   # press enter through the defaults
+ssh-keygen -t ed25519 -C "you@example.com"  # press enter through the defaults
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
-cat ~/.ssh/id_ed25519.pub                    # copy this output
+cat ~/.ssh/id_ed25519.pub                   # copy this output
 ```
 
 Then, in a browser: GitHub → Settings → SSH and GPG keys → New SSH key, and paste what you copied.
@@ -191,21 +191,6 @@ For example, editing a line in `README.md` might produce:
 The unprefixed line is unchanged context. The `-` line is what the file used to say. The `+` line is what replaced it. That's the entire vocabulary: minus means removed, plus means added, no prefix means unchanged.
 
 This is arguably the single most load-bearing skill in this whole book. Starting in Chapter 1, every time Pi proposes a change, you'll be reading a diff like this one to see exactly what it's proposing before you accept it.
-
-### 0.4.6 Branches
-
-A **branch** is a parallel line of history — a place to make changes without touching your main line of work until you're ready to merge them back in.
-
-```bash
-git checkout -b try-something    # create and switch to a new branch
-git checkout main                 # switch back
-```
-
-This matters sooner than you might expect: in Chapter 1, you'll want a branch to work in *before* an agent starts editing your project, so that reviewing its changes is a matter of looking at a diff — the skill from 0.4.5 — not untangling your main line of history.
-
-### 0.4.7 A First Look at a Pull Request
-
-A pull request (PR) is GitHub's way of proposing that changes on one branch be merged into another — with a place to review the diff, leave comments, and decide whether to accept it. You don't need the full workflow yet; just recognize the shape of one when you see it. We'll use pull requests informally, as they come up naturally, rather than teaching the whole GitHub Flow up front.
 
 ## 0.5 vi, Just Enough
 
@@ -285,10 +270,12 @@ uv --version
 ### 0.7.2 Initializing the Project
 
 ```bash
-uv init
+uv init --package
 ```
 
-This generates a `pyproject.toml` — the file that describes your project: its name, its dependencies, and how it's built. Here's what it actually contains right after running `uv init` (this example is from the author's own machine — yours will show your own name and email, not this one):
+The `--package` flag matters: bare `uv init` sets up a single-file `main.py` sitting at the project root, not the installable `src/` layout this book uses throughout. `--package` is what actually generates that layout, along with a `[project.scripts]` entry point — both covered in 0.7.3 just below.
+
+This generates a `pyproject.toml` — the file that describes your project: its name, its dependencies, and how it's built. Here's what it actually contains right after running `uv init --package` (this example is from the author's own machine — yours will show your own name and email, not this one):
 
 ```toml
 [project]
@@ -310,9 +297,11 @@ requires = ["uv_build>=0.12.5,<0.13.0"]
 build-backend = "uv_build"
 ```
 
-A few things worth noticing. The `authors` field wasn't typed by hand — `uv init` pulled it straight from the same `git config --global user.name` and `user.email` you set back in 0.3.2, which is why it was worth getting those right early. `dependencies = []` is empty for now; it starts filling up in Chapter 5. And `[project.scripts]` already contains an entry pointing at a `main` function that doesn't exist yet anywhere in your project — `uv init` generates this automatically as a placeholder for a command-line entry point; Chapter 8 replaces it with the CLI's real one, so don't worry about it being unfulfilled until then.
+A few things worth noticing. The `authors` field wasn't typed by hand — `uv init --package` pulled it straight from the same `git config --global user.name` and `user.email` you set back in 0.3.2, which is why it was worth getting those right early. `dependencies = []` is empty for now; it starts filling up in Chapter 5. And `[project.scripts]` already contains an entry pointing at a `main` function that doesn't exist yet anywhere in your project — `uv init --package` generates this automatically as a placeholder for a command-line entry point; Chapter 8 replaces it with the CLI's real one, so don't worry about it being unfulfilled until then.
 
-You'll come back to this file constantly; every `uv add` command in later chapters edits it for you.
+You'll also see a `.python-version` file appear alongside `pyproject.toml` — that's `uv` pinning the exact Python version for this project, the same reproducibility idea as `uv.lock` in 0.7.4 below, just for the interpreter rather than the dependencies. It's meant to be committed, not ignored.
+
+You'll come back to `pyproject.toml` constantly; every `uv add` command in later chapters edits it for you.
 
 ### 0.7.3 Project Layout
 
@@ -320,15 +309,15 @@ This book uses a **src layout**: your actual package lives inside a `src/` direc
 
 ```
 mortgage-calculator-book/
-+-- .gitignore
-+-- pyproject.toml
-+-- uv.lock
-+-- README.md
-+-- SPEC.md
-+-- src/
-|   \-- mortgage_calculator_book/
-|       \-- __init__.py
-\-- tests/
+|-- .gitignore
+|-- pyproject.toml
+|-- uv.lock
+|-- README.md
+|-- SPEC.md
+|-- src/
+|   `-- mortgage_calculator_book/
+|       `-- __init__.py
+`-- tests/
 ```
 
 The reason: a src layout forces your code to be *installed* to be imported, the same way it would be for anyone else using it — which catches a whole class of "works on my machine because I happened to be in the right directory" bugs before they happen. It's a small amount of extra structure up front that pays for itself the moment you write your first test in Chapter 5.
