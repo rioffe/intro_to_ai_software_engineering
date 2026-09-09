@@ -10,9 +10,13 @@
 --
 -- The build passes two metadata keys, mirroring the PDF build's knobs:
 --   local_toc_depth      2 = ## only; 3 (default) = ## + ###.   (PDF: LOCAL_DEPTH)
---   local_toc_skipfirst  "false"/"0"/"no"/"off" also give the first chapter (the
---                        front matter) a Contents box; any other value (the
---                        default) skips it.               (PDF: FRONTMATTER=first)
+--   local_toc_skip_nth   1-based index of the one chapter whose local Contents
+--                        box is suppressed; 0 = give every chapter a box.
+--                        Default 1 (the front matter).  build-book-html.sh
+--                        derives it from FRONTMATTER exactly as the PDF build
+--                        derives its NOLOCAL file -- FRONTMATTER=first -> 1,
+--                        FRONTMATTER=0 -> 0, FRONTMATTER=<file> -> that file's
+--                        position.
 --
 -- Emits <div class="local-toc"> with a <div class="local-toc-title"> and a
 -- (possibly nested) bullet list; tools/style.css targets those classes.
@@ -20,12 +24,10 @@
 -- Requires Pandoc >= 3.0.
 
 local depth = 3
-local skipfirst = true
+local skip_nth = 1
 
--- Read a metadata key by either spelling.  `--metadata k=v` reaches a Lua
--- filter as a bare string, and `--metadata k=true|false` as a bare boolean, so
--- pick the first key that is actually present (an `or` chain would drop a
--- legitimate `false`).
+-- Read a metadata key by either spelling (pandoc accepts both `local_toc_depth`
+-- and `local-toc-depth`).  Return the first that is present.
 local function metaValue(meta, snake, kebab)
   local v = meta[snake]
   if v == nil then v = meta[kebab] end
@@ -38,12 +40,10 @@ local function readMeta(meta)
     local n = tonumber(pandoc.utils.stringify(d))
     if n and n >= 2 then depth = math.floor(n) end
   end
-  local s = metaValue(meta, 'local_toc_skipfirst', 'local-toc-skipfirst')
-  if type(s) == 'boolean' then
-    skipfirst = s
-  elseif s ~= nil then
-    local v = pandoc.utils.stringify(s):lower()
-    skipfirst = not (v == 'false' or v == '0' or v == 'no' or v == 'off')
+  local s = metaValue(meta, 'local_toc_skip_nth', 'local-toc-skip-nth')
+  if s ~= nil then
+    local n = tonumber(pandoc.utils.stringify(s))
+    if n and n >= 0 then skip_nth = math.floor(n) end
   end
 end
 
@@ -103,7 +103,7 @@ function Pandoc(doc)
     out[#out + 1] = b
     if b.t == 'Header' and b.level == 1 then
       chapter = chapter + 1
-      if not (skipfirst and chapter == 1) then
+      if chapter ~= skip_nth then
         local box = contentsBox(subsectionsAfter(doc.blocks, i + 1))
         if box then out[#out + 1] = box end
       end

@@ -41,7 +41,7 @@ ROOT     ?= .
 MK         := bash $(CURDIR)/tools/build-book-localtoc.sh
 MKH        := bash $(CURDIR)/tools/build-book-html.sh
 
-.PHONY: book book-html clean help
+.PHONY: book book-html test clean help
 
 # The default goal: the PDF book (the established primary artifact).
 .DEFAULT_GOAL := book
@@ -54,9 +54,13 @@ book:
 book-html:
 	$(MKH)
 
+## test: run every tests/*.sh (also what CI runs).
+test:
+	@set -e; for t in $(CURDIR)/tests/*.sh; do echo "== $$t"; bash "$$t"; done
+
 ## Help / overridable variables
 help:
-	@echo "make targets: book, book-html, clean, help"
+	@echo "make targets: book, book-html, test, clean, help"
 	@echo
 	@echo "Overridable variables (pass on the make command line):"
 	@echo "   make book:"

@@ -9,6 +9,12 @@ manuscript/*.pdf
 __pycache__/
 *.pyc
 
+# Local-only author notes (kept out of the published repo)
+notes/
+
+# mermaid-filter / puppeteer local config (e.g. CI's --no-sandbox)
+.puppeteer.json
+
 # Editor / OS temp files
 *~
 *.swp

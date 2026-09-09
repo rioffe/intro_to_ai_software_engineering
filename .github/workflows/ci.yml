@@ -1,0 +1,77 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  # Fast, dependency-light guard for the load-bearing pieces: the shared math
+  # preprocessor and the two Pandoc Lua filters.  Needs only pandoc + python.
+  filters:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-pandoc@v2
+        with:
+          pandoc-version: 3.1.11
+      - name: math-fence preprocessor
+        run: tests/test_math_fence.sh
+      - name: crossref-links.lua
+        run: tests/test_crossref_links.sh
+      - name: local-toc-html.lua
+        run: tests/test_local_toc.sh
+
+  # Full HTML build: pandoc + mermaid (Chrome) + network to vendor KaTeX.
+  html:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-pandoc@v2
+        with:
+          pandoc-version: 3.1.11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install -g mermaid-filter
+      - name: puppeteer sandbox config for CI
+        run: printf '%s\n' '{"args":["--no-sandbox","--disable-setuid-sandbox"]}' > .puppeteer.json
+      - name: build book.html and test it
+        env:
+          PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
+        run: tests/test_book_html.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book-html
+          path: book.html
+          if-no-files-found: ignore
+
+  # Full PDF build: pandoc + xelatex/latexmk + mermaid (Chrome).
+  pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-pandoc@v2
+        with:
+          pandoc-version: 3.1.11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install -g mermaid-filter
+      - name: TeX (xelatex + latexmk)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-xetex texlive-latex-extra texlive-fonts-recommended latexmk
+      - name: puppeteer sandbox config for CI
+        run: printf '%s\n' '{"args":["--no-sandbox","--disable-setuid-sandbox"]}' > .puppeteer.json
+      - name: build book.pdf and test the cover + title page
+        env:
+          PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
+        run: tests/test_book_cover.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: book-pdf
+          path: book.pdf
+          if-no-files-found: ignore

@@ -8,7 +8,8 @@
 #   * every in-page #anchor the build generates actually resolves to an id the
 #     document defines -- the core correctness guarantee of building the local
 #     TOCs from pandoc's own heading identifiers; and
-#   * the math survives into the HTML (class="math" spans are present).
+#   * the math survives into the HTML (class="math" spans are present); and
+#   * the file is self-contained -- no <script>/<link> to an external host.
 # It also asserts the builder wires the shared, drift-proof pieces
 # (tools/math-fence.awk, tools/local-toc-html.lua, tools/crossref-links.lua)
 # into the HTML path.
@@ -97,13 +98,15 @@ grep -Fq 'crossref-links.lua' "$BUILD" || {
  exit 1
 }
 
-# (8) Informational: is the math actually INLINED for offline reading?  A CDN
-#     reference (rather than a data: URI) is not fatal to the structure -- it just
-#     means the build machine lacked the network to fetch the KaTeX source -- so
-#     this is a note, not a failure.
-if grep -Eq '(src|href)="https?://[^"]*(katex|mathjax|\.js)|\.css"' "$out"; then
- echo "NOTE: $out still references an external JS/CSS (e.g. the KaTeX CDN). Rebuild where"
- echo "      the network is available (or vendor KaTeX locally) to keep it offline."
+# (8) book.html MUST be self-contained: no <script>/<link> pointing at an
+#     external host.  A CDN reference means the build could not vendor KaTeX
+#     (usually no network) -- that file is not offline-safe and must not ship.
+#     Content hyperlinks (<a href="https://...">) are fine and not matched here.
+if grep -Eiq '<(script|link)\b[^>]*\b(src|href)="https?://' "$out"; then
+ echo "FAIL: $out references external JS/CSS -- not self-contained / offline-safe:" >&2
+ grep -Eoin '<(script|link)\b[^>]*\b(src|href)="https?://[^"]*"' "$out" | head >&2
+ echo "      Rebuild with network access so pandoc can inline KaTeX." >&2
+ exit 1
 fi
 
-echo "PASS: book.html built with a two-level in-page TOC; all in-page anchors resolve; math present; shared pieces wired."
+echo "PASS: book.html built with a two-level in-page TOC; all in-page anchors resolve; math present; self-contained; shared pieces wired."

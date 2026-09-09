@@ -57,6 +57,8 @@ Overridable variables (env or on the make command line):
                     3 = sections + subsections (default).
     FRONTMATTER     "first" (default): the first file gets no local TOC.
                     "0" / "off" / "no": give the first file a local TOC too.
+                    <path>: name a different file as the one with no local TOC
+                    (mirrors build-book-localtoc.sh).
 EOF
 }
 
@@ -120,15 +122,25 @@ if [ -z "$chapters" ]; then
   exit 1
 fi
 
-# ---- front-matter handling, mirroring the PDF build's FRONTMATTER=first --------
+# ---- front-matter handling: mirror build-book-localtoc.sh's FRONTMATTER -------
 # The first file (00-front-matter.md) is the book's front matter: it sits at the
-# top of the master "Contents" but earns NO per-chapter "Contents" box.  The
-# local-toc-html.lua filter skips it when local_toc_skipfirst is truthy;
-# FRONTMATTER=0/off/no flips that so the front matter gets a box too.
+# top of the master "Contents" but earns NO per-chapter "Contents" box.  The PDF
+# build picks a single NOLOCAL file the same way; we translate that file to its
+# 1-based position and hand it to local-toc-html.lua as local_toc_skip_nth
+# (0 = every chapter gets a box).
+NOLOCAL=""
 case "${FRONTMATTER:-first}" in
-0 | off | no) SKIPFIRST="false" ;;
-*) SKIPFIRST="true" ;;
+0 | off | no | "") NOLOCAL="" ;;
+first | "*") NOLOCAL="$(printf '%s\n' "$chapters" | head -1)" ;;
+*) NOLOCAL="$FRONTMATTER" ;;
 esac
+SKIP_NTH=0
+if [ -n "$NOLOCAL" ]; then
+  SKIP_NTH="$(printf '%s\n' "$chapters" | awk -v t="$NOLOCAL" '
+    $0 == t || $0 ~ ("/" t "$") { print NR; f = 1; exit }
+    END { if (!f) print 0 }')"
+  [ "$SKIP_NTH" != 0 ] || echo "build-book-html: WARNING: FRONTMATTER='$NOLOCAL' matched no manuscript file; every chapter gets a local TOC." >&2
+fi
 total="$(printf '%s\n' "$chapters" | grep -c .)"
 
 # ---- assemble the combined source (plain concatenation, book order) -----------
@@ -156,7 +168,7 @@ if [ ! -s "$SRC" ]; then
   exit 1
 fi
 
-echo "build-book-html: assembled $total chapters ($(wc -l <"$SRC") source lines); front-matter local TOC: $([ "$SKIPFIRST" = true ] && echo skipped || echo included)"
+echo "build-book-html: assembled $total chapters ($(wc -l <"$SRC") source lines); local TOC suppressed for chapter: ${SKIP_NTH:-0} (0 = none)"
 
 # ---- math: the same fence-aware [ / ] -> $$ preprocessor as the PDF build ------
 # math-fence.awk toggles only on lone [ / ] lines, so it is a no-op when there is no
@@ -232,7 +244,7 @@ echo "build-book-html: building $OUT (master TOC via pandoc --toc; per-chapter l
 #     --toc --toc-depth=1          -> master "Contents" lists the chapters only.
 #     --lua-filter crossref-links.lua -> plain-prose cross-references become links.
 #     --lua-filter local-toc-html.lua -> per-chapter "Contents" box after each H1
-#         (local_toc_depth / local_toc_skipfirst mirror the PDF's LOCAL_DEPTH /
+#         (local_toc_depth / local_toc_skip_nth mirror the PDF's LOCAL_DEPTH /
 #          FRONTMATTER); it reads headers only, so it runs after crossref-links.
 #     --math-method=katex --embed-resources -> inlined, offline math (no CDN).
 # $mermaid_args (when set) -> crisp, embeddable SVG diagrams.
@@ -243,7 +255,7 @@ pandoc "$PROC" \
   --lua-filter "$ROOT/tools/crossref-links.lua" \
   --lua-filter "$ROOT/tools/local-toc-html.lua" \
   --metadata "local_toc_depth=$TOC_DEPTH" \
-  --metadata "local_toc_skipfirst=$SKIPFIRST" \
+  --metadata "local_toc_skip_nth=$SKIP_NTH" \
   --metadata "toc-title=Contents" \
   --metadata "title=$TITLE" \
   --metadata "subtitle=$SUBTITLE" \

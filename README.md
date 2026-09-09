@@ -1,6 +1,8 @@
 # Introduction to Software Engineering in the Age of AI
 
-*An open-educational resource.* [![Licence: CC BY 4.0](https://img.shields.io/badge/Licence-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+*An open-educational resource.*
+[![build](https://github.com/rioffe/intro_to_ai_software_engineering_claude/actions/workflows/ci.yml/badge.svg)](https://github.com/rioffe/intro_to_ai_software_engineering_claude/actions/workflows/ci.yml)
+[![Licence: CC BY 4.0](https://img.shields.io/badge/Licence-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
 A hands-on introduction to software engineering, built one working system at a
 time. The book braids two threads: the **tools of the trade** (terminal, git,
@@ -64,8 +66,14 @@ from the Markdown in `manuscript/`.
   `assets/book_cover.png`, followed by the title page.
 - `assets/book_cover.png`: The cover image used as the first page of the generated PDF.
 - [`book.html`](book.html): The self-contained HTML edition of the same book — a single file with a **two-level, in-page table of contents** (a master list *plus* a compact per-chapter "Contents" box of in-page anchor links), the same **clickable in-prose cross-references** as the PDF, and math, mermaid diagrams, the cover, and its CSS all **inlined**. It opens **offline** in any modern browser and publishes cleanly to **GitHub Pages**. Tracked on purpose, like `book.pdf`.
-- `tests/test_book_html.sh`: a smoke test that builds `book.html` and asserts its two-level in-page TOC, that every in-page anchor resolves, and that the book's math survives into the HTML.
-- `Makefile`: The build driver — the normal way to generate the PDF and the HTML (see below).
+- `tests/`: `make test` runs all of these (also what CI runs):
+  - `test_math_fence.sh` — the shared `[`/`]`→`$$` preprocessor is fence-aware.
+  - `test_crossref_links.sh` — `crossref-links.lua` is wired into both builds; references link, quantities (`0.5%`, `Python 3.12`) don't, every target resolves (HTML and LaTeX).
+  - `test_local_toc.sh` — `local-toc-html.lua` is wired in; boxes, `skip_nth`, depth nesting, and anchor resolution are correct.
+  - `test_book_html.sh` — full `book.html` build: two-level in-page TOC, all anchors resolve, math present, self-contained (no external JS/CSS).
+  - `test_book_cover.sh` — full `book.pdf` build: cover art on page 1, title page on page 2.
+- `.github/workflows/ci.yml`: runs the `tests/` on every push and PR — a fast `filters` job (pandoc only) plus `html` and `pdf` jobs for the full builds.
+- `Makefile`: The build driver — the normal way to generate the PDF and the HTML, and to run the tests (see below).
 - `tools/build-book-localtoc.sh`: Assembles `book.pdf` — concatenates every
   `manuscript/*.md` in order and runs pandoc once.
 - `tools/build-book-html.sh`: Assembles `book.html` — the HTML sibling of the PDF build — reusing that build's ordering, fence-aware math preprocessor, and mermaid detection, then rendering with two Pandoc Lua filters (cross-references and per-chapter "Contents" boxes).
@@ -85,15 +93,30 @@ The normal way to (re)generate `book.pdf` (and `book.html`) is the `Makefile`.
 
 ### Prerequisites
 
-- **pandoc** — the Markdown→LaTeX converter.
+Common to both builds:
+
+- **pandoc** (≥ 3.0) — the Markdown converter; also runs the two Lua filters
+  (`tools/crossref-links.lua`, and for HTML `tools/local-toc-html.lua`).
+- **Chrome / Chromium** — the manuscript embeds Mermaid diagrams (Chapter 1 and
+  Chapter 13), rendered via `mermaid-filter` → `mmdc`, which drives a headless
+  browser. The build auto-detects Chrome, Chrome Canary, Chromium, or Edge, or
+  honours `PUPPETEER_EXECUTABLE_PATH`.
+- **`mermaid-filter`** on `PATH` (`npm install -g mermaid-filter`).
+
+For `make book` (PDF):
+
 - **A TeX distribution that provides `xelatex` and `latexmk`** — `xelatex` renders
   the PDF and `latexmk` iterates it to a fixed point so the per-page footers and
   the two-level table of contents resolve their forward references and page
   numbers. (For example, BasicTeX on macOS, installed via `brew install --cask
   basictex`.)
 
-The book embeds no Mermaid diagrams, so no browser is needed; the build keeps
-Mermaid/Chrome detection only so a future diagram chapter "just works."
+For `make book-html` (HTML):
+
+- No TeX. Math is rendered with pandoc's **KaTeX** method and inlined via
+  `--embed-resources`, so the **first** build needs network access to fetch the
+  KaTeX assets; once `book.html` is produced it is fully self-contained and opens
+  offline.
 
 ### Make targets
 
@@ -101,6 +124,7 @@ Mermaid/Chrome detection only so a future diagram chapter "just works."
 make                 # alias: build book.pdf (the default target)
 make book            # build book.pdf (cover, two-level TOC, cross-ref links, license footer)
 make book-html       # build book.html (self-contained: TOC, cross-ref links, math, cover inlined)
+make test            # run every tests/*.sh (also what CI runs)
 make clean           # remove the generated book.pdf and book.html
 make help            # show the targets and overridable variables
 ```
