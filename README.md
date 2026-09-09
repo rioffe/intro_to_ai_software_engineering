@@ -1,7 +1,7 @@
 # Introduction to Software Engineering in the Age of AI
 
 *An open-educational resource.*
-[![build](https://github.com/rioffe/intro_to_ai_software_engineering_claude/actions/workflows/ci.yml/badge.svg)](https://github.com/rioffe/intro_to_ai_software_engineering_claude/actions/workflows/ci.yml)
+[![build](https://github.com/rioffe/intro_to_ai_software_engineering/actions/workflows/ci.yml/badge.svg)](https://github.com/rioffe/intro_to_ai_software_engineering/actions/workflows/ci.yml)
 [![Licence: CC BY 4.0](https://img.shields.io/badge/Licence-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
 A hands-on introduction to software engineering, built one working system at a
@@ -18,7 +18,7 @@ around it — but neither one gets to decide what "correct" means. That judgment
 stays with you, written down three times at three altitudes: a plain-language
 spec, executable tests, and a formal schema a language model can call.
 
-Read it online: **<https://rioffe.github.io/intro_to_ai_software_engineering_claude/>**
+Read it online: **<https://rioffe.github.io/intro_to_ai_software_engineering/>**
 — or grab the single-file [**book.pdf**](book.pdf) / [**book.html**](book.html).
 All three are assembled from the Markdown in `manuscript/`.
 
@@ -188,7 +188,7 @@ AUTHOR="Robert Ioffe" tools/build-book-html.sh out.html
 ### Publishing to GitHub Pages
 
 The site at
-<https://rioffe.github.io/intro_to_ai_software_engineering_claude/> is served
+<https://rioffe.github.io/intro_to_ai_software_engineering/> is served
 straight from `main` (repo **Settings → Pages → Deploy from a branch → `main` /
 `/`**). `index.html` redirects to the tracked `book.html`, and `.nojekyll` keeps
 Pages from touching anything.
