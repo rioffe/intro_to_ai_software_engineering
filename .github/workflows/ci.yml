@@ -59,12 +59,12 @@ jobs:
         with:
           node-version: 20
       - run: npm install -g mermaid-filter
-      - name: TeX (xelatex + latexmk)
+      - name: TeX (xelatex + latexmk) and poppler (pdfimages/pdftotext)
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
             texlive-xetex texlive-latex-recommended texlive-latex-extra \
-            texlive-fonts-recommended lmodern latexmk
+            texlive-fonts-recommended lmodern latexmk poppler-utils
       - name: mermaid / puppeteer setup for CI
         run: |
           printf '%s\n' '{"args":["--no-sandbox","--disable-setuid-sandbox"]}' > .puppeteer.json
