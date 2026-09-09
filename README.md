@@ -61,9 +61,11 @@ All three are assembled from the Markdown in `manuscript/`.
   the Closing, the Appendix, and the License page, in one PDF, with a
   **two-level, clickable, paginated table of contents** (a short front-matter
   "Contents" listing the chapters, plus a compact per-chapter "Contents" page at
-  the start of each chapter) and **clickable in-prose cross-references**
-  ("Chapter 6", "section 1.4", the Closing's chapter table, and so on). The first
-  page is the cover image from `assets/book_cover.png`, followed by the title page.
+  the start of each chapter), **clickable in-prose cross-references** ("Chapter 6",
+  "section 1.4", the Closing's chapter table, and so on), the book class's running
+  headers, and a per-page `CC BY 4.0 · © 2026  Robert Ioffe` footer (omit it with
+  `make book LICENSE=0`). The first page is the cover image from
+  `assets/book_cover.png`, followed by the title page.
 - `assets/book_cover.png`: The cover image used as the first page of the generated PDF.
 - [`book.html`](book.html): The self-contained HTML edition of the same book — a single file with a **two-level, in-page table of contents** (a master list *plus* a compact per-chapter "Contents" box of in-page anchor links), the same **clickable in-prose cross-references** as the PDF, and math, mermaid diagrams, the cover, and its CSS all **inlined**. It opens **offline** in any modern browser and publishes cleanly to **GitHub Pages**. Tracked on purpose, like `book.pdf`.
 - `index.html` + `.nojekyll`: the GitHub Pages entry point — `index.html` is a
@@ -87,8 +89,10 @@ All three are assembled from the Markdown in `manuscript/`.
 - `tools/book-html.html` + `tools/style.css`: the HTML5 pandoc template and its readable stylesheet.
 - `tools/ascii-cleanup.py`: A helper that swaps Unicode box-drawing characters
   for ASCII (the `lmmono` PDF code font lacks them); not part of the automated build.
-- `tools/license-footer.tex`: A LaTeX preamble for a per-page CC BY footer. **Not
-  currently wired into either build** — kept for reference / possible future use.
+- `tools/license-footer.tex`: The LaTeX preamble the PDF build (`make book`)
+  includes for the per-page `CC BY 4.0 · © 2026  Robert Ioffe` footer; it also
+  reproduces the book class's running headers via `fancyhdr`. Skipped when
+  `LICENSE=0`.
 - [`LICENSE`](LICENSE): The license — Creative Commons Attribution 4.0 (CC BY 4.0).
 - `.gitignore`: Ignores per-chapter build artifacts (`manuscript/*.pdf`), Python
   bytecode caches, `mermaid-filter` `.err` logs, a local `.puppeteer.json`, the
@@ -133,7 +137,7 @@ For `make book-html` (HTML):
 
 ```sh
 make                 # alias: build book.pdf (the default target)
-make book            # build book.pdf (cover, two-level TOC, cross-ref links)
+make book            # build book.pdf (cover, two-level TOC, cross-ref links, CC BY footer)
 make book-html       # build book.html (self-contained: TOC, cross-ref links, math, cover inlined)
 make test            # run every tests/*.sh (also what CI runs)
 make clean           # remove the generated book.pdf and book.html
@@ -157,6 +161,7 @@ PDF only (`make book`):
 make book LOCAL_DEPTH=2           # per-chapter local TOC depth (default 3: sections + subsections)
 make book OUTPUT=mybook.pdf       # output path (default: book.pdf at the repo root)
 make book MARGIN=0.5in            # page margin on all sides (default: pandoc's layout; e.g. 1cm, 0.3in)
+make book LICENSE=0               # omit the per-page CC BY footer
 ```
 
 HTML only (`make book-html`):

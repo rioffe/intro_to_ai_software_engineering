@@ -32,6 +32,7 @@
 #   OUTPUT=book-local.pdf tools/build-book-localtoc.sh   (via the Makefile: OUTPUT=)
 #   LOCAL_DEPTH=2 tools/build-book-localtoc.sh           -> sections only (default 3)
 #   --margin 0.5in / MARGIN=0.5in                        -> page margins on all sides
+#   LICENSE=0 tools/build-book-localtoc.sh               -> no per-page CC BY footer
 #
 # Why latexmk, not xelatex: a per-chapter \tableofcontents needs several LaTeX
 # passes for the cross-references (page numbers) to stabilise.  pandoc runs its
@@ -118,7 +119,11 @@ DATE="${DATE:-$(date +%Y)}"
 # Depth of the per-chapter local TOC: 2 = sections only; 3 (default) =
 # sections + subsections (###).  Override via LOCAL_DEPTH env.
 LOCAL_DEPTH="${LOCAL_DEPTH:-3}"
+# Per-page CC BY footer (tools/license-footer.tex).  On by default;
+# LICENSE=0 / off / no omits it.
+LICENSE="${LICENSE:-1}"
 COVER_IMAGE="$ROOT/assets/book_cover.png"
+LICENSE_HEADER="$ROOT/tools/license-footer.tex"
 
 if [ ! -f "$COVER_IMAGE" ]; then
  echo "build-book-localtoc: cover image not found: $COVER_IMAGE" >&2
@@ -308,14 +313,20 @@ if grep -q '^```mermaid' "$SRC"; then
  mermaid_args="--filter mermaid-filter"
 fi
 
+# Per-page CC BY footer: a second --include-in-header, unless LICENSE is off.
+license_args=""
+case "$LICENSE" in
+0 | off | no | false) echo "build-book-localtoc: LICENSE=$LICENSE -> no per-page CC BY footer" ;;
+*) license_args="--include-in-header=$LICENSE_HEADER" ;;
+esac
+
 echo "build-book-localtoc: building $OUT"
 echo "build-book-localtoc: master TOC depth=1 (chapters); per-chapter local TOC depth=$LOCAL_DEPTH (etoc, linked; multi-pass via latexmk)"
 
 #    --toc --toc-depth=1         -> master "Contents" lists chapters only.
 # Per-chapter local TOCs are injected as raw etoc blocks (see above); latexmk
 # iterates xelatex to a fixed point so the page numbers are correct.
-# $mermaid_args is a pre-split arg list (--filter mermaid-filter), expanded
-# unquoted on purpose.
+# $mermaid_args / $license_args are pre-split arg lists, expanded unquoted on purpose.
 # shellcheck disable=SC2086
 pandoc "$PROC" \
  --toc --toc-depth=1 \
@@ -324,6 +335,7 @@ pandoc "$PROC" \
  --pdf-engine-opt="-xelatex" \
  --pdf-engine-opt="-interaction=nonstopmode" \
  --include-in-header="$HEADER" \
+ $license_args \
  --variable documentclass=book \
  --variable colorlinks=true \
  --metadata "title=$TITLE" \

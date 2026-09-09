@@ -1,42 +1,64 @@
-% license-footer.tex -- a LaTeX preamble that stamps the open-educational
-% material branding ("CC BY 4.0 · © 2026 Robert Ioffe") as a per-page footer.
+% license-footer.tex -- a LaTeX preamble that adds the open-educational material
+% branding ("CC BY 4.0 - (c) 2026 Robert Ioffe") as a per-page footer WITHOUT
+% disturbing the book class's running headers.
 %
-% STATUS: not currently wired into any build.  build-book-localtoc.sh builds its
-% own inline preamble (hyperref + etoc + the cover \maketitle) and does not
-% --include-in-header this file.  Kept for reference; to re-enable, add
-%   --include-in-header="$ROOT/tools/license-footer.tex"
-% to the pandoc call in build-book-localtoc.sh (and restore a LICENSE= toggle).
+% Wired in by tools/build-book-localtoc.sh as a second --include-in-header
+% (unless LICENSE=0).
 %
-% IMPLEMENTATION NOTE (why centered, not per-side):
-% This PDF is a two-sided `book` class rendered through
-% pandoc + xelatex + hyperref (hyperref is loaded by the two-level-TOC preamble).
-% In that combination fancyhdr's per-side position codes (LO/RO/LE/RE) are
-% unreliable -- they can drop the footer on EVEN pages.  A single centered footer
-% with an \hfill ("license <tab> pagenum") is robust: it lands on every page, odd
-% and even alike, and \hfill still flushes the license to the left and the page
-% number to the right.  We reapply it to every page style a book uses -- "fancy"
-% (running text), "plain" (front matter / chapter-openers / table of contents) and
-% "empty" (title page + blank inter-chapter pages) -- so the footer also appears on
-% the title page and the front matter.
+% What each page gets:
+%   * body pages: the book class's "headings" running header, unchanged --
+%     UPPERCASE slanted marks (section on odd, chapter on even), page number in
+%     the outer corner, no rule -- PLUS a centered "CC BY 4.0 ..." footer line.
+%   * chapter openers / Contents / front matter: no running header (as before),
+%     with the license flush-left and the page number flush-right in the foot.
 %
-% NOTE: macro names are deliberately @-free so they do not require \makeatletter
-% (pandoc's include-in-header runs with a plain catcode for '@'). To change the
-% footer wording, edit \LicenseFooter below and rebuild.
+% IMPLEMENTATION NOTES:
+%  * We rebuild "headings" via fancyhdr rather than adding a foot to the class
+%    style, because you cannot append to \ps@headings cleanly.  \chaptermark /
+%    \sectionmark are restored to the class's UPPERCASE, prefix-free form (the
+%    manuscript numbers its own headings; LaTeX's secnumdepth is negative).
+%  * Odd/even \fancyhead[..] codes are used only in the HEADER (where the class
+%    already splits by side); the footer is a single centered \fancyfoot[C] that
+%    lands on every page, avoiding fancyhdr's flaky LE/RO footer behaviour.
+%  * Re-assert \pagestyle{fancy} around \frontmatter / \mainmatter: pandoc's
+%    book output runs \frontmatter \maketitle \tableofcontents \mainmatter, and
+%    that sequence otherwise leaves the class default in effect for the body.
+%  * @-free macro names, so no \makeatletter (pandoc's include-in-header runs
+%    with a normal catcode for '@').  To change the wording, edit \LicenseFooter.
 
 \usepackage{fancyhdr}
 
-% The single source of truth for the footer wording.
 \newcommand{\LicenseFooter}{%
       \small CC BY\ 4.0\ \textbullet\ \copyright\ 2026\ \ \textbf{Robert\ Ioffe}}
 
-% One centered footer: license flush-left, page number flush-right, no rules.
-\newcommand{\LicenseFancyStyle}{%
+% Marks exactly as the book class's \ps@headings would set them.
+\renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{#1}}{}}
+\renewcommand{\sectionmark}[1]{\markright{\MakeUppercase{#1}}}
+
+% Running-header pages: the class "headings" layout + a centered license foot.
+\newcommand{\LicenseMainStyle}{%
+      \fancyhf{}%
+      \fancyhead[LE]{\thepage}\fancyhead[RE]{\slshape\leftmark}%
+      \fancyhead[LO]{\slshape\rightmark}\fancyhead[RO]{\thepage}%
+      \fancyfoot[C]{\LicenseFooter}%
+      \renewcommand{\headrulewidth}{0pt}%
+      \renewcommand{\footrulewidth}{0pt}}
+
+% No-running-header pages (chapter openers, Contents, front matter): the page
+% number moves down beside the license.
+\newcommand{\LicensePlainStyle}{%
       \fancyhf{}%
       \fancyfoot[C]{\LicenseFooter \hfill \thepage}%
-      \renewcommand{\headrulewidth}{0pt}}
+      \renewcommand{\headrulewidth}{0pt}%
+      \renewcommand{\footrulewidth}{0pt}}
 
-% Apply the footer to every page style a book document uses.
 \pagestyle{fancy}
-\fancypagestyle{fancy}{\LicenseFancyStyle}
-\fancypagestyle{plain}{\LicenseFancyStyle}
-\fancypagestyle{empty}{\LicenseFancyStyle}
+\fancypagestyle{fancy}{\LicenseMainStyle}
+\fancypagestyle{plain}{\LicensePlainStyle}
+\fancypagestyle{empty}{\LicensePlainStyle}
+
+\AtBeginDocument{\pagestyle{fancy}}
+\let\LicenseOrigFrontmatter\frontmatter
+\renewcommand{\frontmatter}{\LicenseOrigFrontmatter\pagestyle{fancy}}
+\let\LicenseOrigMainmatter\mainmatter
+\renewcommand{\mainmatter}{\LicenseOrigMainmatter\pagestyle{fancy}}

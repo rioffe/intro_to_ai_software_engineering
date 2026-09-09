@@ -78,6 +78,7 @@ help:
 	@echo "  make book OUTPUT=mybook.pdf       Output PDF path (default: book.pdf at repo root)."
 	@echo "  make book MARGIN=0.5in            Page margin on all sides (default: pandoc's layout; e.g. 1cm, 0.3in)."
 	@echo "  make book FRONTMATTER=0           Give the first file a local \"Contents\" page too."
+	@echo "  make book LICENSE=0               Omit the per-page CC BY footer."
 	@echo "  Cover: assets/book_cover.png is added as the first PDF page."
 	@echo
 	@echo "   make book-html:"
