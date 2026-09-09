@@ -95,8 +95,10 @@ The normal way to (re)generate `book.pdf` (and `book.html`) is the `Makefile`.
 
 Common to both builds:
 
-- **pandoc** (≥ 3.0) — the Markdown converter; also runs the two Lua filters
+- **pandoc** — the Markdown converter; also runs the two Lua filters
   (`tools/crossref-links.lua`, and for HTML `tools/local-toc-html.lua`).
+  Developed and CI-tested against **pandoc 3.11**; the HTML build needs
+  `--math-method` / `--embed-resources`, so a recent 3.x (≳ 3.1.7).
 - **Chrome / Chromium** — the manuscript embeds Mermaid diagrams (Chapter 1 and
   Chapter 13), rendered via `mermaid-filter` → `mmdc`, which drives a headless
   browser. The build auto-detects Chrome, Chrome Canary, Chromium, or Edge, or

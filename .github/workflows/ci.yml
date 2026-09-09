@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: r-lib/actions/setup-pandoc@v2
         with:
-          pandoc-version: 3.1.11
+          pandoc-version: "3.11"
       - name: math-fence preprocessor
         run: tests/test_math_fence.sh
       - name: crossref-links.lua
@@ -30,16 +30,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: r-lib/actions/setup-pandoc@v2
         with:
-          pandoc-version: 3.1.11
+          pandoc-version: "3.11"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
       - run: npm install -g mermaid-filter
-      - name: puppeteer sandbox config for CI
-        run: printf '%s\n' '{"args":["--no-sandbox","--disable-setuid-sandbox"]}' > .puppeteer.json
+      - name: mermaid / puppeteer setup for CI
+        run: |
+          printf '%s\n' '{"args":["--no-sandbox","--disable-setuid-sandbox"]}' > .puppeteer.json
+          echo "PUPPETEER_EXECUTABLE_PATH=$(command -v google-chrome || command -v google-chrome-stable || command -v chromium-browser)" >> "$GITHUB_ENV"
       - name: build book.html and test it
-        env:
-          PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
         run: tests/test_book_html.sh
       - uses: actions/upload-artifact@v4
         with:
@@ -54,7 +54,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: r-lib/actions/setup-pandoc@v2
         with:
-          pandoc-version: 3.1.11
+          pandoc-version: "3.11"
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -63,12 +63,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            texlive-xetex texlive-latex-extra texlive-fonts-recommended latexmk
-      - name: puppeteer sandbox config for CI
-        run: printf '%s\n' '{"args":["--no-sandbox","--disable-setuid-sandbox"]}' > .puppeteer.json
+            texlive-xetex texlive-latex-recommended texlive-latex-extra \
+            texlive-fonts-recommended lmodern latexmk
+      - name: mermaid / puppeteer setup for CI
+        run: |
+          printf '%s\n' '{"args":["--no-sandbox","--disable-setuid-sandbox"]}' > .puppeteer.json
+          echo "PUPPETEER_EXECUTABLE_PATH=$(command -v google-chrome || command -v google-chrome-stable || command -v chromium-browser)" >> "$GITHUB_ENV"
       - name: build book.pdf and test the cover + title page
-        env:
-          PUPPETEER_EXECUTABLE_PATH: /usr/bin/google-chrome
         run: tests/test_book_cover.sh
       - uses: actions/upload-artifact@v4
         with:
