@@ -5,6 +5,10 @@ manuscript/*.pdf
 # mermaid-filter writes per-run diagnostics (.err) in cwd and next to outputs
 *.err
 
+# Python bytecode caches (tools/*.py)
+__pycache__/
+*.pyc
+
 # Editor / OS temp files
 *~
 *.swp

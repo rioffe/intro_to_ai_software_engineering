@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>$title$</title>
+   $for(header-includes)$
+   $header-includes$
+   $endfor$
+   $if(math)$
+   $math$
+   $endif$
+</head>
+<body class="book-html">
+   $for(include-before)$
+   $include-before$
+   $endfor$
+   $if(toc)$
+   <nav class="master-toc" aria-label="Contents">
+      <p class="toc-title">$toc-title$</p>
+      $toc$
+   </nav>
+   $endif$
+   $body$
+</body>
+</html>

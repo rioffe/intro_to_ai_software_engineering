@@ -1,0 +1,208 @@
+/* tools/style.css -- minimal, readable stylesheet for the HTML book build.
+ *
+ * Delivered by build-book-html.sh: the build wraps this file in a <style>
+ * element and inlines it via pandoc's --include-in-header, so the published
+ * book.html carries its own CSS (no external request) and reads the same
+ * offline as its math and diagrams.
+ */
+
+:root {
+   --page-max: 46rem;
+   --ink: #1a1a1a;
+   --muted: #555;
+   --link: #0057b8;
+   --rule: #e2e2e2;
+   --code-bg: #f5f5f5;
+   --toc-bg: #fafafa;
+   --toc-border: #dcdcdc;
+}
+
+/* Reading column: narrow and centered like a page. */
+html {
+   font-family: Georgia, "Times New Roman", serif;
+   font-size: 1.06rem;
+   line-height: 1.55;
+   color: var(--ink);
+   background: #ffffff;
+}
+
+body {
+   max-width: var(--page-max);
+   margin: 0 auto;
+   padding: 2rem 1.25rem 4rem;
+}
+
+/* Headings: slightly smaller and spaced like book matter. */
+h1,
+h2,
+h3,
+h4 {
+   font-family: "Helvetica Neue", Arial, sans-serif;
+   line-height: 1.3;
+   color: var(--ink);
+}
+
+h1 {
+   font-size: 1.7rem;
+   margin-top: 2.2rem;
+   padding-bottom: 0.3rem;
+   border-bottom: 1px solid var(--rule);
+}
+
+h2 {
+   font-size: 1.3rem;
+   margin-top: 1.8rem;
+}
+
+h3 {
+   font-size: 1.12rem;
+   margin-top: 1.4rem;
+}
+
+a {
+   color: var(--link);
+   text-decoration: none;
+}
+a:hover {
+   text-decoration: underline;
+}
+
+/* Cover + title matter (injected --include-before-body). */
+.cover {
+   text-align: center;
+   margin-bottom: 1.5rem;
+}
+.cover img {
+   max-width: 100%;
+   height: auto;
+   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+}
+
+.titleblock {
+   text-align: center;
+   margin-bottom: 2.5rem;
+}
+.book-title {
+   font-family: "Helvetica Neue", Arial, sans-serif;
+   font-size: 2rem;
+   margin: 0.2rem 0;
+}
+.book-subtitle {
+   font-style: italic;
+   color: var(--muted);
+   margin: 0.1rem 0;
+}
+.book-author,
+.book-date {
+   color: var(--muted);
+   margin: 0.1rem 0;
+   font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Master table of contents (top of the book). */
+.master-toc {
+   margin: 2rem 0 3rem;
+   padding: 1rem 1.5rem;
+   background: var(--toc-bg);
+   border: 1px solid var(--toc-border);
+   border-radius: 6px;
+}
+.master-toc .toc-title {
+   font-family: "Helvetica Neue", Arial, sans-serif;
+   font-weight: 600;
+   margin: 0 0 0.5rem;
+}
+.master-toc ul {
+   list-style: none;
+   margin: 0.15rem 0;
+   padding-left: 0;
+}
+.master-toc a {
+   color: var(--ink);
+}
+
+/* Per-chapter local table of contents (injected after each chapter's H1). */
+.local-toc {
+   margin: 1rem 0 1.75rem;
+   padding: 0.85rem 1.25rem;
+   background: var(--toc-bg);
+   border: 1px solid var(--toc-border);
+   border-radius: 6px;
+   font-size: 0.95rem;
+}
+.local-toc .local-toc-title {
+   font-family: "Helvetica Neue", Arial, sans-serif;
+   font-weight: 600;
+   margin: 0 0 0.35rem;
+}
+.local-toc ul,
+.local-toc ul ul {
+   list-style: none;
+   margin: 0;
+   padding-left: 1rem;
+}
+.local-toc > ul {
+   padding-left: 0;
+}
+.local-toc a {
+   color: var(--ink);
+}
+
+/* Mermaid diagrams (inlined by the build as embedded SVG/img). */
+.mermaid,
+figure img {
+   max-width: 100%;
+   height: auto;
+}
+
+/* Code: monospace, readable, with horizontal scroll for long lines. */
+code {
+   font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+   font-size: 0.9em;
+   background: var(--code-bg);
+   padding: 0 0.2em;
+   border-radius: 3px;
+}
+pre {
+   background: var(--code-bg);
+   padding: 0.85rem 1rem;
+   overflow-x: auto;
+   border-radius: 6px;
+   line-height: 1.4;
+}
+pre code {
+   background: none;
+   padding: 0;
+}
+
+/* Blockquote / figure spacing. */
+figure {
+   margin: 1.5rem 0;
+   text-align: center;
+}
+figcaption {
+   font-size: 0.85rem;
+   color: var(--muted);
+   margin-top: 0.35rem;
+}
+
+/* Print: drop screen chrome, keep page-ish. */
+@page {
+   margin: 2cm;
+}
+@media print {
+   body {
+      max-width: none;
+      padding: 0;
+      font-size: 11pt;
+   }
+   a {
+      color: var(--ink);
+      text-decoration: none;
+   }
+   .local-toc,
+   .master-toc {
+      background: none;
+      border: none;
+   }
+}

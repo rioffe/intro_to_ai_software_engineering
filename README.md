@@ -58,22 +58,29 @@ from the Markdown in `manuscript/`.
   the Closing, the Appendix, and the License page, in one PDF, with a
   **two-level, clickable, paginated table of contents** (a short front-matter
   "Contents" listing the chapters, plus a compact per-chapter "Contents" page at
-  the start of each chapter), a title page, and a per-page
-  `CC BY 4.0 · © 2026` footer. The first page is the cover image from
+  the start of each chapter), **clickable in-prose cross-references** ("Chapter 6",
+  "section 1.4", the Closing's chapter table, and so on), a title page, and a
+  per-page `CC BY 4.0 · © 2026` footer. The first page is the cover image from
   `assets/book_cover.png`, followed by the title page.
 - `assets/book_cover.png`: The cover image used as the first page of the generated PDF.
-- `Makefile`: The build driver — the normal way to generate the PDF (see below).
+- [`book.html`](book.html): The self-contained HTML edition of the same book — a single file with a **two-level, in-page table of contents** (a master list *plus* a compact per-chapter "Contents" box of in-page anchor links), the same **clickable in-prose cross-references** as the PDF, and math, mermaid diagrams, the cover, and its CSS all **inlined**. It opens **offline** in any modern browser and publishes cleanly to **GitHub Pages**. Tracked on purpose, like `book.pdf`.
+- `tests/test_book_html.sh`: a smoke test that builds `book.html` and asserts its two-level in-page TOC, that every in-page anchor resolves, and that the book's math survives into the HTML.
+- `Makefile`: The build driver — the normal way to generate the PDF and the HTML (see below).
 - `tools/build-book-localtoc.sh`: Assembles `book.pdf` — concatenates every
   `manuscript/*.md` in order and runs pandoc once.
+- `tools/build-book-html.sh`: Assembles `book.html` — the HTML sibling of the PDF build — reusing that build's ordering, fence-aware math preprocessor, and mermaid detection, then expanding per-chapter "Contents" markers into in-page anchor links.
+- `tools/crossref-links.lua`: Shared Pandoc filter (both builds) that turns the manuscript's plain-prose cross-references into internal links, using pandoc's own heading ids.
+- `tools/book-html.html` + `tools/style.css` + `tools/local-toc-html.py`: the HTML5 template, its readable stylesheet, and the per-chapter "Contents"-box generator that `build-book-html.sh` uses to expand the in-page TOCs.
 - `tools/license-footer.tex`: The shared LaTeX preamble that stamps the per-page
   license footer on every page.
 - [`LICENSE`](LICENSE): The license — Creative Commons Attribution 4.0 (CC BY 4.0).
-- `.gitignore`: Ignores per-chapter build artifacts (`manuscript/*.pdf`) and
-  editor/OS temp files; the assembled `book.pdf` is tracked on purpose.
+- `.gitignore`: Ignores per-chapter build artifacts (`manuscript/*.pdf`),
+  Python bytecode caches, and editor/OS temp files; the assembled `book.pdf`
+  and `book.html` are tracked on purpose.
 
 ## Building the book
 
-The normal way to (re)generate `book.pdf` is the `Makefile`.
+The normal way to (re)generate `book.pdf` (and `book.html`) is the `Makefile`.
 
 ### Prerequisites
 
@@ -91,8 +98,9 @@ Mermaid/Chrome detection only so a future diagram chapter "just works."
 
 ```sh
 make                 # alias: build book.pdf (the default target)
-make book            # build book.pdf (cover, two-level TOC, per-page license footer)
-make clean           # remove the generated book.pdf
+make book            # build book.pdf (cover, two-level TOC, cross-ref links, license footer)
+make book-html       # build book.html (self-contained: TOC, cross-ref links, math, cover inlined)
+make clean           # remove the generated book.pdf and book.html
 make help            # show the targets and overridable variables
 ```
 
@@ -107,18 +115,25 @@ make book OUTPUT=mybook.pdf       # output path (default: book.pdf at the repo r
 make book MARGIN=0.5in             # page margin on all sides (default: pandoc's layout; e.g. 1cm, 0.3in)
 make book LICENSE=0               # omit the per-page license footer
 make book FRONTMATTER=0           # give the front matter a per-chapter "Contents" page too
+
+make book-html TOC_DEPTH=2        # per-chapter local TOC depth (default 3; maps to the PDF's LOCAL_DEPTH)
+make book-html OUT=mybook.html    # output path (default: book.html at the repo root)
+make book-html AUTHOR="..."       # author on the title block (also TITLE, DATE)
+make book-html FRONTMATTER=0      # give the front matter a per-chapter "Contents" box too
 ```
 
-### Using `build-book-localtoc.sh` directly
+### Using the build scripts directly
 
-The `Makefile` target shells out to `tools/build-book-localtoc.sh`, which
-resolves paths relative to its own location, so it can also be run directly.
-The generated PDF starts with `assets/book_cover.png`, followed by the title page:
+Each `Makefile` target shells out to a script under `tools/`, which resolves
+paths relative to its own location, so both can also be run directly:
 
 ```sh
 tools/build-book-localtoc.sh
 AUTHOR="Robert Ioffe" tools/build-book-localtoc.sh out.pdf
 tools/build-book-localtoc.sh --margin 0.5in out.pdf
+
+tools/build-book-html.sh
+AUTHOR="Robert Ioffe" tools/build-book-html.sh out.html
 ```
 
 ## License
