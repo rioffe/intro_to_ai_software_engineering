@@ -25,7 +25,8 @@
 #   make help        -> show the targets and overridable variables.
 #
 # Overridable variables (pass on the make command line):
-#   make book      AUTHOR="Robert Ioffe"          PDF: author on the title page.
+#   make book      AUTHOR="..."                   PDF: author on the title page
+#                                                 (default: Robert Ioffe; AUTHOR= for none).
 #   make book      TITLE="..." DATE="..." LOCAL_DEPTH=2 OUTPUT=mybook.pdf
 #   make book      MARGIN=0.5in                   PDF: page margin on all sides.
 #   make book      FRONTMATTER=0                  give the first file a local
@@ -40,6 +41,12 @@
 ROOT     ?= .
 MK         := bash $(CURDIR)/tools/build-book-localtoc.sh
 MKH        := bash $(CURDIR)/tools/build-book-html.sh
+
+# Author on the title page of both builds. Defaults to "Robert Ioffe";
+# override on the command line (make book AUTHOR="Someone Else") or pass
+# AUTHOR= for no author.
+AUTHOR   ?= Robert Ioffe
+export AUTHOR
 
 .PHONY: book book-html test clean help
 
@@ -64,7 +71,7 @@ help:
 	@echo
 	@echo "Overridable variables (pass on the make command line):"
 	@echo "   make book:"
-	@echo "  make book AUTHOR=\"...\"            Author on the title page."
+	@echo "  make book AUTHOR=\"...\"            Author on the title page (default: Robert Ioffe; AUTHOR= for none)."
 	@echo "  make book TITLE=\"...\"           Book title (default: Introduction to AI Software Engineering)."
 	@echo "  make book DATE=\"...\"             Date on the title page (default: this year)."
 	@echo "  make book LOCAL_DEPTH=2|3         Per-chapter local TOC depth (default 3: sections + subsections)."
@@ -76,7 +83,7 @@ help:
 	@echo "   make book-html:"
 	@echo "  make book-html TOC_DEPTH=2|3     Per-chapter local TOC depth (default 3)."
 	@echo "  make book-html FRONTMATTER=0     Give the first file a local \"Contents\" box too."
-	@echo "  make book-html AUTHOR=\"...\"     Author on the title page (also TITLE, DATE)."
+	@echo "  make book-html AUTHOR=\"...\"     Author on the title page (default: Robert Ioffe; also TITLE, DATE)."
 	@echo "  make book-html OUT=mybook.html   Output HTML path (default: book.html at repo root)."
 	@echo "  HTML: math + mermaid SVGs + CSS + cover are INLINED into book.html -- it opens"
 	@echo "  offline in any modern browser and publishes to GitHub Pages at any sub-path."
