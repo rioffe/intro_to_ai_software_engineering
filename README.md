@@ -41,7 +41,7 @@ All three are assembled from the Markdown in `manuscript/`.
 - [Chapter 8 — Command Line Interface](manuscript/09-cli.md)
 - [Chapter 9 — Calculator UI](manuscript/10-calculator-ui.md)
 - [Chapter 10 — Tool Interface](manuscript/11-tool-interface.md)
-- [Chapter 11 — LLM Interface: A Second Model for a Second Job](manuscript/12-llm-interface.md)
+- [Chapter 11 — LLM Interface: Enter A Second Model](manuscript/12-llm-interface.md)
 - [Chapter 12 — Evaluation](manuscript/13-evaluation.md)
 - [Chapter 13 — Hardening](manuscript/14-hardening.md)
 
@@ -61,12 +61,14 @@ All three are assembled from the Markdown in `manuscript/`.
   the Closing, the Appendix, and the License page, in one PDF, with a
   **two-level, clickable, paginated table of contents** (a short front-matter
   "Contents" listing the chapters, plus a compact per-chapter "Contents" page at
-  the start of each chapter), **clickable in-prose cross-references** ("Chapter 6",
-  "section 1.4", the Closing's chapter table, and so on), a title page, and a
-  per-page `CC BY 4.0 · © 2026` footer. The first page is the cover image from
-  `assets/book_cover.png`, followed by the title page.
+  the start of each chapter) and **clickable in-prose cross-references**
+  ("Chapter 6", "section 1.4", the Closing's chapter table, and so on). The first
+  page is the cover image from `assets/book_cover.png`, followed by the title page.
 - `assets/book_cover.png`: The cover image used as the first page of the generated PDF.
 - [`book.html`](book.html): The self-contained HTML edition of the same book — a single file with a **two-level, in-page table of contents** (a master list *plus* a compact per-chapter "Contents" box of in-page anchor links), the same **clickable in-prose cross-references** as the PDF, and math, mermaid diagrams, the cover, and its CSS all **inlined**. It opens **offline** in any modern browser and publishes cleanly to **GitHub Pages**. Tracked on purpose, like `book.pdf`.
+- `index.html` + `.nojekyll`: the GitHub Pages entry point — `index.html` is a
+  one-line redirect to `book.html`; `.nojekyll` tells Pages to serve every file
+  verbatim (no Jekyll). See *Publishing to GitHub Pages* below.
 - `tests/`: `make test` runs all of these (also what CI runs):
   - `test_math_fence.sh` — the shared `[`/`]`→`$$` preprocessor is fence-aware.
   - `test_crossref_links.sh` — `crossref-links.lua` is wired into both builds; references link, quantities (`0.5%`, `Python 3.12`) don't, every target resolves (HTML and LaTeX).
@@ -80,13 +82,18 @@ All three are assembled from the Markdown in `manuscript/`.
 - `tools/build-book-html.sh`: Assembles `book.html` — the HTML sibling of the PDF build — reusing that build's ordering, fence-aware math preprocessor, and mermaid detection, then rendering with two Pandoc Lua filters (cross-references and per-chapter "Contents" boxes).
 - `tools/crossref-links.lua`: Shared Pandoc filter (both builds) that turns the manuscript's plain-prose cross-references into internal links, using pandoc's own heading ids.
 - `tools/local-toc-html.lua`: Pandoc filter for the HTML build that inserts a per-chapter "Contents" box after each chapter's H1, built from pandoc's heading ids (the AST-level analogue of the PDF's per-chapter etoc TOC).
+- `tools/math-fence.awk`: The shared, fence-aware `[`/`]`→`$$` display-math
+  preprocessor, run by both builds (guarded by `tests/test_math_fence.sh`).
 - `tools/book-html.html` + `tools/style.css`: the HTML5 pandoc template and its readable stylesheet.
-- `tools/license-footer.tex`: The shared LaTeX preamble that stamps the per-page
-  license footer on every page.
+- `tools/ascii-cleanup.py`: A helper that swaps Unicode box-drawing characters
+  for ASCII (the `lmmono` PDF code font lacks them); not part of the automated build.
+- `tools/license-footer.tex`: A LaTeX preamble for a per-page CC BY footer. **Not
+  currently wired into either build** — kept for reference / possible future use.
 - [`LICENSE`](LICENSE): The license — Creative Commons Attribution 4.0 (CC BY 4.0).
-- `.gitignore`: Ignores per-chapter build artifacts (`manuscript/*.pdf`),
-  Python bytecode caches, and editor/OS temp files; the assembled `book.pdf`
-  and `book.html` are tracked on purpose.
+- `.gitignore`: Ignores per-chapter build artifacts (`manuscript/*.pdf`), Python
+  bytecode caches, `mermaid-filter` `.err` logs, a local `.puppeteer.json`, the
+  local-only `notes/`, and editor/OS temp files; the assembled `book.pdf` and
+  `book.html` are tracked on purpose.
 
 ## Building the book
 
@@ -109,10 +116,11 @@ Common to both builds:
 For `make book` (PDF):
 
 - **A TeX distribution that provides `xelatex` and `latexmk`** — `xelatex` renders
-  the PDF and `latexmk` iterates it to a fixed point so the per-page footers and
-  the two-level table of contents resolve their forward references and page
-  numbers. (For example, BasicTeX on macOS, installed via `brew install --cask
-  basictex`.)
+  the PDF and `latexmk` iterates it to a fixed point so the two-level table of
+  contents resolves its forward references and page numbers. (For example,
+  BasicTeX on macOS, installed via `brew install --cask basictex`; the CI `pdf`
+  job installs `texlive-xetex texlive-latex-recommended texlive-latex-extra
+  texlive-fonts-recommended lmodern latexmk`.)
 
 For `make book-html` (HTML):
 
@@ -125,7 +133,7 @@ For `make book-html` (HTML):
 
 ```sh
 make                 # alias: build book.pdf (the default target)
-make book            # build book.pdf (cover, two-level TOC, cross-ref links, license footer)
+make book            # build book.pdf (cover, two-level TOC, cross-ref links)
 make book-html       # build book.html (self-contained: TOC, cross-ref links, math, cover inlined)
 make test            # run every tests/*.sh (also what CI runs)
 make clean           # remove the generated book.pdf and book.html
@@ -134,20 +142,28 @@ make help            # show the targets and overridable variables
 
 ### Overridable variables
 
+Shared by both builds (`export`ed from the `Makefile`):
+
 ```sh
-make book AUTHOR="Robert Ioffe"   # author on the title page
-make book TITLE="..."             # book title on the title page
-make book DATE="..."              # date on the title page
+make book AUTHOR="Ada Lovelace"   # author on the title page (default: Robert Ioffe; AUTHOR= for none)
+make book TITLE="..."             # book title
+make book DATE="..."              # date on the title page (default: current year)
+make book FRONTMATTER=0           # give the front matter a per-chapter "Contents" too
+```
+
+PDF only (`make book`):
+
+```sh
 make book LOCAL_DEPTH=2           # per-chapter local TOC depth (default 3: sections + subsections)
 make book OUTPUT=mybook.pdf       # output path (default: book.pdf at the repo root)
-make book MARGIN=0.5in             # page margin on all sides (default: pandoc's layout; e.g. 1cm, 0.3in)
-make book LICENSE=0               # omit the per-page license footer
-make book FRONTMATTER=0           # give the front matter a per-chapter "Contents" page too
+make book MARGIN=0.5in            # page margin on all sides (default: pandoc's layout; e.g. 1cm, 0.3in)
+```
 
-make book-html TOC_DEPTH=2        # per-chapter local TOC depth (default 3; maps to the PDF's LOCAL_DEPTH)
+HTML only (`make book-html`):
+
+```sh
+make book-html TOC_DEPTH=2        # per-chapter local TOC depth (default 3; the PDF's LOCAL_DEPTH)
 make book-html OUT=mybook.html    # output path (default: book.html at the repo root)
-make book-html AUTHOR="..."       # author on the title block (also TITLE, DATE)
-make book-html FRONTMATTER=0      # give the front matter a per-chapter "Contents" box too
 ```
 
 ### Using the build scripts directly
@@ -163,6 +179,23 @@ tools/build-book-localtoc.sh --margin 0.5in out.pdf
 tools/build-book-html.sh
 AUTHOR="Robert Ioffe" tools/build-book-html.sh out.html
 ```
+
+### Publishing to GitHub Pages
+
+The site at
+<https://rioffe.github.io/intro_to_ai_software_engineering_claude/> is served
+straight from `main` (repo **Settings → Pages → Deploy from a branch → `main` /
+`/`**). `index.html` redirects to the tracked `book.html`, and `.nojekyll` keeps
+Pages from touching anything.
+
+Because Pages serves the committed file, **after editing the manuscript you must
+rebuild and commit `book.html`** for the site to update:
+
+```sh
+make book-html && git add book.html && git commit -m "rebuild book.html"
+```
+
+Every push to `main` then triggers a Pages redeploy (~1 min).
 
 ## License
 

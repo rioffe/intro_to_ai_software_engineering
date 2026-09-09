@@ -1,6 +1,11 @@
-% license-footer.tex -- shared LaTeX preamble that stamps the open-educational
-% material branding ("CC BY 4.0 · © 2026 Robert Ioffe") as a page footer.  Included
-% via pandoc's --include-in-header from tools/build-book-localtoc.sh.
+% license-footer.tex -- a LaTeX preamble that stamps the open-educational
+% material branding ("CC BY 4.0 · © 2026 Robert Ioffe") as a per-page footer.
+%
+% STATUS: not currently wired into any build.  build-book-localtoc.sh builds its
+% own inline preamble (hyperref + etoc + the cover \maketitle) and does not
+% --include-in-header this file.  Kept for reference; to re-enable, add
+%   --include-in-header="$ROOT/tools/license-footer.tex"
+% to the pandoc call in build-book-localtoc.sh (and restore a LICENSE= toggle).
 %
 % IMPLEMENTATION NOTE (why centered, not per-side):
 % This PDF is a two-sided `book` class rendered through
