@@ -18,8 +18,9 @@ around it — but neither one gets to decide what "correct" means. That judgment
 stays with you, written down three times at three altitudes: a plain-language
 spec, executable tests, and a formal schema a language model can call.
 
-The full book is available as a single PDF — [**book.pdf**](book.pdf) — assembled
-from the Markdown in `manuscript/`.
+Read it online: **<https://rioffe.github.io/intro_to_ai_software_engineering_claude/>**
+— or grab the single-file [**book.pdf**](book.pdf) / [**book.html**](book.html).
+All three are assembled from the Markdown in `manuscript/`.
 
 ## Table of Contents
 
