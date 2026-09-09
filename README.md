@@ -68,9 +68,10 @@ from the Markdown in `manuscript/`.
 - `Makefile`: The build driver — the normal way to generate the PDF and the HTML (see below).
 - `tools/build-book-localtoc.sh`: Assembles `book.pdf` — concatenates every
   `manuscript/*.md` in order and runs pandoc once.
-- `tools/build-book-html.sh`: Assembles `book.html` — the HTML sibling of the PDF build — reusing that build's ordering, fence-aware math preprocessor, and mermaid detection, then expanding per-chapter "Contents" markers into in-page anchor links.
+- `tools/build-book-html.sh`: Assembles `book.html` — the HTML sibling of the PDF build — reusing that build's ordering, fence-aware math preprocessor, and mermaid detection, then rendering with two Pandoc Lua filters (cross-references and per-chapter "Contents" boxes).
 - `tools/crossref-links.lua`: Shared Pandoc filter (both builds) that turns the manuscript's plain-prose cross-references into internal links, using pandoc's own heading ids.
-- `tools/book-html.html` + `tools/style.css` + `tools/local-toc-html.py`: the HTML5 template, its readable stylesheet, and the per-chapter "Contents"-box generator that `build-book-html.sh` uses to expand the in-page TOCs.
+- `tools/local-toc-html.lua`: Pandoc filter for the HTML build that inserts a per-chapter "Contents" box after each chapter's H1, built from pandoc's heading ids (the AST-level analogue of the PDF's per-chapter etoc TOC).
+- `tools/book-html.html` + `tools/style.css`: the HTML5 pandoc template and its readable stylesheet.
 - `tools/license-footer.tex`: The shared LaTeX preamble that stamps the per-page
   license footer on every page.
 - [`LICENSE`](LICENSE): The license — Creative Commons Attribution 4.0 (CC BY 4.0).

@@ -9,11 +9,10 @@
 # browser detection.  What differs, and why:
 #
 #   Two-level TOC.  The PDF uses LaTeX etoc \localtableofcontents per chapter and
-#   Pandoc --toc for the master list.  HTML has no etoc, so the assembler injects
-#   a raw-HTML marker (<!--LOCAL-TOC-->) after each chapter's first H1, and
-#   tools/local-toc-html.py -- run AFTER pandoc -- expands each marker into a
-#   per-chapter "Contents" box using pandoc's OWN emitted anchor ids.  The master
-#   list is pandoc's native --toc.
+#   Pandoc --toc for the master list.  HTML has no etoc, so a pandoc Lua filter
+#   (tools/local-toc-html.lua) inserts a per-chapter "Contents" box right after
+#   each chapter's H1, built from pandoc's OWN heading identifiers in the same
+#   run that assigns them.  The master list is pandoc's native --toc.
 #
 #   Self-contained (offline + GitHub Pages).  Math is rendered by KaTeX and the
 #   whole document is inlined with --embed-resources, and mermaid is rendered to
@@ -39,10 +38,6 @@
 #   TITLE="..." AUTHOR="..." tools/build-book-html.sh
 #   TOC_DEPTH=2 tools/build-book-html.sh       -> per-chapter TOC: sections only (3)
 #   FRONTMATTER=0 tools/build-book-html.sh     -> front matter gets a local TOC too
-#
-# Why this order: pandoc runs once and emits stable #anchor ids; the marker
-# expansion must happen on that rendered HTML so every local-TOC link points at a
-# real id.  Mermaid math/diagrams are resolved by pandoc's filters first.
 #
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -104,7 +99,6 @@ DATE="${DATE:-$(date +%Y)}"
 COVER_IMAGE="$ROOT/assets/book_cover.png"
 TEMPLATE="$ROOT/tools/book-html.html"
 CSS="$ROOT/tools/style.css"
-LUATEST="$ROOT/tools/local-toc-html.py" # marker-expansion post-processor
 
 if [ ! -f "$COVER_IMAGE" ]; then
   echo "build-book-html: cover image not found: $COVER_IMAGE" >&2
@@ -126,87 +120,43 @@ if [ -z "$chapters" ]; then
   exit 1
 fi
 
-# ---- mark the first file as front matter (NOLOCAL), like the PDF build --------
-NOLOCAL=""
+# ---- front-matter handling, mirroring the PDF build's FRONTMATTER=first --------
+# The first file (00-front-matter.md) is the book's front matter: it sits at the
+# top of the master "Contents" but earns NO per-chapter "Contents" box.  The
+# local-toc-html.lua filter skips it when local_toc_skipfirst is truthy;
+# FRONTMATTER=0/off/no flips that so the front matter gets a box too.
 case "${FRONTMATTER:-first}" in
-0 | off | no | "") NOLOCAL="" ;;
-first | "*") NOLOCAL="$(printf '%s\n' "$chapters" | head -1)" ;;
-*) NOLOCAL="$FRONTMATTER" ;;
+0 | off | no) SKIPFIRST="false" ;;
+*) SKIPFIRST="true" ;;
 esac
 total="$(printf '%s\n' "$chapters" | grep -c .)"
 
-# ---- assemble the combined source, injecting a local-TOC marker per chapter ----
+# ---- assemble the combined source (plain concatenation, book order) -----------
 SRC="$(mktemp /tmp/bbh-src.XXXXXX.md)"
 PROC="$(mktemp /tmp/bbh-proc.XXXXXX.md)"
 COVER="$(mktemp /tmp/bbh-cover.XXXXXX.html)"
 STYLE="$(mktemp /tmp/bbh-style.XXXXXX.html)"
 LIST="$(mktemp /tmp/bbh-list.XXXXXX.txt)"
-ASMPY="$(mktemp /tmp/bbh-asm.XXXXXX.py)"
-trap 'rm -f "$SRC" "$PROC" "$COVER" "$STYLE" "$LIST" "$ASMPY"' EXIT
+trap 'rm -f "$SRC" "$PROC" "$COVER" "$STYLE" "$LIST"' EXIT
 
-# The assembler (argv: LIST, DEPTH, NOLOCAL) reads the ordered chapter paths and,
-# for each chapter that has ## / ### subsections and is NOT the front matter,
-# injects a raw-HTML marker right after the chapter's first REAL H1.  Fenced code
-# blocks are skipped when locating that H1, exactly like build-book-localtoc.sh,
-# so an embedded "# SPEC.md" inside a ```markdown fence is never mistaken for the
-# chapter title.  The marker is later expanded by local-toc-html.py.
+# Concatenate every manuscript file in filename (= book) order, blank-line
+# separated.  No markers and no H1 hunting: the per-chapter "Contents" boxes are
+# inserted from the AST by tools/local-toc-html.lua, and an embedded "# SPEC.md"
+# inside a ```markdown fence is invisible to pandoc anyway.
 printf '%s\n' "$chapters" >"$LIST"
-cat >"$ASMPY" <<'PY'
-import re, sys
-
-LIST, DEPTH, NOLOCAL = sys.argv[1], sys.argv[2], sys.argv[3]
-HEADING = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
-SUBSECTION = re.compile(r"^#{2,4}\s+\S")   # ## .. #### => a chapter has a local TOC
-FENCE = re.compile(r"^\s*(```|~~~)")
-MARKER = (
-    "```{=html}\n"
-    "<!--LOCAL-TOC-->\n"
-    "```"
-)
-
-paths = [l.strip() for l in open(LIST, encoding="utf-8") if l.strip()]
-out = []
-for n, path in enumerate(paths):
-    with open(path, encoding="utf-8", errors="replace") as f:
-        src = f.read().splitlines()
-
-    is_nolocal = NOLOCAL != "" and path == NOLOCAL
-    has_subs = any(SUBSECTION.match(l) for l in src) and not is_nolocal
-
-    # First REAL H1: skip fenced code blocks (an embedded '# SPEC.md' lives inside
-    # a ```markdown fence, so pandoc never turns it into a heading).
-    h1 = 0
-    in_fence = False
-    for i, ln in enumerate(src):
-        if FENCE.match(ln):
-            in_fence = not in_fence
-            continue
-        m = HEADING.match(ln)
-        if m and len(m.group(1)) == 1:
-            h1 = i
-            break
-
-    chunk = list(src[: h1 + 1])
-    if has_subs:
-        chunk += ["", MARKER, ""]
-    chunk += src[h1 + 1:]
-
-    text = "\n".join(chunk)
-    out.append(text)
-
-# Chapters are plain markdown, separated by blank lines; each opens at its own H1
-# (HTML has no page break).   The markers injected above build the per-chapter
-# local TOC; no thematic break sits between chapters -- the H1 heading styles it.
-sys.stdout.write("\n\n\n".join(out))
+python3 - "$LIST" >"$SRC" <<'PY'
+import sys
+paths = [l.strip() for l in open(sys.argv[1], encoding="utf-8") if l.strip()]
+parts = [open(p, encoding="utf-8", errors="replace").read().rstrip("\n") for p in paths]
+sys.stdout.write("\n\n\n".join(parts) + "\n")
 PY
-python3 "$ASMPY" "$LIST" "$TOC_DEPTH" "$NOLOCAL" >"$SRC"
 
 if [ ! -s "$SRC" ]; then
   echo "build-book-html: assembled source is empty" >&2
   exit 1
 fi
 
-echo "build-book-html: assembled $total chapters ($(wc -l <"$SRC") source lines); front matter (no local TOC): ${NOLOCAL:-<none>}"
+echo "build-book-html: assembled $total chapters ($(wc -l <"$SRC") source lines); front-matter local TOC: $([ "$SKIPFIRST" = true ] && echo skipped || echo included)"
 
 # ---- math: the same fence-aware [ / ] -> $$ preprocessor as the PDF build ------
 # math-fence.awk toggles only on lone [ / ] lines, so it is a no-op when there is no
@@ -277,11 +227,13 @@ COVER_B64="$(base64 <"$COVER_IMAGE" 2>/dev/null | tr -d '\n' || true)"
   echo '</div>'
 } >"$COVER"
 
-echo "build-book-html: building $OUT (master TOC depth=1 via pandoc --toc; per-chapter local TOC depth=$TOC_DEPTH via marker markers; offline via KaTeX + --embed-resources)"
+echo "build-book-html: building $OUT (master TOC via pandoc --toc; per-chapter local TOC depth=$TOC_DEPTH via local-toc-html.lua; offline via KaTeX + --embed-resources)"
 
 #     --toc --toc-depth=1          -> master "Contents" lists the chapters only.
-# Per-chapter local TOCs are the markers, expanded after rendering by local-toc-html.py.
 #     --lua-filter crossref-links.lua -> plain-prose cross-references become links.
+#     --lua-filter local-toc-html.lua -> per-chapter "Contents" box after each H1
+#         (local_toc_depth / local_toc_skipfirst mirror the PDF's LOCAL_DEPTH /
+#          FRONTMATTER); it reads headers only, so it runs after crossref-links.
 #     --math-method=katex --embed-resources -> inlined, offline math (no CDN).
 # $mermaid_args (when set) -> crisp, embeddable SVG diagrams.
 # shellcheck disable=SC2086
@@ -289,6 +241,9 @@ pandoc "$PROC" \
   --toc \
   --toc-depth=1 \
   --lua-filter "$ROOT/tools/crossref-links.lua" \
+  --lua-filter "$ROOT/tools/local-toc-html.lua" \
+  --metadata "local_toc_depth=$TOC_DEPTH" \
+  --metadata "local_toc_skipfirst=$SKIPFIRST" \
   --metadata "toc-title=Contents" \
   --metadata "title=$TITLE" \
   --metadata "subtitle=$SUBTITLE" \
@@ -301,9 +256,5 @@ pandoc "$PROC" \
   --embed-resources \
   $mermaid_args \
   --output "$OUT"
-
-# ---- expand the per-chapter local-TOC markers into real anchor links -----------
-echo "build-book-html: expanding per-chapter local TOCs (depth=$TOC_DEPTH)"
-TOC_DEPTH="$TOC_DEPTH" python3 "$LUATEST" "$OUT"
 
 echo "Success! Created '$OUT'.  (self-contained: math + diagrams + CSS + cover inlined; opens offline and at any GitHub Pages sub-path.)"

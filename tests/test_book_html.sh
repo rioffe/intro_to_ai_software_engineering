@@ -6,11 +6,12 @@
 #     "Contents" boxes, all anchored -- not page numbers);
 #   * no leaked LaTeX \newpage page breaks (the HTML assembler must not emit them);
 #   * every in-page #anchor the build generates actually resolves to an id the
-#     document defines -- the core correctness guarantee of the marker/post-process
-#     design; and
+#     document defines -- the core correctness guarantee of building the local
+#     TOCs from pandoc's own heading identifiers; and
 #   * the math survives into the HTML (class="math" spans are present).
 # It also asserts the builder wires the shared, drift-proof pieces
-# (tools/math-fence.awk + tools/local-toc-html.py) into the HTML path.
+# (tools/math-fence.awk, tools/local-toc-html.lua, tools/crossref-links.lua)
+# into the HTML path.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -50,14 +51,15 @@ grep -qF 'class="master-toc"' "$out" || {
 }
 
 # (4) At least one per-chapter local "Contents" box was generated.
-local_count="$(grep -oc "<nav class='local-toc'>" "$out" || true)"
+local_count="$(grep -oc 'class="local-toc"' "$out" || true)"
 if [ "${local_count:-0}" -lt 1 ]; then
  echo "FAIL: expected >=1 per-chapter local 'Contents' box, found $local_count" >&2
  exit 1
 fi
 
 # (5) Every in-page '#' anchor the build emits resolves to an id the document
-#     defines -- the heart of the marker-expansion design.
+#     defines -- local-toc-html.lua and crossref-links.lua both build their links
+#     from pandoc's own heading identifiers, so this must always hold.
 python3 - "$out" <<'PY'
 import re, sys
 html_path = sys.argv[1]
@@ -86,8 +88,12 @@ grep -Fq 'awk -f "$ROOT/tools/math-fence.awk"' "$BUILD" || {
  echo "FAIL: build-book-html.sh does not call the shared tools/math-fence.awk" >&2
  exit 1
 }
-grep -Fq 'local-toc-html.py' "$BUILD" || {
- echo "FAIL: build-book-html.sh does not run the local-TOC post-processor local-toc-html.py" >&2
+grep -Fq 'local-toc-html.lua' "$BUILD" || {
+ echo "FAIL: build-book-html.sh does not run the local-TOC filter local-toc-html.lua" >&2
+ exit 1
+}
+grep -Fq 'crossref-links.lua' "$BUILD" || {
+ echo "FAIL: build-book-html.sh does not run the shared cross-reference filter crossref-links.lua" >&2
  exit 1
 }
 

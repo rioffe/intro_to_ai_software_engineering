@@ -399,7 +399,75 @@ border: none;
       <p>Portland, Oregon</p>
       <p>September 1, 2026</p>
       <h1 id="chapter-0-orientation">Chapter 0 — Orientation</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#why-this-chapter-exists">0.1 Why This Chapter Exists</a></li><li><a href="#the-terminal">0.2 The Terminal</a><ul><li><a href="#opening-a-terminal">0.2.1 Opening a Terminal</a></li><li><a href="#navigation">0.2.2 Navigation</a></li><li><a href="#file-basics">0.2.3 File Basics</a></li><li><a href="#why-the-terminal-matters-more-now-not-less">0.2.4 Why the Terminal Matters More Now, Not Less</a></li></ul></li><li><a href="#git-basics">0.3 Git Basics</a><ul><li><a href="#what-version-control-is-actually-for">0.3.1 What Version Control Is Actually For</a></li><li><a href="#installing-and-configuring-git">0.3.2 Installing and Configuring Git</a></li><li><a href="#the-core-loop">0.3.3 The Core Loop</a></li><li><a href="#reading-a-commit-log">0.3.4 Reading a Commit Log</a></li></ul></li><li><a href="#github.com">0.4 GitHub.com</a><ul><li><a href="#creating-an-account">0.4.1 Creating an Account</a></li><li><a href="#installing-and-authenticating-gh">0.4.2 Installing and Authenticating gh</a></li><li><a href="#ssh-keys-briefly">0.4.3 SSH Keys, Briefly</a></li><li><a href="#creating-and-connecting-the-repository">0.4.4 Creating and Connecting the Repository</a></li><li><a href="#reading-a-diff">0.4.5 Reading a Diff</a></li></ul></li><li><a href="#vi-just-enough">0.5 vi, Just Enough</a><ul><li><a href="#why-bother">0.5.1 Why Bother</a></li><li><a href="#modes">0.5.2 Modes</a></li><li><a href="#the-commands-you-actually-need">0.5.3 The Commands You Actually Need</a></li><li><a href="#when-to-reach-for-it">0.5.4 When to Reach for It</a></li></ul></li><li><a href="#python-3.12">0.6 Python 3.12</a><ul><li><a href="#installing">0.6.1 Installing</a></li><li><a href="#checking-your-install">0.6.2 Checking Your Install</a></li><li><a href="#whats-relevant-here">0.6.3 What’s Relevant Here</a></li></ul></li><li><a href="#uv-good-project-structure">0.7 uv & Good Project Structure</a><ul><li><a href="#what-uv-is">0.7.1 What uv Is</a></li><li><a href="#initializing-the-project">0.7.2 Initializing the Project</a></li><li><a href="#project-layout">0.7.3 Project Layout</a></li><li><a href="#adding-a-dependency">0.7.4 Adding a Dependency</a></li><li><a href="#the-skeleton-youre-building-toward">0.7.5 The Skeleton You’re Building Toward</a></li></ul></li><li><a href="#checkpoint">0.8 Checkpoint</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#why-this-chapter-exists">0.1 Why This Chapter
+      Exists</a></li>
+      <li><a href="#the-terminal">0.2 The Terminal</a>
+      <ul>
+      <li><a href="#opening-a-terminal">0.2.1 Opening a
+      Terminal</a></li>
+      <li><a href="#navigation">0.2.2 Navigation</a></li>
+      <li><a href="#file-basics">0.2.3 File Basics</a></li>
+      <li><a href="#why-the-terminal-matters-more-now-not-less">0.2.4
+      Why the Terminal Matters More Now, Not Less</a></li>
+      </ul></li>
+      <li><a href="#git-basics">0.3 Git Basics</a>
+      <ul>
+      <li><a href="#what-version-control-is-actually-for">0.3.1 What
+      Version Control Is Actually For</a></li>
+      <li><a href="#installing-and-configuring-git">0.3.2 Installing and
+      Configuring Git</a></li>
+      <li><a href="#the-core-loop">0.3.3 The Core Loop</a></li>
+      <li><a href="#reading-a-commit-log">0.3.4 Reading a Commit
+      Log</a></li>
+      </ul></li>
+      <li><a href="#github.com">0.4 GitHub.com</a>
+      <ul>
+      <li><a href="#creating-an-account">0.4.1 Creating an
+      Account</a></li>
+      <li><a href="#installing-and-authenticating-gh">0.4.2 Installing
+      and Authenticating gh</a></li>
+      <li><a href="#ssh-keys-briefly">0.4.3 SSH Keys, Briefly</a></li>
+      <li><a href="#creating-and-connecting-the-repository">0.4.4
+      Creating and Connecting the Repository</a></li>
+      <li><a href="#reading-a-diff">0.4.5 Reading a Diff</a></li>
+      </ul></li>
+      <li><a href="#vi-just-enough">0.5 vi, Just Enough</a>
+      <ul>
+      <li><a href="#why-bother">0.5.1 Why Bother</a></li>
+      <li><a href="#modes">0.5.2 Modes</a></li>
+      <li><a href="#the-commands-you-actually-need">0.5.3 The Commands
+      You Actually Need</a></li>
+      <li><a href="#when-to-reach-for-it">0.5.4 When to Reach for
+      It</a></li>
+      </ul></li>
+      <li><a href="#python-3.12">0.6 Python 3.12</a>
+      <ul>
+      <li><a href="#installing">0.6.1 Installing</a></li>
+      <li><a href="#checking-your-install">0.6.2 Checking Your
+      Install</a></li>
+      <li><a href="#whats-relevant-here">0.6.3 What’s Relevant
+      Here</a></li>
+      </ul></li>
+      <li><a href="#uv-good-project-structure">0.7 uv &amp; Good Project
+      Structure</a>
+      <ul>
+      <li><a href="#what-uv-is">0.7.1 What uv Is</a></li>
+      <li><a href="#initializing-the-project">0.7.2 Initializing the
+      Project</a></li>
+      <li><a href="#project-layout">0.7.3 Project Layout</a></li>
+      <li><a href="#adding-a-dependency">0.7.4 Adding a
+      Dependency</a></li>
+      <li><a href="#the-skeleton-youre-building-toward">0.7.5 The
+      Skeleton You’re Building Toward</a></li>
+      </ul></li>
+      <li><a href="#checkpoint">0.8 Checkpoint</a></li>
+      </ul>
+      </div>
       <h2 id="why-this-chapter-exists">0.1 Why This Chapter Exists</h2>
       <p>Every chapter after this one assumes you have a few things
       already in place: a terminal you’re not afraid of, a git
@@ -901,7 +969,73 @@ __pycache__/
       reviewed, agent-assisted change.</p>
       <h1 id="chapter-1-meet-your-coding-agent">Chapter 1 — Meet Your
       Coding Agent</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#why-this-chapter-exists-1">1.1 Why This Chapter Exists</a></li><li><a href="#what-a-model-actually-is">1.2 What a Model Actually Is</a><ul><li><a href="#tokens">1.2.1 Tokens</a></li><li><a href="#context-windows">1.2.2 Context Windows</a></li><li><a href="#local-vs.-hosted">1.2.3 Local vs. Hosted</a></li></ul></li><li><a href="#ollama">1.3 Ollama</a><ul><li><a href="#installing-1">1.3.1 Installing</a></li><li><a href="#pulling-a-model">1.3.2 Pulling a Model</a></li><li><a href="#a-first-raw-conversation">1.3.3 A First Raw Conversation</a></li><li><a href="#where-the-model-lives">1.3.4 Where the Model Lives</a></li></ul></li><li><a href="#choosing-a-local-model-for-the-coding-agent">1.4 Choosing a Local Model for the Coding Agent</a><ul><li><a href="#why-the-choice-matters-here-specifically">1.4.1 Why the Choice Matters Here Specifically</a></li><li><a href="#this-books-working-example-qwen3">1.4.2 This Book’s Working Example: Qwen3</a></li><li><a href="#a-hardware-gut-check">1.4.3 A Hardware Gut-Check</a></li></ul></li><li><a href="#installing-and-configuring-pi">1.5 Installing and Configuring Pi</a><ul><li><a href="#what-pi-actually-does">1.5.1 What Pi Actually Does</a></li><li><a href="#installation">1.5.2 Installation</a></li><li><a href="#pointing-pi-at-your-local-model">1.5.3 Pointing Pi at Your Local Model</a></li><li><a href="#skills">1.5.4 Skills</a></li><li><a href="#starting-pi-in-the-repository">1.5.5 Starting Pi in the Repository</a></li></ul></li><li><a href="#your-first-agent-assisted-interaction">1.6 Your First Agent-Assisted Interaction</a><ul><li><a href="#a-deliberately-small-task">1.6.1 A Deliberately Small Task</a></li><li><a href="#reading-the-diff">1.6.2 Reading the Diff</a></li><li><a href="#what-trust-but-verify-looks-like-here">1.6.3 What “Trust but Verify” Looks Like Here</a></li></ul></li><li><a href="#escape-hatch-if-local-setup-isnt-working">1.7 Escape Hatch: If Local Setup Isn’t Working</a><ul><li><a href="#recognizing-the-signs">1.7.1 Recognizing the Signs</a></li><li><a href="#a-minimal-fallback">1.7.2 A Minimal Fallback</a></li><li><a href="#this-isnt-permanent">1.7.3 This Isn’t Permanent</a></li></ul></li><li><a href="#checkpoint-1">1.8 Checkpoint</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#why-this-chapter-exists-1">1.1 Why This Chapter
+      Exists</a></li>
+      <li><a href="#what-a-model-actually-is">1.2 What a Model Actually
+      Is</a>
+      <ul>
+      <li><a href="#tokens">1.2.1 Tokens</a></li>
+      <li><a href="#context-windows">1.2.2 Context Windows</a></li>
+      <li><a href="#local-vs.-hosted">1.2.3 Local vs. Hosted</a></li>
+      </ul></li>
+      <li><a href="#ollama">1.3 Ollama</a>
+      <ul>
+      <li><a href="#installing-1">1.3.1 Installing</a></li>
+      <li><a href="#pulling-a-model">1.3.2 Pulling a Model</a></li>
+      <li><a href="#a-first-raw-conversation">1.3.3 A First Raw
+      Conversation</a></li>
+      <li><a href="#where-the-model-lives">1.3.4 Where the Model
+      Lives</a></li>
+      </ul></li>
+      <li><a href="#choosing-a-local-model-for-the-coding-agent">1.4
+      Choosing a Local Model for the Coding Agent</a>
+      <ul>
+      <li><a href="#why-the-choice-matters-here-specifically">1.4.1 Why
+      the Choice Matters Here Specifically</a></li>
+      <li><a href="#this-books-working-example-qwen3">1.4.2 This Book’s
+      Working Example: Qwen3</a></li>
+      <li><a href="#a-hardware-gut-check">1.4.3 A Hardware
+      Gut-Check</a></li>
+      </ul></li>
+      <li><a href="#installing-and-configuring-pi">1.5 Installing and
+      Configuring Pi</a>
+      <ul>
+      <li><a href="#what-pi-actually-does">1.5.1 What Pi Actually
+      Does</a></li>
+      <li><a href="#installation">1.5.2 Installation</a></li>
+      <li><a href="#pointing-pi-at-your-local-model">1.5.3 Pointing Pi
+      at Your Local Model</a></li>
+      <li><a href="#skills">1.5.4 Skills</a></li>
+      <li><a href="#starting-pi-in-the-repository">1.5.5 Starting Pi in
+      the Repository</a></li>
+      </ul></li>
+      <li><a href="#your-first-agent-assisted-interaction">1.6 Your
+      First Agent-Assisted Interaction</a>
+      <ul>
+      <li><a href="#a-deliberately-small-task">1.6.1 A Deliberately
+      Small Task</a></li>
+      <li><a href="#reading-the-diff">1.6.2 Reading the Diff</a></li>
+      <li><a href="#what-trust-but-verify-looks-like-here">1.6.3 What
+      “Trust but Verify” Looks Like Here</a></li>
+      </ul></li>
+      <li><a href="#escape-hatch-if-local-setup-isnt-working">1.7 Escape
+      Hatch: If Local Setup Isn’t Working</a>
+      <ul>
+      <li><a href="#recognizing-the-signs">1.7.1 Recognizing the
+      Signs</a></li>
+      <li><a href="#a-minimal-fallback">1.7.2 A Minimal
+      Fallback</a></li>
+      <li><a href="#this-isnt-permanent">1.7.3 This Isn’t
+      Permanent</a></li>
+      </ul></li>
+      <li><a href="#checkpoint-1">1.8 Checkpoint</a></li>
+      </ul>
+      </div>
       <h2 id="why-this-chapter-exists-1">1.1 Why This Chapter
       Exists</h2>
       <p><a href="#chapter-0-orientation">Chapter 0</a> gave you an
@@ -1256,7 +1390,58 @@ pi auth &lt;command&gt;            Print credentials or check provider readiness
       is actually supposed to do, before any real code exists.</p>
       <h1 id="chapter-2-writing-spec.md">Chapter 2 — Writing
       SPEC.md</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#why-this-chapter-exists-2">2.1 Why This Chapter Exists</a></li><li><a href="#what-a-spec-is-and-isnt">2.2 What a Spec Is (and Isn’t)</a><ul><li><a href="#intent-written-before-code">2.2.1 Intent, Written Before Code</a></li><li><a href="#living-not-fixed">2.2.2 Living, Not Fixed</a></li><li><a href="#three-readers-one-document">2.2.3 Three Readers, One Document</a></li></ul></li><li><a href="#anatomy-of-a-lightweight-spec.md">2.3 Anatomy of a Lightweight SPEC.md</a><ul><li><a href="#what-the-calculator-does">2.3.1 What the Calculator Does</a></li><li><a href="#inputs-and-outputs">2.3.2 Inputs and Outputs</a></li><li><a href="#what-correct-means">2.3.3 What “Correct” Means</a></li><li><a href="#whats-out-of-scope">2.3.4 What’s Out of Scope</a></li></ul></li><li><a href="#writing-the-first-draft-with-pi">2.4 Writing the First Draft, With Pi</a><ul><li><a href="#prompting-pi-to-help-structure-the-draft">2.4.1 Prompting Pi to Help Structure the Draft</a></li><li><a href="#reading-pis-suggestions-critically">2.4.2 Reading Pi’s Suggestions Critically</a></li><li><a href="#editing-down-to-what-you-actually-mean">2.4.3 Editing Down to What You Actually Mean</a></li><li><a href="#what-you-might-actually-see">2.4.4 What You Might Actually See</a></li></ul></li><li><a href="#committing-the-spec">2.5 Committing the Spec</a><ul><li><a href="#where-it-lives">2.5.1 Where It Lives</a></li><li><a href="#markdown-reused">2.5.2 Markdown, Reused</a></li><li><a href="#committing-it-as-its-own-checkpoint">2.5.3 Committing It as Its Own Checkpoint</a></li></ul></li><li><a href="#what-happens-when-the-spec-is-wrong">2.6 What Happens When the Spec Is Wrong</a></li><li><a href="#checkpoint-2">2.7 Checkpoint</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#why-this-chapter-exists-2">2.1 Why This Chapter
+      Exists</a></li>
+      <li><a href="#what-a-spec-is-and-isnt">2.2 What a Spec Is (and
+      Isn’t)</a>
+      <ul>
+      <li><a href="#intent-written-before-code">2.2.1 Intent, Written
+      Before Code</a></li>
+      <li><a href="#living-not-fixed">2.2.2 Living, Not Fixed</a></li>
+      <li><a href="#three-readers-one-document">2.2.3 Three Readers, One
+      Document</a></li>
+      </ul></li>
+      <li><a href="#anatomy-of-a-lightweight-spec.md">2.3 Anatomy of a
+      Lightweight SPEC.md</a>
+      <ul>
+      <li><a href="#what-the-calculator-does">2.3.1 What the Calculator
+      Does</a></li>
+      <li><a href="#inputs-and-outputs">2.3.2 Inputs and
+      Outputs</a></li>
+      <li><a href="#what-correct-means">2.3.3 What “Correct”
+      Means</a></li>
+      <li><a href="#whats-out-of-scope">2.3.4 What’s Out of
+      Scope</a></li>
+      </ul></li>
+      <li><a href="#writing-the-first-draft-with-pi">2.4 Writing the
+      First Draft, With Pi</a>
+      <ul>
+      <li><a href="#prompting-pi-to-help-structure-the-draft">2.4.1
+      Prompting Pi to Help Structure the Draft</a></li>
+      <li><a href="#reading-pis-suggestions-critically">2.4.2 Reading
+      Pi’s Suggestions Critically</a></li>
+      <li><a href="#editing-down-to-what-you-actually-mean">2.4.3
+      Editing Down to What You Actually Mean</a></li>
+      <li><a href="#what-you-might-actually-see">2.4.4 What You Might
+      Actually See</a></li>
+      </ul></li>
+      <li><a href="#committing-the-spec">2.5 Committing the Spec</a>
+      <ul>
+      <li><a href="#where-it-lives">2.5.1 Where It Lives</a></li>
+      <li><a href="#markdown-reused">2.5.2 Markdown, Reused</a></li>
+      <li><a href="#committing-it-as-its-own-checkpoint">2.5.3
+      Committing It as Its Own Checkpoint</a></li>
+      </ul></li>
+      <li><a href="#what-happens-when-the-spec-is-wrong">2.6 What
+      Happens When the Spec Is Wrong</a></li>
+      <li><a href="#checkpoint-2">2.7 Checkpoint</a></li>
+      </ul>
+      </div>
       <h2 id="why-this-chapter-exists-2">2.1 Why This Chapter
       Exists</h2>
       <p>At the end of <a href="#chapter-1-meet-your-coding-agent">Chapter 1</a>, you gave
@@ -1499,7 +1684,56 @@ pi auth &lt;command&gt;            Print credentials or check provider readiness
       is on the table.</p>
       <h1 id="chapter-3-holding-the-agent-to-a-standard">Chapter 3 —
       Holding the Agent to a Standard</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#why-this-chapter-exists-3">3.1 Why This Chapter Exists</a></li><li><a href="#passes-tests-isnt-the-same-as-good-code">3.2 “Passes Tests” Isn’t the Same as “Good Code”</a><ul><li><a href="#why-this-matters-more-once-an-agent-is-involved">3.2.1 Why This Matters More Once an Agent Is Involved</a></li><li><a href="#a-plausible-example">3.2.2 A Plausible Example</a></li></ul></li><li><a href="#what-ruff-is">3.3 What Ruff Is</a><ul><li><a href="#linting-and-formatting-one-tool">3.3.1 Linting and Formatting, One Tool</a></li><li><a href="#why-ruff-specifically">3.3.2 Why Ruff, Specifically</a></li></ul></li><li><a href="#installing-and-configuring-ruff">3.4 Installing and Configuring Ruff</a><ul><li><a href="#installing-2">3.4.1 Installing</a></li><li><a href="#a-minimal-configuration">3.4.2 A Minimal Configuration</a></li><li><a href="#running-it">3.4.3 Running It</a></li></ul></li><li><a href="#running-ruff-against-agent-output">3.5 Running Ruff Against Agent Output</a><ul><li><a href="#pointing-it-at-chapter-1s-change">3.5.1 Pointing It at Chapter 1’s Change</a></li><li><a href="#reading-and-fixing-what-it-flags">3.5.2 Reading and Fixing What It Flags</a></li><li><a href="#asking-pi-to-fix-ruffs-complaints">3.5.3 Asking Pi to Fix Ruff’s Complaints</a></li></ul></li><li><a href="#making-it-a-habit-not-a-one-off">3.6 Making It a Habit, Not a One-Off</a><ul><li><a href="#before-every-commit">3.6.1 Before Every Commit</a></li><li><a href="#looking-ahead">3.6.2 Looking Ahead</a></li></ul></li><li><a href="#checkpoint-3">3.7 Checkpoint</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#why-this-chapter-exists-3">3.1 Why This Chapter
+      Exists</a></li>
+      <li><a href="#passes-tests-isnt-the-same-as-good-code">3.2 “Passes
+      Tests” Isn’t the Same as “Good Code”</a>
+      <ul>
+      <li><a href="#why-this-matters-more-once-an-agent-is-involved">3.2.1 Why
+      This Matters More Once an Agent Is Involved</a></li>
+      <li><a href="#a-plausible-example">3.2.2 A Plausible
+      Example</a></li>
+      </ul></li>
+      <li><a href="#what-ruff-is">3.3 What Ruff Is</a>
+      <ul>
+      <li><a href="#linting-and-formatting-one-tool">3.3.1 Linting and
+      Formatting, One Tool</a></li>
+      <li><a href="#why-ruff-specifically">3.3.2 Why Ruff,
+      Specifically</a></li>
+      </ul></li>
+      <li><a href="#installing-and-configuring-ruff">3.4 Installing and
+      Configuring Ruff</a>
+      <ul>
+      <li><a href="#installing-2">3.4.1 Installing</a></li>
+      <li><a href="#a-minimal-configuration">3.4.2 A Minimal
+      Configuration</a></li>
+      <li><a href="#running-it">3.4.3 Running It</a></li>
+      </ul></li>
+      <li><a href="#running-ruff-against-agent-output">3.5 Running Ruff
+      Against Agent Output</a>
+      <ul>
+      <li><a href="#pointing-it-at-chapter-1s-change">3.5.1 Pointing It
+      at Chapter 1’s Change</a></li>
+      <li><a href="#reading-and-fixing-what-it-flags">3.5.2 Reading and
+      Fixing What It Flags</a></li>
+      <li><a href="#asking-pi-to-fix-ruffs-complaints">3.5.3 Asking Pi
+      to Fix Ruff’s Complaints</a></li>
+      </ul></li>
+      <li><a href="#making-it-a-habit-not-a-one-off">3.6 Making It a
+      Habit, Not a One-Off</a>
+      <ul>
+      <li><a href="#before-every-commit">3.6.1 Before Every
+      Commit</a></li>
+      <li><a href="#looking-ahead">3.6.2 Looking Ahead</a></li>
+      </ul></li>
+      <li><a href="#checkpoint-3">3.7 Checkpoint</a></li>
+      </ul>
+      </div>
       <h2 id="why-this-chapter-exists-3">3.1 Why This Chapter
       Exists</h2>
       <p>You have a spec now, and a working relationship with an agent
@@ -1692,7 +1926,65 @@ pi auth &lt;command&gt;            Print credentials or check provider readiness
       back to revise it.</p>
       <h1 id="chapter-4-the-domain-fixed-mortgages">Chapter 4 — The
       Domain: Fixed Mortgages</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#why-this-chapter-exists-4">4.1 Why This Chapter Exists</a></li><li><a href="#fixed-mortgage-primer">4.2 Fixed Mortgage Primer</a><ul><li><a href="#what-a-mortgage-is">4.2.1 What a Mortgage Is</a></li><li><a href="#why-fixed">4.2.2 Why “Fixed”</a></li><li><a href="#the-shape-of-a-payment">4.2.3 The Shape of a Payment</a></li></ul></li><li><a href="#the-four-core-quantities">4.3 The Four Core Quantities</a><ul><li><a href="#principal">4.3.1 Principal</a></li><li><a href="#periodic-interest-rate">4.3.2 Periodic Interest Rate</a></li><li><a href="#total-number-of-payments">4.3.3 Total Number of Payments</a></li><li><a href="#fixed-periodic-payment">4.3.4 Fixed Periodic Payment</a></li></ul></li><li><a href="#the-gory-details-deriving-the-formula">4.4 The Gory Details: Deriving the Formula</a><ul><li><a href="#the-formula">4.4.1 The Formula</a></li><li><a href="#where-it-comes-from">4.4.2 Where It Comes From</a></li><li><a href="#two-edge-cases-worth-naming-now">4.4.3 Two Edge Cases Worth Naming Now</a></li></ul></li><li><a href="#a-worked-example-by-hand">4.5 A Worked Example, By Hand</a><ul><li><a href="#the-numbers">4.5.1 The Numbers</a></li><li><a href="#computing-the-payment">4.5.2 Computing the Payment</a></li><li><a href="#this-is-the-answer-key">4.5.3 This Is the Answer Key</a></li></ul></li><li><a href="#optional-using-pi-as-a-study-aid">4.6 Optional: Using Pi as a Study Aid</a></li><li><a href="#revising-spec.md">4.7 Revising SPEC.md</a><ul><li><a href="#going-back-to-chapter-2s-draft">4.7.1 Going Back to Chapter 2’s Draft</a></li><li><a href="#what-was-actually-wrong">4.7.2 What Was Actually Wrong</a></li><li><a href="#writing-the-derivation-down">4.7.3 Writing the Derivation Down</a></li><li><a href="#the-revision">4.7.4 The Revision</a></li></ul></li><li><a href="#checkpoint-4">4.8 Checkpoint</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#why-this-chapter-exists-4">4.1 Why This Chapter
+      Exists</a></li>
+      <li><a href="#fixed-mortgage-primer">4.2 Fixed Mortgage Primer</a>
+      <ul>
+      <li><a href="#what-a-mortgage-is">4.2.1 What a Mortgage
+      Is</a></li>
+      <li><a href="#why-fixed">4.2.2 Why “Fixed”</a></li>
+      <li><a href="#the-shape-of-a-payment">4.2.3 The Shape of a
+      Payment</a></li>
+      </ul></li>
+      <li><a href="#the-four-core-quantities">4.3 The Four Core
+      Quantities</a>
+      <ul>
+      <li><a href="#principal">4.3.1 Principal</a></li>
+      <li><a href="#periodic-interest-rate">4.3.2 Periodic Interest
+      Rate</a></li>
+      <li><a href="#total-number-of-payments">4.3.3 Total Number of
+      Payments</a></li>
+      <li><a href="#fixed-periodic-payment">4.3.4 Fixed Periodic
+      Payment</a></li>
+      </ul></li>
+      <li><a href="#the-gory-details-deriving-the-formula">4.4 The Gory
+      Details: Deriving the Formula</a>
+      <ul>
+      <li><a href="#the-formula">4.4.1 The Formula</a></li>
+      <li><a href="#where-it-comes-from">4.4.2 Where It Comes
+      From</a></li>
+      <li><a href="#two-edge-cases-worth-naming-now">4.4.3 Two Edge
+      Cases Worth Naming Now</a></li>
+      </ul></li>
+      <li><a href="#a-worked-example-by-hand">4.5 A Worked Example, By
+      Hand</a>
+      <ul>
+      <li><a href="#the-numbers">4.5.1 The Numbers</a></li>
+      <li><a href="#computing-the-payment">4.5.2 Computing the
+      Payment</a></li>
+      <li><a href="#this-is-the-answer-key">4.5.3 This Is the Answer
+      Key</a></li>
+      </ul></li>
+      <li><a href="#optional-using-pi-as-a-study-aid">4.6 Optional:
+      Using Pi as a Study Aid</a></li>
+      <li><a href="#revising-spec.md">4.7 Revising SPEC.md</a>
+      <ul>
+      <li><a href="#going-back-to-chapter-2s-draft">4.7.1 Going Back to
+      Chapter 2’s Draft</a></li>
+      <li><a href="#what-was-actually-wrong">4.7.2 What Was Actually
+      Wrong</a></li>
+      <li><a href="#writing-the-derivation-down">4.7.3 Writing the
+      Derivation Down</a></li>
+      <li><a href="#the-revision">4.7.4 The Revision</a></li>
+      </ul></li>
+      <li><a href="#checkpoint-4">4.8 Checkpoint</a></li>
+      </ul>
+      </div>
       <h2 id="why-this-chapter-exists-4">4.1 Why This Chapter
       Exists</h2>
       <p>No code gets written in this chapter. Instead, this chapter
@@ -2080,7 +2372,79 @@ pi auth &lt;command&gt;            Print credentials or check provider readiness
       implementation will need to satisfy.</p>
       <h1 id="chapter-5-tests-test-driven-development">Chapter 5 — Tests
       &amp; Test-Driven Development</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#why-this-chapter-exists-5">5.1 Why This Chapter Exists</a></li><li><a href="#what-tdd-actually-is">5.2 What TDD Actually Is</a><ul><li><a href="#red-green-refactor">5.2.1 Red, Green, Refactor</a></li><li><a href="#why-write-the-test-first">5.2.2 Why Write the Test First</a></li><li><a href="#a-tiny-example-first">5.2.3 A Tiny Example First</a></li></ul></li><li><a href="#pytest-basics">5.3 pytest Basics</a><ul><li><a href="#installing-3">5.3.1 Installing</a></li><li><a href="#test-discovery">5.3.2 Test Discovery</a></li><li><a href="#assertions">5.3.3 Assertions</a></li><li><a href="#running-the-suite">5.3.4 Running the Suite</a></li></ul></li><li><a href="#fixtures-just-enough">5.4 Fixtures, Just Enough</a><ul><li><a href="#the-problem-they-solve">5.4.1 The Problem They Solve</a></li><li><a href="#the-worked-example-as-a-fixture">5.4.2 The Worked Example as a Fixture</a></li><li><a href="#scope-setting">5.4.3 Scope-Setting</a></li></ul></li><li><a href="#encoding-the-answer-key-as-a-test">5.5 Encoding the Answer Key as a Test</a><ul><li><a href="#translating-the-worked-example">5.5.1 Translating the Worked Example</a></li><li><a href="#running-it-and-watching-it-fail">5.5.2 Running It — and Watching It Fail</a></li><li><a href="#why-a-failing-test-is-a-milestone">5.5.3 Why a Failing Test Is a Milestone</a></li></ul></li><li><a href="#agent-assisted-tdd-letting-pi-draft-test-skeletons">5.6 Agent-Assisted TDD: Letting Pi Draft Test Skeletons</a><ul><li><a href="#prompting-from-the-spec">5.6.1 Prompting from the Spec</a></li><li><a href="#reviewing-what-it-proposes">5.6.2 Reviewing What It Proposes</a></li><li><a href="#accepting-correcting-or-rejecting-each-one">5.6.3 Accepting, Correcting, or Rejecting Each One</a></li><li><a href="#what-a-larger-model-actually-produced">5.6.4 What a Larger Model Actually Produced</a></li></ul></li><li><a href="#debugger-basics-pdb">5.7 Debugger Basics: pdb</a><ul><li><a href="#when-to-reach-for-it-1">5.7.1 When to Reach for It</a></li><li><a href="#trying-it-on-something-that-actually-exists">5.7.2 Trying It, On Something That Actually Exists</a></li><li><a href="#why-this-is-worth-a-page">5.7.3 Why This Is Worth a Page</a></li></ul></li><li><a href="#edge-cases-worth-testing-now">5.8 Edge Cases Worth Testing Now</a><ul><li><a href="#the-two-cases-from-chapter-4.4.3">5.8.1 The Two Cases from Chapter 4.4.3</a></li><li><a href="#planting-red-tests-on-purpose">5.8.2 Planting Red Tests on Purpose</a></li></ul></li><li><a href="#checkpoint-5">5.9 Checkpoint</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#why-this-chapter-exists-5">5.1 Why This Chapter
+      Exists</a></li>
+      <li><a href="#what-tdd-actually-is">5.2 What TDD Actually Is</a>
+      <ul>
+      <li><a href="#red-green-refactor">5.2.1 Red, Green,
+      Refactor</a></li>
+      <li><a href="#why-write-the-test-first">5.2.2 Why Write the Test
+      First</a></li>
+      <li><a href="#a-tiny-example-first">5.2.3 A Tiny Example
+      First</a></li>
+      </ul></li>
+      <li><a href="#pytest-basics">5.3 pytest Basics</a>
+      <ul>
+      <li><a href="#installing-3">5.3.1 Installing</a></li>
+      <li><a href="#test-discovery">5.3.2 Test Discovery</a></li>
+      <li><a href="#assertions">5.3.3 Assertions</a></li>
+      <li><a href="#running-the-suite">5.3.4 Running the Suite</a></li>
+      </ul></li>
+      <li><a href="#fixtures-just-enough">5.4 Fixtures, Just Enough</a>
+      <ul>
+      <li><a href="#the-problem-they-solve">5.4.1 The Problem They
+      Solve</a></li>
+      <li><a href="#the-worked-example-as-a-fixture">5.4.2 The Worked
+      Example as a Fixture</a></li>
+      <li><a href="#scope-setting">5.4.3 Scope-Setting</a></li>
+      </ul></li>
+      <li><a href="#encoding-the-answer-key-as-a-test">5.5 Encoding the
+      Answer Key as a Test</a>
+      <ul>
+      <li><a href="#translating-the-worked-example">5.5.1 Translating
+      the Worked Example</a></li>
+      <li><a href="#running-it-and-watching-it-fail">5.5.2 Running It —
+      and Watching It Fail</a></li>
+      <li><a href="#why-a-failing-test-is-a-milestone">5.5.3 Why a
+      Failing Test Is a Milestone</a></li>
+      </ul></li>
+      <li><a href="#agent-assisted-tdd-letting-pi-draft-test-skeletons">5.6
+      Agent-Assisted TDD: Letting Pi Draft Test Skeletons</a>
+      <ul>
+      <li><a href="#prompting-from-the-spec">5.6.1 Prompting from the
+      Spec</a></li>
+      <li><a href="#reviewing-what-it-proposes">5.6.2 Reviewing What It
+      Proposes</a></li>
+      <li><a href="#accepting-correcting-or-rejecting-each-one">5.6.3
+      Accepting, Correcting, or Rejecting Each One</a></li>
+      <li><a href="#what-a-larger-model-actually-produced">5.6.4 What a
+      Larger Model Actually Produced</a></li>
+      </ul></li>
+      <li><a href="#debugger-basics-pdb">5.7 Debugger Basics: pdb</a>
+      <ul>
+      <li><a href="#when-to-reach-for-it-1">5.7.1 When to Reach for
+      It</a></li>
+      <li><a href="#trying-it-on-something-that-actually-exists">5.7.2
+      Trying It, On Something That Actually Exists</a></li>
+      <li><a href="#why-this-is-worth-a-page">5.7.3 Why This Is Worth a
+      Page</a></li>
+      </ul></li>
+      <li><a href="#edge-cases-worth-testing-now">5.8 Edge Cases Worth
+      Testing Now</a>
+      <ul>
+      <li><a href="#the-two-cases-from-chapter-4.4.3">5.8.1 The Two
+      Cases from Chapter 4.4.3</a></li>
+      <li><a href="#planting-red-tests-on-purpose">5.8.2 Planting Red
+      Tests on Purpose</a></li>
+      </ul></li>
+      <li><a href="#checkpoint-5">5.9 Checkpoint</a></li>
+      </ul>
+      </div>
       <h2 id="why-this-chapter-exists-5">5.1 Why This Chapter
       Exists</h2>
       <p><a href="#chapter-4-the-domain-fixed-mortgages">Chapter 4</a>
@@ -2626,7 +2990,75 @@ ModuleNotFoundError: No module named &#39;mortgage_calculator_book.core&#39;</co
       project has had.</p>
       <h1 id="chapter-6-mathematical-core-library">Chapter 6 —
       Mathematical Core Library</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#why-this-chapter-exists-6">6.1 Why This Chapter Exists</a></li><li><a href="#what-pure-means-and-why-its-the-rule-here">6.2 What “Pure” Means, and Why It’s the Rule Here</a><ul><li><a href="#pure-functions">6.2.1 Pure Functions</a></li><li><a href="#the-rule-for-this-module">6.2.2 The Rule for This Module</a></li></ul></li><li><a href="#module-layout">6.3 Module Layout</a><ul><li><a href="#where-this-lives">6.3.1 Where This Lives</a></li><li><a href="#naming-things-to-match-the-spec">6.3.2 Naming Things to Match the Spec</a></li></ul></li><li><a href="#implementing-the-periodic-rate-and-payment-count-helpers">6.4 Implementing the Periodic Rate and Payment-Count Helpers</a><ul><li><a href="#annual-rate-to-periodic-rate">6.4.1 Annual Rate to Periodic Rate</a></li><li><a href="#term-and-frequency-to-total-payments">6.4.2 Term and Frequency to Total Payments</a></li><li><a href="#watching-the-suite">6.4.3 Watching the Suite</a></li></ul></li><li><a href="#implementing-the-fixed-payment-formula">6.5 Implementing the Fixed Payment Formula</a><ul><li><a href="#code-that-mirrors-the-math">6.5.1 Code That Mirrors the Math</a></li><li><a href="#agent-assisted-implementation">6.5.2 Agent-Assisted Implementation</a></li><li><a href="#reviewing-before-accepting">6.5.3 Reviewing Before Accepting</a></li></ul></li><li><a href="#handling-the-named-edge-cases">6.6 Handling the Named Edge Cases</a><ul><li><a href="#zero-interest-loans">6.6.1 Zero-Interest Loans</a></li><li><a href="#single-payment-terms">6.6.2 Single-Payment Terms</a></li><li><a href="#confirming-both-are-genuinely-fixed">6.6.3 Confirming Both Are Genuinely Fixed</a></li></ul></li><li><a href="#verifying-against-the-answer-key">6.7 Verifying Against the Answer Key</a><ul><li><a href="#the-worked-example">6.7.1 The Worked Example</a></li><li><a href="#if-it-doesnt-match">6.7.2 If It Doesn’t Match</a></li></ul></li><li><a href="#refactor">6.8 Refactor</a><ul><li><a href="#the-refactor-step-for-real-this-time">6.8.1 The Refactor Step, For Real This Time</a></li><li><a href="#ruff-pass">6.8.2 Ruff Pass</a></li><li><a href="#a-note-on-rounding">6.8.3 A Note on Rounding</a></li></ul></li><li><a href="#checkpoint-6">6.9 Checkpoint</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#why-this-chapter-exists-6">6.1 Why This Chapter
+      Exists</a></li>
+      <li><a href="#what-pure-means-and-why-its-the-rule-here">6.2 What
+      “Pure” Means, and Why It’s the Rule Here</a>
+      <ul>
+      <li><a href="#pure-functions">6.2.1 Pure Functions</a></li>
+      <li><a href="#the-rule-for-this-module">6.2.2 The Rule for This
+      Module</a></li>
+      </ul></li>
+      <li><a href="#module-layout">6.3 Module Layout</a>
+      <ul>
+      <li><a href="#where-this-lives">6.3.1 Where This Lives</a></li>
+      <li><a href="#naming-things-to-match-the-spec">6.3.2 Naming Things
+      to Match the Spec</a></li>
+      </ul></li>
+      <li><a href="#implementing-the-periodic-rate-and-payment-count-helpers">6.4
+      Implementing the Periodic Rate and Payment-Count Helpers</a>
+      <ul>
+      <li><a href="#annual-rate-to-periodic-rate">6.4.1 Annual Rate to
+      Periodic Rate</a></li>
+      <li><a href="#term-and-frequency-to-total-payments">6.4.2 Term and
+      Frequency to Total Payments</a></li>
+      <li><a href="#watching-the-suite">6.4.3 Watching the
+      Suite</a></li>
+      </ul></li>
+      <li><a href="#implementing-the-fixed-payment-formula">6.5
+      Implementing the Fixed Payment Formula</a>
+      <ul>
+      <li><a href="#code-that-mirrors-the-math">6.5.1 Code That Mirrors
+      the Math</a></li>
+      <li><a href="#agent-assisted-implementation">6.5.2 Agent-Assisted
+      Implementation</a></li>
+      <li><a href="#reviewing-before-accepting">6.5.3 Reviewing Before
+      Accepting</a></li>
+      </ul></li>
+      <li><a href="#handling-the-named-edge-cases">6.6 Handling the
+      Named Edge Cases</a>
+      <ul>
+      <li><a href="#zero-interest-loans">6.6.1 Zero-Interest
+      Loans</a></li>
+      <li><a href="#single-payment-terms">6.6.2 Single-Payment
+      Terms</a></li>
+      <li><a href="#confirming-both-are-genuinely-fixed">6.6.3
+      Confirming Both Are Genuinely Fixed</a></li>
+      </ul></li>
+      <li><a href="#verifying-against-the-answer-key">6.7 Verifying
+      Against the Answer Key</a>
+      <ul>
+      <li><a href="#the-worked-example">6.7.1 The Worked
+      Example</a></li>
+      <li><a href="#if-it-doesnt-match">6.7.2 If It Doesn’t
+      Match</a></li>
+      </ul></li>
+      <li><a href="#refactor">6.8 Refactor</a>
+      <ul>
+      <li><a href="#the-refactor-step-for-real-this-time">6.8.1 The
+      Refactor Step, For Real This Time</a></li>
+      <li><a href="#ruff-pass">6.8.2 Ruff Pass</a></li>
+      <li><a href="#a-note-on-rounding">6.8.3 A Note on
+      Rounding</a></li>
+      </ul></li>
+      <li><a href="#checkpoint-6">6.9 Checkpoint</a></li>
+      </ul>
+      </div>
       <h2 id="why-this-chapter-exists-6">6.1 Why This Chapter
       Exists</h2>
       <p><a href="#chapter-5-tests-test-driven-development">Chapter
@@ -2870,7 +3302,71 @@ ModuleNotFoundError: No module named &#39;mortgage_calculator_book.core&#39;</co
       wrong-looking answer for a negative principal or an absurd
       interest rate, and nothing has stopped it from being asked to.</p>
       <h1 id="chapter-7-validation">Chapter 7 — Validation</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#why-this-chapter-exists-7">7.1 Why This Chapter Exists</a></li><li><a href="#why-validation-is-its-own-layer-not-bolted-onto-the-core">7.2 Why Validation Is Its Own Layer, Not Bolted onto the Core</a><ul><li><a href="#revisiting-purity">7.2.1 Revisiting Purity</a></li><li><a href="#what-skipping-this-layer-costs">7.2.2 What Skipping This Layer Costs</a></li><li><a href="#where-this-is-headed">7.2.3 Where This Is Headed</a></li></ul></li><li><a href="#what-needs-validating">7.3 What Needs Validating</a><ul><li><a href="#revisiting-spec.mds-inputs">7.3.1 Revisiting SPEC.md’s Inputs</a></li><li><a href="#turning-edge-cases-into-explicit-boundaries">7.3.2 Turning Edge Cases into Explicit Boundaries</a></li></ul></li><li><a href="#introducing-pydantic">7.4 Introducing Pydantic</a><ul><li><a href="#the-problem-it-solves">7.4.1 The Problem It Solves</a></li><li><a href="#installing-4">7.4.2 Installing</a></li><li><a href="#a-first-minimal-model">7.4.3 A First Minimal Model</a></li></ul></li><li><a href="#building-the-input-model">7.5 Building the Input Model</a><ul><li><a href="#the-model">7.5.1 The Model</a></li><li><a href="#custom-validators-explained">7.5.2 Custom Validators, Explained</a></li><li><a href="#error-messages-as-a-user-facing-surface">7.5.3 Error Messages as a User-Facing Surface</a></li></ul></li><li><a href="#agent-assisted-tdd-applied-to-validation">7.6 Agent-Assisted TDD, Applied to Validation</a><ul><li><a href="#setting-aside-what-you-just-built">7.6.1 Setting Aside What You Just Built</a></li><li><a href="#writing-the-failing-tests-first">7.6.2 Writing the Failing Tests First</a></li><li><a href="#prompting-pi">7.6.3 Prompting Pi</a></li><li><a href="#reviewing-the-proposal-and-comparing-notes">7.6.4 Reviewing the Proposal, and Comparing Notes</a></li></ul></li><li><a href="#wiring-validation-to-the-core">7.7 Wiring Validation to the Core</a><ul><li><a href="#the-only-path-in">7.7.1 The Only Path In</a></li><li><a href="#confirming-the-boundary">7.7.2 Confirming the Boundary</a></li><li><a href="#running-everything">7.7.3 Running Everything</a></li></ul></li><li><a href="#refactor-and-ruff-pass">7.8 Refactor and Ruff Pass</a></li><li><a href="#checkpoint-7">7.9 Checkpoint</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#why-this-chapter-exists-7">7.1 Why This Chapter
+      Exists</a></li>
+      <li><a href="#why-validation-is-its-own-layer-not-bolted-onto-the-core">7.2
+      Why Validation Is Its Own Layer, Not Bolted onto the Core</a>
+      <ul>
+      <li><a href="#revisiting-purity">7.2.1 Revisiting Purity</a></li>
+      <li><a href="#what-skipping-this-layer-costs">7.2.2 What Skipping
+      This Layer Costs</a></li>
+      <li><a href="#where-this-is-headed">7.2.3 Where This Is
+      Headed</a></li>
+      </ul></li>
+      <li><a href="#what-needs-validating">7.3 What Needs Validating</a>
+      <ul>
+      <li><a href="#revisiting-spec.mds-inputs">7.3.1 Revisiting
+      SPEC.md’s Inputs</a></li>
+      <li><a href="#turning-edge-cases-into-explicit-boundaries">7.3.2
+      Turning Edge Cases into Explicit Boundaries</a></li>
+      </ul></li>
+      <li><a href="#introducing-pydantic">7.4 Introducing Pydantic</a>
+      <ul>
+      <li><a href="#the-problem-it-solves">7.4.1 The Problem It
+      Solves</a></li>
+      <li><a href="#installing-4">7.4.2 Installing</a></li>
+      <li><a href="#a-first-minimal-model">7.4.3 A First Minimal
+      Model</a></li>
+      </ul></li>
+      <li><a href="#building-the-input-model">7.5 Building the Input
+      Model</a>
+      <ul>
+      <li><a href="#the-model">7.5.1 The Model</a></li>
+      <li><a href="#custom-validators-explained">7.5.2 Custom
+      Validators, Explained</a></li>
+      <li><a href="#error-messages-as-a-user-facing-surface">7.5.3 Error
+      Messages as a User-Facing Surface</a></li>
+      </ul></li>
+      <li><a href="#agent-assisted-tdd-applied-to-validation">7.6
+      Agent-Assisted TDD, Applied to Validation</a>
+      <ul>
+      <li><a href="#setting-aside-what-you-just-built">7.6.1 Setting
+      Aside What You Just Built</a></li>
+      <li><a href="#writing-the-failing-tests-first">7.6.2 Writing the
+      Failing Tests First</a></li>
+      <li><a href="#prompting-pi">7.6.3 Prompting Pi</a></li>
+      <li><a href="#reviewing-the-proposal-and-comparing-notes">7.6.4
+      Reviewing the Proposal, and Comparing Notes</a></li>
+      </ul></li>
+      <li><a href="#wiring-validation-to-the-core">7.7 Wiring Validation
+      to the Core</a>
+      <ul>
+      <li><a href="#the-only-path-in">7.7.1 The Only Path In</a></li>
+      <li><a href="#confirming-the-boundary">7.7.2 Confirming the
+      Boundary</a></li>
+      <li><a href="#running-everything">7.7.3 Running
+      Everything</a></li>
+      </ul></li>
+      <li><a href="#refactor-and-ruff-pass">7.8 Refactor and Ruff
+      Pass</a></li>
+      <li><a href="#checkpoint-7">7.9 Checkpoint</a></li>
+      </ul>
+      </div>
       <h2 id="why-this-chapter-exists-7">7.1 Why This Chapter
       Exists</h2>
       <p><a href="#chapter-6-mathematical-core-library">Chapter 6</a>
@@ -3239,7 +3735,84 @@ ModuleNotFoundError: No module named &#39;mortgage_calculator_book.core&#39;</co
       interface a person can actually run.</p>
       <h1 id="chapter-8-command-line-interface">Chapter 8 — Command Line
       Interface</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#why-this-chapter-exists-8">8.1 Why This Chapter Exists</a></li><li><a href="#what-the-cli-needs-to-do">8.2 What the CLI Needs to Do</a><ul><li><a href="#revisiting-the-spec">8.2.1 Revisiting the Spec</a></li><li><a href="#sketching-the-shape-first">8.2.2 Sketching the Shape First</a></li></ul></li><li><a href="#argparse-basics">8.3 argparse Basics</a><ul><li><a href="#why-argparse">8.3.1 Why argparse</a></li><li><a href="#arguments-types-defaults-help-text">8.3.2 Arguments, Types, Defaults, Help Text</a></li><li><a href="#a-minimal-working-parser">8.3.3 A Minimal Working Parser</a></li><li><a href="#aside-typer">8.3.4 Aside: Typer</a></li></ul></li><li><a href="#wiring-the-cli-to-validation-and-the-core">8.4 Wiring the CLI to Validation and the Core</a><ul><li><a href="#the-full-pipeline-assembled">8.4.1 The Full Pipeline, Assembled</a></li><li><a href="#handling-validation-failure-gracefully">8.4.2 Handling Validation Failure Gracefully</a></li><li><a href="#wiring-up-the-command-and-trying-it">8.4.3 Wiring Up the Command, and Trying It</a></li></ul></li><li><a href="#json-output">8.5 JSON Output</a><ul><li><a href="#why-json-not-just-text">8.5.1 Why JSON, Not Just Text</a></li><li><a href="#a---format-flag">8.5.2 A --format Flag</a></li><li><a href="#serializing-with-the-standard-library">8.5.3 Serializing with the Standard Library</a></li><li><a href="#forward-note">8.5.4 Forward-Note</a></li></ul></li><li><a href="#agent-assisted-build-with-tests-first">8.6 Agent-Assisted Build, With Tests First</a><ul><li><a href="#setting-aside-what-you-just-built-1">8.6.1 Setting Aside What You Just Built</a></li><li><a href="#cli-level-tests">8.6.2 CLI-Level Tests</a></li><li><a href="#prompting-pi-1">8.6.3 Prompting Pi</a></li><li><a href="#reviewing-the-diff-and-comparing-notes">8.6.4 Reviewing the Diff, and Comparing Notes</a></li></ul></li><li><a href="#environment-variables-and-.env">8.7 Environment Variables and .env</a><ul><li><a href="#why-now-not-chapter-11">8.7.1 Why Now, Not Chapter 11</a></li><li><a href="#python-dotenv">8.7.2 python-dotenv</a></li><li><a href="#never-commit-your-secrets">8.7.3 Never Commit Your Secrets</a></li><li><a href="#forward-note-1">8.7.4 Forward-Note</a></li></ul></li><li><a href="#writing-the-readme">8.8 Writing the README</a><ul><li><a href="#a-little-more-markdown">8.8.1 A Little More Markdown</a></li><li><a href="#what-belongs-in-it">8.8.2 What Belongs in It</a></li><li><a href="#a-draft">8.8.3 A Draft</a></li><li><a href="#letting-pi-draft-it-instead">8.8.4 Letting Pi Draft It Instead</a></li></ul></li><li><a href="#refactor-and-ruff-pass-1">8.9 Refactor and Ruff Pass</a></li><li><a href="#checkpoint-8">8.10 Checkpoint</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#why-this-chapter-exists-8">8.1 Why This Chapter
+      Exists</a></li>
+      <li><a href="#what-the-cli-needs-to-do">8.2 What the CLI Needs to
+      Do</a>
+      <ul>
+      <li><a href="#revisiting-the-spec">8.2.1 Revisiting the
+      Spec</a></li>
+      <li><a href="#sketching-the-shape-first">8.2.2 Sketching the Shape
+      First</a></li>
+      </ul></li>
+      <li><a href="#argparse-basics">8.3 argparse Basics</a>
+      <ul>
+      <li><a href="#why-argparse">8.3.1 Why argparse</a></li>
+      <li><a href="#arguments-types-defaults-help-text">8.3.2 Arguments,
+      Types, Defaults, Help Text</a></li>
+      <li><a href="#a-minimal-working-parser">8.3.3 A Minimal Working
+      Parser</a></li>
+      <li><a href="#aside-typer">8.3.4 Aside: Typer</a></li>
+      </ul></li>
+      <li><a href="#wiring-the-cli-to-validation-and-the-core">8.4
+      Wiring the CLI to Validation and the Core</a>
+      <ul>
+      <li><a href="#the-full-pipeline-assembled">8.4.1 The Full
+      Pipeline, Assembled</a></li>
+      <li><a href="#handling-validation-failure-gracefully">8.4.2
+      Handling Validation Failure Gracefully</a></li>
+      <li><a href="#wiring-up-the-command-and-trying-it">8.4.3 Wiring Up
+      the Command, and Trying It</a></li>
+      </ul></li>
+      <li><a href="#json-output">8.5 JSON Output</a>
+      <ul>
+      <li><a href="#why-json-not-just-text">8.5.1 Why JSON, Not Just
+      Text</a></li>
+      <li><a href="#a---format-flag">8.5.2 A --format Flag</a></li>
+      <li><a href="#serializing-with-the-standard-library">8.5.3
+      Serializing with the Standard Library</a></li>
+      <li><a href="#forward-note">8.5.4 Forward-Note</a></li>
+      </ul></li>
+      <li><a href="#agent-assisted-build-with-tests-first">8.6
+      Agent-Assisted Build, With Tests First</a>
+      <ul>
+      <li><a href="#setting-aside-what-you-just-built-1">8.6.1 Setting
+      Aside What You Just Built</a></li>
+      <li><a href="#cli-level-tests">8.6.2 CLI-Level Tests</a></li>
+      <li><a href="#prompting-pi-1">8.6.3 Prompting Pi</a></li>
+      <li><a href="#reviewing-the-diff-and-comparing-notes">8.6.4
+      Reviewing the Diff, and Comparing Notes</a></li>
+      </ul></li>
+      <li><a href="#environment-variables-and-.env">8.7 Environment
+      Variables and .env</a>
+      <ul>
+      <li><a href="#why-now-not-chapter-11">8.7.1 Why Now, Not Chapter
+      11</a></li>
+      <li><a href="#python-dotenv">8.7.2 python-dotenv</a></li>
+      <li><a href="#never-commit-your-secrets">8.7.3 Never Commit Your
+      Secrets</a></li>
+      <li><a href="#forward-note-1">8.7.4 Forward-Note</a></li>
+      </ul></li>
+      <li><a href="#writing-the-readme">8.8 Writing the README</a>
+      <ul>
+      <li><a href="#a-little-more-markdown">8.8.1 A Little More
+      Markdown</a></li>
+      <li><a href="#what-belongs-in-it">8.8.2 What Belongs in
+      It</a></li>
+      <li><a href="#a-draft">8.8.3 A Draft</a></li>
+      <li><a href="#letting-pi-draft-it-instead">8.8.4 Letting Pi Draft
+      It Instead</a></li>
+      </ul></li>
+      <li><a href="#refactor-and-ruff-pass-1">8.9 Refactor and Ruff
+      Pass</a></li>
+      <li><a href="#checkpoint-8">8.10 Checkpoint</a></li>
+      </ul>
+      </div>
       <h2 id="why-this-chapter-exists-8">8.1 Why This Chapter
       Exists</h2>
       <p>Everything so far has been invisible to anyone who isn’t
@@ -3802,7 +4375,76 @@ __pycache__/
       validated core, proving the separation of concerns from <a href="#chapter-6-mathematical-core-library">Chapter 6</a> actually
       pays off.</p>
       <h1 id="chapter-9-calculator-ui">Chapter 9 — Calculator UI</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#why-this-chapter-exists-9">9.1 Why This Chapter Exists</a></li><li><a href="#two-front-ends-one-core">9.2 Two Front Ends, One Core</a><ul><li><a href="#the-rule-for-this-chapter">9.2.1 The Rule for This Chapter</a></li><li><a href="#whats-allowed-to-change-and-what-isnt">9.2.2 What’s Allowed to Change, and What Isn’t</a></li></ul></li><li><a href="#pyqt5-basics">9.3 PyQt5 Basics</a><ul><li><a href="#installing-5">9.3.1 Installing</a></li><li><a href="#the-smallest-possible-window">9.3.2 The Smallest Possible Window</a></li><li><a href="#core-widgets-for-this-project">9.3.3 Core Widgets for This Project</a></li><li><a href="#signals-and-slots">9.3.4 Signals and Slots</a></li></ul></li><li><a href="#designing-the-calculator-window">9.4 Designing the Calculator Window</a><ul><li><a href="#sketching-the-layout">9.4.1 Sketching the Layout</a></li><li><a href="#whats-worth-planning-vs.-what-isnt">9.4.2 What’s Worth Planning vs. What Isn’t</a></li></ul></li><li><a href="#wiring-the-ui-to-validation-and-the-core">9.5 Wiring the UI to Validation and the Core</a><ul><li><a href="#the-full-window">9.5.1 The Full Window</a></li><li><a href="#displaying-errors-in-the-ui">9.5.2 Displaying Errors in the UI</a></li><li><a href="#displaying-the-result">9.5.3 Displaying the Result</a></li></ul></li><li><a href="#where-agent-assistance-helps-and-where-it-doesnt">9.6 Where Agent Assistance Helps, and Where It Doesn’t</a><ul><li><a href="#good-delegation-and-a-trickier-request-bundled-with-it">9.6.1 Good Delegation, and a Trickier Request Bundled With It</a></li><li><a href="#writing-the-interface-into-spec.md-then-redoing-it-from-there">9.6.2 Writing the Interface Into SPEC.md, Then Redoing It From There</a></li><li><a href="#poor-delegation-layout-and-visual-judgment">9.6.3 Poor Delegation: Layout and Visual Judgment</a></li></ul></li><li><a href="#testing-ui-logic-where-its-worth-it">9.7 Testing UI Logic Where It’s Worth It</a><ul><li><a href="#whats-testable-without-a-full-gui-framework">9.7.1 What’s Testable Without a Full GUI Framework</a></li><li><a href="#the-judgment-of-not-over-testing">9.7.2 The Judgment of Not Over-Testing</a></li></ul></li><li><a href="#running-the-app">9.8 Running the App</a><ul><li><a href="#a-walkthrough">9.8.1 A Walkthrough</a></li><li><a href="#packaging-briefly">9.8.2 Packaging, Briefly</a></li></ul></li><li><a href="#refactor-and-ruff-pass-2">9.9 Refactor and Ruff Pass</a></li><li><a href="#checkpoint-9">9.10 Checkpoint</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#why-this-chapter-exists-9">9.1 Why This Chapter
+      Exists</a></li>
+      <li><a href="#two-front-ends-one-core">9.2 Two Front Ends, One
+      Core</a>
+      <ul>
+      <li><a href="#the-rule-for-this-chapter">9.2.1 The Rule for This
+      Chapter</a></li>
+      <li><a href="#whats-allowed-to-change-and-what-isnt">9.2.2 What’s
+      Allowed to Change, and What Isn’t</a></li>
+      </ul></li>
+      <li><a href="#pyqt5-basics">9.3 PyQt5 Basics</a>
+      <ul>
+      <li><a href="#installing-5">9.3.1 Installing</a></li>
+      <li><a href="#the-smallest-possible-window">9.3.2 The Smallest
+      Possible Window</a></li>
+      <li><a href="#core-widgets-for-this-project">9.3.3 Core Widgets
+      for This Project</a></li>
+      <li><a href="#signals-and-slots">9.3.4 Signals and Slots</a></li>
+      </ul></li>
+      <li><a href="#designing-the-calculator-window">9.4 Designing the
+      Calculator Window</a>
+      <ul>
+      <li><a href="#sketching-the-layout">9.4.1 Sketching the
+      Layout</a></li>
+      <li><a href="#whats-worth-planning-vs.-what-isnt">9.4.2 What’s
+      Worth Planning vs. What Isn’t</a></li>
+      </ul></li>
+      <li><a href="#wiring-the-ui-to-validation-and-the-core">9.5 Wiring
+      the UI to Validation and the Core</a>
+      <ul>
+      <li><a href="#the-full-window">9.5.1 The Full Window</a></li>
+      <li><a href="#displaying-errors-in-the-ui">9.5.2 Displaying Errors
+      in the UI</a></li>
+      <li><a href="#displaying-the-result">9.5.3 Displaying the
+      Result</a></li>
+      </ul></li>
+      <li><a href="#where-agent-assistance-helps-and-where-it-doesnt">9.6 Where
+      Agent Assistance Helps, and Where It Doesn’t</a>
+      <ul>
+      <li><a href="#good-delegation-and-a-trickier-request-bundled-with-it">9.6.1
+      Good Delegation, and a Trickier Request Bundled With It</a></li>
+      <li><a href="#writing-the-interface-into-spec.md-then-redoing-it-from-there">9.6.2
+      Writing the Interface Into SPEC.md, Then Redoing It From
+      There</a></li>
+      <li><a href="#poor-delegation-layout-and-visual-judgment">9.6.3
+      Poor Delegation: Layout and Visual Judgment</a></li>
+      </ul></li>
+      <li><a href="#testing-ui-logic-where-its-worth-it">9.7 Testing UI
+      Logic Where It’s Worth It</a>
+      <ul>
+      <li><a href="#whats-testable-without-a-full-gui-framework">9.7.1
+      What’s Testable Without a Full GUI Framework</a></li>
+      <li><a href="#the-judgment-of-not-over-testing">9.7.2 The Judgment
+      of Not Over-Testing</a></li>
+      </ul></li>
+      <li><a href="#running-the-app">9.8 Running the App</a>
+      <ul>
+      <li><a href="#a-walkthrough">9.8.1 A Walkthrough</a></li>
+      <li><a href="#packaging-briefly">9.8.2 Packaging, Briefly</a></li>
+      </ul></li>
+      <li><a href="#refactor-and-ruff-pass-2">9.9 Refactor and Ruff
+      Pass</a></li>
+      <li><a href="#checkpoint-9">9.10 Checkpoint</a></li>
+      </ul>
+      </div>
       <h2 id="why-this-chapter-exists-9">9.1 Why This Chapter
       Exists</h2>
       <p><a href="#chapter-8-command-line-interface">Chapter 8</a> gave
@@ -4331,7 +4973,67 @@ Fixed periodic payment: $1,199.10</code></pre>
       exposing the same validated core as a callable tool.</p>
       <h1 id="chapter-10-tool-interface">Chapter 10 — Tool
       Interface</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#why-this-chapter-exists-10">10.1 Why This Chapter Exists</a></li><li><a href="#what-a-tool-means-in-this-context">10.2 What a “Tool” Means in This Context</a><ul><li><a href="#the-core-idea">10.2.1 The Core Idea</a></li><li><a href="#a-third-front-end-not-a-new-architecture">10.2.2 A Third Front End, Not a New Architecture</a></li><li><a href="#validation-as-schema-revisited">10.2.3 Validation-as-Schema, Revisited</a></li></ul></li><li><a href="#reusing-the-pydantic-models">10.3 Reusing the Pydantic Models</a><ul><li><a href="#free-json-schema">10.3.1 Free JSON Schema</a></li><li><a href="#what-still-needs-to-be-added">10.3.2 What Still Needs to Be Added</a></li></ul></li><li><a href="#defining-the-tool-contract">10.4 Defining the Tool Contract</a><ul><li><a href="#writing-the-description">10.4.1 Writing the Description</a></li><li><a href="#the-output-schema">10.4.2 The Output Schema</a></li></ul></li><li><a href="#tdd-the-contract-before-wiring-anything-up">10.5 TDD the Contract Before Wiring Anything Up</a><ul><li><a href="#tests-first-no-model-involved">10.5.1 Tests First, No Model Involved</a></li><li><a href="#confirming-errors-are-handleable">10.5.2 Confirming Errors Are Handleable</a></li><li><a href="#agent-assisted-implementation-1">10.5.3 Agent-Assisted Implementation</a></li></ul></li><li><a href="#sidebar-model-context-protocol-mcp">10.6 Sidebar: Model Context Protocol (MCP)</a><ul><li><a href="#what-you-just-built-named">10.6.1 What You Just Built, Named</a></li><li><a href="#the-shape-of-mcp-conceptually">10.6.2 The Shape of MCP, Conceptually</a></li><li><a href="#why-this-matters">10.6.3 Why This Matters</a></li></ul></li><li><a href="#manual-verification-calling-the-tool-like-a-model-would">10.7 Manual Verification: Calling the Tool Like a Model Would</a><ul><li><a href="#a-simulated-call">10.7.1 A Simulated Call</a></li><li><a href="#the-last-checkpoint-before-a-real-model">10.7.2 The Last Checkpoint Before a Real Model</a></li></ul></li><li><a href="#refactor-and-ruff-pass-3">10.8 Refactor and Ruff Pass</a></li><li><a href="#checkpoint-10">10.9 Checkpoint</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#why-this-chapter-exists-10">10.1 Why This Chapter
+      Exists</a></li>
+      <li><a href="#what-a-tool-means-in-this-context">10.2 What a
+      “Tool” Means in This Context</a>
+      <ul>
+      <li><a href="#the-core-idea">10.2.1 The Core Idea</a></li>
+      <li><a href="#a-third-front-end-not-a-new-architecture">10.2.2 A
+      Third Front End, Not a New Architecture</a></li>
+      <li><a href="#validation-as-schema-revisited">10.2.3
+      Validation-as-Schema, Revisited</a></li>
+      </ul></li>
+      <li><a href="#reusing-the-pydantic-models">10.3 Reusing the
+      Pydantic Models</a>
+      <ul>
+      <li><a href="#free-json-schema">10.3.1 Free JSON Schema</a></li>
+      <li><a href="#what-still-needs-to-be-added">10.3.2 What Still
+      Needs to Be Added</a></li>
+      </ul></li>
+      <li><a href="#defining-the-tool-contract">10.4 Defining the Tool
+      Contract</a>
+      <ul>
+      <li><a href="#writing-the-description">10.4.1 Writing the
+      Description</a></li>
+      <li><a href="#the-output-schema">10.4.2 The Output Schema</a></li>
+      </ul></li>
+      <li><a href="#tdd-the-contract-before-wiring-anything-up">10.5 TDD
+      the Contract Before Wiring Anything Up</a>
+      <ul>
+      <li><a href="#tests-first-no-model-involved">10.5.1 Tests First,
+      No Model Involved</a></li>
+      <li><a href="#confirming-errors-are-handleable">10.5.2 Confirming
+      Errors Are Handleable</a></li>
+      <li><a href="#agent-assisted-implementation-1">10.5.3
+      Agent-Assisted Implementation</a></li>
+      </ul></li>
+      <li><a href="#sidebar-model-context-protocol-mcp">10.6 Sidebar:
+      Model Context Protocol (MCP)</a>
+      <ul>
+      <li><a href="#what-you-just-built-named">10.6.1 What You Just
+      Built, Named</a></li>
+      <li><a href="#the-shape-of-mcp-conceptually">10.6.2 The Shape of
+      MCP, Conceptually</a></li>
+      <li><a href="#why-this-matters">10.6.3 Why This Matters</a></li>
+      </ul></li>
+      <li><a href="#manual-verification-calling-the-tool-like-a-model-would">10.7
+      Manual Verification: Calling the Tool Like a Model Would</a>
+      <ul>
+      <li><a href="#a-simulated-call">10.7.1 A Simulated Call</a></li>
+      <li><a href="#the-last-checkpoint-before-a-real-model">10.7.2 The
+      Last Checkpoint Before a Real Model</a></li>
+      </ul></li>
+      <li><a href="#refactor-and-ruff-pass-3">10.8 Refactor and Ruff
+      Pass</a></li>
+      <li><a href="#checkpoint-10">10.9 Checkpoint</a></li>
+      </ul>
+      </div>
       <h2 id="why-this-chapter-exists-10">10.1 Why This Chapter
       Exists</h2>
       <p><a href="#chapter-8-command-line-interface">Chapters 8</a> and
@@ -4678,7 +5380,92 @@ Fixed periodic payment: $1,199.10</code></pre>
       end for the first time.</p>
       <h1 id="chapter-11-llm-interface-enter-a-second-model">Chapter 11
       — LLM Interface: Enter A Second Model</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#why-this-chapter-exists-11">11.1 Why This Chapter Exists</a></li><li><a href="#two-models-two-jobs">11.2 Two Models, Two Jobs</a><ul><li><a href="#explicitly-distinguishing-the-roles">11.2.1 Explicitly Distinguishing the Roles</a></li><li><a href="#why-the-same-model-isnt-necessarily-right-for-both">11.2.2 Why the Same Model Isn’t Necessarily Right for Both</a></li></ul></li><li><a href="#choosing-a-local-model-for-the-intelligence-engine">11.3 Choosing a Local Model for the Intelligence Engine</a><ul><li><a href="#what-matters-for-this-job">11.3.1 What Matters for This Job</a></li><li><a href="#pulling-a-second-model">11.3.2 Pulling a Second Model</a></li><li><a href="#a-standalone-conversation-first">11.3.3 A Standalone Conversation First</a></li></ul></li><li><a href="#wiring-the-local-model-to-the-chapter-10-tool">11.4 Wiring the Local Model to the Chapter 10 Tool</a><ul><li><a href="#the-requestresponse-shape">11.4.1 The Request/Response Shape</a></li><li><a href="#a-minimal-implementation">11.4.2 A Minimal Implementation</a></li><li><a href="#when-the-model-gets-it-wrong">11.4.3 When the Model Gets It Wrong</a></li></ul></li><li><a href="#environment-variables-in-practice">11.5 Environment Variables in Practice</a><ul><li><a href="#where-the-chapter-8-pattern-finally-gets-used">11.5.1 Where the Chapter 8 Pattern Finally Gets Used</a></li><li><a href="#config-alongside-the-secret">11.5.2 Config Alongside the Secret</a></li></ul></li><li><a href="#openrouter-paying-for-models">11.6 OpenRouter & Paying for Models</a><ul><li><a href="#what-openrouter-is-and-when-local-isnt-enough">11.6.1 What OpenRouter Is, and When Local Isn’t Enough</a></li><li><a href="#account-key-and-storage">11.6.2 Account, Key, and Storage</a></li><li><a href="#understanding-cost">11.6.3 Understanding Cost</a></li><li><a href="#wiring-openrouter-in">11.6.4 Wiring OpenRouter In</a></li></ul></li><li><a href="#comparing-local-vs.-hosted-informally">11.7 Comparing Local vs. Hosted, Informally</a><ul><li><a href="#running-the-same-questions-through-both">11.7.1 Running the Same Questions Through Both</a></li><li><a href="#what-to-watch-for">11.7.2 What to Watch For</a></li><li><a href="#a-practical-decision-framework">11.7.3 A Practical Decision Framework</a></li></ul></li><li><a href="#agent-assisted-build-same-habits-as-always">11.8 Agent-Assisted Build, Same Habits as Always</a><ul><li><a href="#tests-first-with-mocking">11.8.1 Tests First, With Mocking</a></li><li><a href="#prompting-pi-reviewing-the-diff">11.8.2 Prompting Pi, Reviewing the Diff</a></li></ul></li><li><a href="#connecting-this-to-the-cli-and-ui">11.9 Connecting This to the CLI and UI</a><ul><li><a href="#the-cli-a-natural-language-flag">11.9.1 The CLI: A Natural-Language Flag</a></li><li><a href="#the-ui-sketching-and-documenting-the-addition">11.9.2 The UI: Sketching and Documenting the Addition</a></li><li><a href="#building-it-via-pi">11.9.3 Building It, via Pi</a></li></ul></li><li><a href="#refactor-and-ruff-pass-4">11.10 Refactor and Ruff Pass</a></li><li><a href="#checkpoint-11">11.11 Checkpoint</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#why-this-chapter-exists-11">11.1 Why This Chapter
+      Exists</a></li>
+      <li><a href="#two-models-two-jobs">11.2 Two Models, Two Jobs</a>
+      <ul>
+      <li><a href="#explicitly-distinguishing-the-roles">11.2.1
+      Explicitly Distinguishing the Roles</a></li>
+      <li><a href="#why-the-same-model-isnt-necessarily-right-for-both">11.2.2
+      Why the Same Model Isn’t Necessarily Right for Both</a></li>
+      </ul></li>
+      <li><a href="#choosing-a-local-model-for-the-intelligence-engine">11.3
+      Choosing a Local Model for the Intelligence Engine</a>
+      <ul>
+      <li><a href="#what-matters-for-this-job">11.3.1 What Matters for
+      This Job</a></li>
+      <li><a href="#pulling-a-second-model">11.3.2 Pulling a Second
+      Model</a></li>
+      <li><a href="#a-standalone-conversation-first">11.3.3 A Standalone
+      Conversation First</a></li>
+      </ul></li>
+      <li><a href="#wiring-the-local-model-to-the-chapter-10-tool">11.4
+      Wiring the Local Model to the Chapter 10 Tool</a>
+      <ul>
+      <li><a href="#the-requestresponse-shape">11.4.1 The
+      Request/Response Shape</a></li>
+      <li><a href="#a-minimal-implementation">11.4.2 A Minimal
+      Implementation</a></li>
+      <li><a href="#when-the-model-gets-it-wrong">11.4.3 When the Model
+      Gets It Wrong</a></li>
+      </ul></li>
+      <li><a href="#environment-variables-in-practice">11.5 Environment
+      Variables in Practice</a>
+      <ul>
+      <li><a href="#where-the-chapter-8-pattern-finally-gets-used">11.5.1 Where
+      the Chapter 8 Pattern Finally Gets Used</a></li>
+      <li><a href="#config-alongside-the-secret">11.5.2 Config Alongside
+      the Secret</a></li>
+      </ul></li>
+      <li><a href="#openrouter-paying-for-models">11.6 OpenRouter &amp;
+      Paying for Models</a>
+      <ul>
+      <li><a href="#what-openrouter-is-and-when-local-isnt-enough">11.6.1 What
+      OpenRouter Is, and When Local Isn’t Enough</a></li>
+      <li><a href="#account-key-and-storage">11.6.2 Account, Key, and
+      Storage</a></li>
+      <li><a href="#understanding-cost">11.6.3 Understanding
+      Cost</a></li>
+      <li><a href="#wiring-openrouter-in">11.6.4 Wiring OpenRouter
+      In</a></li>
+      </ul></li>
+      <li><a href="#comparing-local-vs.-hosted-informally">11.7
+      Comparing Local vs. Hosted, Informally</a>
+      <ul>
+      <li><a href="#running-the-same-questions-through-both">11.7.1
+      Running the Same Questions Through Both</a></li>
+      <li><a href="#what-to-watch-for">11.7.2 What to Watch For</a></li>
+      <li><a href="#a-practical-decision-framework">11.7.3 A Practical
+      Decision Framework</a></li>
+      </ul></li>
+      <li><a href="#agent-assisted-build-same-habits-as-always">11.8
+      Agent-Assisted Build, Same Habits as Always</a>
+      <ul>
+      <li><a href="#tests-first-with-mocking">11.8.1 Tests First, With
+      Mocking</a></li>
+      <li><a href="#prompting-pi-reviewing-the-diff">11.8.2 Prompting
+      Pi, Reviewing the Diff</a></li>
+      </ul></li>
+      <li><a href="#connecting-this-to-the-cli-and-ui">11.9 Connecting
+      This to the CLI and UI</a>
+      <ul>
+      <li><a href="#the-cli-a-natural-language-flag">11.9.1 The CLI: A
+      Natural-Language Flag</a></li>
+      <li><a href="#the-ui-sketching-and-documenting-the-addition">11.9.2 The
+      UI: Sketching and Documenting the Addition</a></li>
+      <li><a href="#building-it-via-pi">11.9.3 Building It, via
+      Pi</a></li>
+      </ul></li>
+      <li><a href="#refactor-and-ruff-pass-4">11.10 Refactor and Ruff
+      Pass</a></li>
+      <li><a href="#checkpoint-11">11.11 Checkpoint</a></li>
+      </ul>
+      </div>
       <h2 id="why-this-chapter-exists-11">11.1 Why This Chapter
       Exists</h2>
       <p><a href="#chapter-10-tool-interface">Chapter 10</a> proved the
@@ -5334,7 +6121,67 @@ Answer:</code></pre>
       informal local-vs-hosted comparison into a real, repeatable
       evaluation.</p>
       <h1 id="chapter-12-evaluation">Chapter 12 — Evaluation</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#why-this-chapter-exists-12">12.1 Why This Chapter Exists</a></li><li><a href="#evaluation-is-not-testing">12.2 Evaluation Is Not Testing</a><ul><li><a href="#what-unit-tests-check">12.2.1 What Unit Tests Check</a></li><li><a href="#why-a-model-needs-something-different">12.2.2 Why a Model Needs Something Different</a></li></ul></li><li><a href="#what-to-evaluate">12.3 What to Evaluate</a><ul><li><a href="#tool-call-correctness">12.3.1 Tool-Call Correctness</a></li><li><a href="#answer-quality">12.3.2 Answer Quality</a></li><li><a href="#refusal-and-clarification-behavior">12.3.3 Refusal and Clarification Behavior</a></li></ul></li><li><a href="#building-a-small-eval-set">12.4 Building a Small Eval Set</a><ul><li><a href="#representative-questions">12.4.1 Representative Questions</a></li><li><a href="#expected-outcomes-defined-per-case">12.4.2 Expected Outcomes, Defined Per Case</a></li><li><a href="#data-not-a-hardcoded-script">12.4.3 Data, Not a Hardcoded Script</a></li></ul></li><li><a href="#running-the-eval">12.5 Running the Eval</a><ul><li><a href="#a-small-refactor-first">12.5.1 A Small Refactor First</a></li><li><a href="#scoring">12.5.2 Scoring</a></li><li><a href="#testing-the-scoring-logic-itself">12.5.3 Testing the Scoring Logic Itself</a></li></ul></li><li><a href="#comparing-local-vs.-hosted-formally">12.6 Comparing Local vs. Hosted, Formally</a><ul><li><a href="#running-the-full-set-against-both">12.6.1 Running the Full Set Against Both</a></li><li><a href="#reading-the-results-side-by-side">12.6.2 Reading the Results Side by Side</a></li><li><a href="#from-impression-to-evidence">12.6.3 From Impression to Evidence</a></li></ul></li><li><a href="#regression-checks">12.7 Regression Checks</a><ul><li><a href="#why-re-run-this-later">12.7.1 Why Re-Run This Later</a></li><li><a href="#a-lightweight-habit">12.7.2 A Lightweight Habit</a></li></ul></li><li><a href="#checkpoint-12">12.8 Checkpoint</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#why-this-chapter-exists-12">12.1 Why This Chapter
+      Exists</a></li>
+      <li><a href="#evaluation-is-not-testing">12.2 Evaluation Is Not
+      Testing</a>
+      <ul>
+      <li><a href="#what-unit-tests-check">12.2.1 What Unit Tests
+      Check</a></li>
+      <li><a href="#why-a-model-needs-something-different">12.2.2 Why a
+      Model Needs Something Different</a></li>
+      </ul></li>
+      <li><a href="#what-to-evaluate">12.3 What to Evaluate</a>
+      <ul>
+      <li><a href="#tool-call-correctness">12.3.1 Tool-Call
+      Correctness</a></li>
+      <li><a href="#answer-quality">12.3.2 Answer Quality</a></li>
+      <li><a href="#refusal-and-clarification-behavior">12.3.3 Refusal
+      and Clarification Behavior</a></li>
+      </ul></li>
+      <li><a href="#building-a-small-eval-set">12.4 Building a Small
+      Eval Set</a>
+      <ul>
+      <li><a href="#representative-questions">12.4.1 Representative
+      Questions</a></li>
+      <li><a href="#expected-outcomes-defined-per-case">12.4.2 Expected
+      Outcomes, Defined Per Case</a></li>
+      <li><a href="#data-not-a-hardcoded-script">12.4.3 Data, Not a
+      Hardcoded Script</a></li>
+      </ul></li>
+      <li><a href="#running-the-eval">12.5 Running the Eval</a>
+      <ul>
+      <li><a href="#a-small-refactor-first">12.5.1 A Small Refactor
+      First</a></li>
+      <li><a href="#scoring">12.5.2 Scoring</a></li>
+      <li><a href="#testing-the-scoring-logic-itself">12.5.3 Testing the
+      Scoring Logic Itself</a></li>
+      </ul></li>
+      <li><a href="#comparing-local-vs.-hosted-formally">12.6 Comparing
+      Local vs. Hosted, Formally</a>
+      <ul>
+      <li><a href="#running-the-full-set-against-both">12.6.1 Running
+      the Full Set Against Both</a></li>
+      <li><a href="#reading-the-results-side-by-side">12.6.2 Reading the
+      Results Side by Side</a></li>
+      <li><a href="#from-impression-to-evidence">12.6.3 From Impression
+      to Evidence</a></li>
+      </ul></li>
+      <li><a href="#regression-checks">12.7 Regression Checks</a>
+      <ul>
+      <li><a href="#why-re-run-this-later">12.7.1 Why Re-Run This
+      Later</a></li>
+      <li><a href="#a-lightweight-habit">12.7.2 A Lightweight
+      Habit</a></li>
+      </ul></li>
+      <li><a href="#checkpoint-12">12.8 Checkpoint</a></li>
+      </ul>
+      </div>
       <h2 id="why-this-chapter-exists-12">12.1 Why This Chapter
       Exists</h2>
       <p><a href="#chapter-11-llm-interface-enter-a-second-model">Chapter
@@ -5883,7 +6730,71 @@ Answer:</code></pre>
       malformed input, unexpected model behavior, and everything else a
       real user might do that these eight questions don’t cover.</p>
       <h1 id="chapter-13-hardening">Chapter 13 — Hardening</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#why-this-chapter-exists-13">13.1 Why This Chapter Exists</a></li><li><a href="#what-production-ish-means-for-a-learning-project">13.2 What “Production-ish” Means for a Learning Project</a><ul><li><a href="#setting-scope-honestly">13.2.1 Setting Scope Honestly</a></li><li><a href="#whats-still-out-of-scope">13.2.2 What’s Still Out of Scope</a></li></ul></li><li><a href="#finding-the-seams">13.3 Finding the Seams</a><ul><li><a href="#mapping-the-boundaries">13.3.1 Mapping the Boundaries</a></li><li><a href="#why-each-needs-different-handling">13.3.2 Why Each Needs Different Handling</a></li></ul></li><li><a href="#error-handling-at-each-seam">13.4 Error Handling at Each Seam</a><ul><li><a href="#stress-testing-existing-validation">13.4.1 Stress-Testing Existing Validation</a></li><li><a href="#malformed-tool-call-arguments">13.4.2 Malformed Tool-Call Arguments</a></li><li><a href="#unexpected-model-output">13.4.3 Unexpected Model Output</a></li><li><a href="#agent-assisted-tests-first">13.4.4 Agent-Assisted, Tests First</a></li></ul></li><li><a href="#structured-logging-with-loguru">13.5 Structured Logging with loguru</a><ul><li><a href="#why-logging-not-just-print">13.5.1 Why Logging, Not Just print</a></li><li><a href="#installing-loguru">13.5.2 Installing loguru</a></li><li><a href="#logging-at-the-seams">13.5.3 Logging at the Seams</a></li><li><a href="#reading-a-log-back">13.5.4 Reading a Log Back</a></li></ul></li><li><a href="#final-spec-and-readme-check">13.6 Final Spec and README Check</a><ul><li><a href="#returning-to-spec.md">13.6.1 Returning to SPEC.md</a></li><li><a href="#whats-drifted">13.6.2 What’s Drifted</a></li><li><a href="#reconciling-readme.md">13.6.3 Reconciling README.md</a></li></ul></li><li><a href="#the-complete-definition-of-done">13.7 The Complete Definition of Done</a><ul><li><a href="#assembling-every-checkpoint">13.7.1 Assembling Every Checkpoint</a></li><li><a href="#what-to-do-with-what-doesnt-pass">13.7.2 What to Do With What Doesn’t Pass</a></li></ul></li><li><a href="#checkpoint-13">13.8 Checkpoint</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#why-this-chapter-exists-13">13.1 Why This Chapter
+      Exists</a></li>
+      <li><a href="#what-production-ish-means-for-a-learning-project">13.2 What
+      “Production-ish” Means for a Learning Project</a>
+      <ul>
+      <li><a href="#setting-scope-honestly">13.2.1 Setting Scope
+      Honestly</a></li>
+      <li><a href="#whats-still-out-of-scope">13.2.2 What’s Still Out of
+      Scope</a></li>
+      </ul></li>
+      <li><a href="#finding-the-seams">13.3 Finding the Seams</a>
+      <ul>
+      <li><a href="#mapping-the-boundaries">13.3.1 Mapping the
+      Boundaries</a></li>
+      <li><a href="#why-each-needs-different-handling">13.3.2 Why Each
+      Needs Different Handling</a></li>
+      </ul></li>
+      <li><a href="#error-handling-at-each-seam">13.4 Error Handling at
+      Each Seam</a>
+      <ul>
+      <li><a href="#stress-testing-existing-validation">13.4.1
+      Stress-Testing Existing Validation</a></li>
+      <li><a href="#malformed-tool-call-arguments">13.4.2 Malformed
+      Tool-Call Arguments</a></li>
+      <li><a href="#unexpected-model-output">13.4.3 Unexpected Model
+      Output</a></li>
+      <li><a href="#agent-assisted-tests-first">13.4.4 Agent-Assisted,
+      Tests First</a></li>
+      </ul></li>
+      <li><a href="#structured-logging-with-loguru">13.5 Structured
+      Logging with loguru</a>
+      <ul>
+      <li><a href="#why-logging-not-just-print">13.5.1 Why Logging, Not
+      Just print</a></li>
+      <li><a href="#installing-loguru">13.5.2 Installing loguru</a></li>
+      <li><a href="#logging-at-the-seams">13.5.3 Logging at the
+      Seams</a></li>
+      <li><a href="#reading-a-log-back">13.5.4 Reading a Log
+      Back</a></li>
+      </ul></li>
+      <li><a href="#final-spec-and-readme-check">13.6 Final Spec and
+      README Check</a>
+      <ul>
+      <li><a href="#returning-to-spec.md">13.6.1 Returning to
+      SPEC.md</a></li>
+      <li><a href="#whats-drifted">13.6.2 What’s Drifted</a></li>
+      <li><a href="#reconciling-readme.md">13.6.3 Reconciling
+      README.md</a></li>
+      </ul></li>
+      <li><a href="#the-complete-definition-of-done">13.7 The Complete
+      Definition of Done</a>
+      <ul>
+      <li><a href="#assembling-every-checkpoint">13.7.1 Assembling Every
+      Checkpoint</a></li>
+      <li><a href="#what-to-do-with-what-doesnt-pass">13.7.2 What to Do
+      With What Doesn’t Pass</a></li>
+      </ul></li>
+      <li><a href="#checkpoint-13">13.8 Checkpoint</a></li>
+      </ul>
+      </div>
       <h2 id="why-this-chapter-exists-13">13.1 Why This Chapter
       Exists</h2>
       <p><a href="#chapter-12-evaluation">Chapter 12</a> proved the
@@ -6469,7 +7380,23 @@ Answer:</code></pre>
       chapters — what was hand-written, what was agent-assisted, and why
       that boundary sat where it did throughout.</p>
       <h1 id="closing">Closing</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#c.1-why-this-chapter-exists">C.1 Why This Chapter Exists</a></li><li><a href="#c.2-what-got-built">C.2 What Got Built</a></li><li><a href="#c.3-what-was-hand-written-vs.-ai-assisted-chapter-by-chapter">C.3 What Was Hand-Written vs. AI-Assisted, Chapter by Chapter</a></li><li><a href="#c.4-why-the-boundary-sat-where-it-did">C.4 Why the Boundary Sat Where It Did</a></li><li><a href="#c.5-where-to-apply-this-pattern-next">C.5 Where to Apply This Pattern Next</a></li><li><a href="#c.6-a-closing-note">C.6 A Closing Note</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#c.1-why-this-chapter-exists">C.1 Why This Chapter
+      Exists</a></li>
+      <li><a href="#c.2-what-got-built">C.2 What Got Built</a></li>
+      <li><a href="#c.3-what-was-hand-written-vs.-ai-assisted-chapter-by-chapter">C.3
+      What Was Hand-Written vs. AI-Assisted, Chapter by Chapter</a></li>
+      <li><a href="#c.4-why-the-boundary-sat-where-it-did">C.4 Why the
+      Boundary Sat Where It Did</a></li>
+      <li><a href="#c.5-where-to-apply-this-pattern-next">C.5 Where to
+      Apply This Pattern Next</a></li>
+      <li><a href="#c.6-a-closing-note">C.6 A Closing Note</a></li>
+      </ul>
+      </div>
       <h2 id="c.1-why-this-chapter-exists">C.1 Why This Chapter
       Exists</h2>
       <p>Fourteen chapters is a lot of ground covered one small step at
@@ -6658,7 +7585,27 @@ Answer:</code></pre>
       will keep changing.</p>
       <h1 id="appendix-where-to-go-next">Appendix — Where to Go
       Next</h1>
-      <nav class='local-toc'><p class='local-toc-title'>Contents</p><ul><li><a href="#a.1-why-this-appendix-exists">A.1 Why This Appendix Exists</a></li><li><a href="#a.2-docker">A.2 Docker</a></li><li><a href="#a.3-cicd-github-actions">A.3 CI/CD (GitHub Actions)</a></li><li><a href="#a.4-mypy-type-checking">A.4 mypy / Type Checking</a></li><li><a href="#a.5-pre-commit-hooks">A.5 pre-commit Hooks</a></li><li><a href="#a.6-typer">A.6 Typer</a></li><li><a href="#a.7-direct-pyqt5-widget-testing">A.7 Direct PyQt5 Widget Testing</a></li><li><a href="#a.8-packaging-with-pyinstaller">A.8 Packaging with PyInstaller</a></li><li><a href="#a.9-beyond-this-book">A.9 Beyond This Book</a></li></ul></nav>
+      <div class="local-toc">
+      <div class="local-toc-title">
+      Contents
+      </div>
+      <ul>
+      <li><a href="#a.1-why-this-appendix-exists">A.1 Why This Appendix
+      Exists</a></li>
+      <li><a href="#a.2-docker">A.2 Docker</a></li>
+      <li><a href="#a.3-cicd-github-actions">A.3 CI/CD (GitHub
+      Actions)</a></li>
+      <li><a href="#a.4-mypy-type-checking">A.4 mypy / Type
+      Checking</a></li>
+      <li><a href="#a.5-pre-commit-hooks">A.5 pre-commit Hooks</a></li>
+      <li><a href="#a.6-typer">A.6 Typer</a></li>
+      <li><a href="#a.7-direct-pyqt5-widget-testing">A.7 Direct PyQt5
+      Widget Testing</a></li>
+      <li><a href="#a.8-packaging-with-pyinstaller">A.8 Packaging with
+      PyInstaller</a></li>
+      <li><a href="#a.9-beyond-this-book">A.9 Beyond This Book</a></li>
+      </ul>
+      </div>
       <h2 id="a.1-why-this-appendix-exists">A.1 Why This Appendix
       Exists</h2>
       <p>Fourteen chapters back, the front matter promised a note on
