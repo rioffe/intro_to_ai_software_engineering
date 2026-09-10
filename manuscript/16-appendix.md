@@ -41,25 +41,18 @@ Strip away the mortgage-specific details and what's left is a pattern with nothi
 Every entry above named the place it would attach to. Collected onto the finished system, they stop being six separate essays and become one map of a next project:
 
 ```mermaid
-flowchart TD
-    CLI["Command line<br/>cli.py"]
-    GUI["Desktop window<br/>ui.py"]
-    TOOL["Tool interface<br/>tool.py"]
-
-    CLI --> VAL["validation.py"]
-    GUI --> VAL
-    TOOL --> VAL
-    VAL --> CORE["core.py"]
-
-    TYPER["A.6 Typer<br/>replaces argparse, touches cli.py alone"] -.-> CLI
-    PYI["A.8 PyInstaller<br/>a double-clickable app"] -.-> GUI
-    DOCKER["A.2 Docker<br/>ship these as a service — not the GUI"] -.-> TOOL
-    DOCKER -.-> CLI
-    MYPY["A.4 mypy<br/>where a type slip is easiest to make"] -.-> CORE
-    MYPY -.-> TOOL
-
-    PRECOMMIT["A.5 pre-commit<br/>runs Chapter 3's gate for you"] -.-> GATE["ruff check, ruff format, pytest"]
-    CI["A.3 GitHub Actions<br/>runs the same gate on every push"] -.-> GATE
+---
+config:
+  flowchart:
+    wrappingWidth: 360
+---
+flowchart LR
+    D["<b>A.2 Docker</b>"] --> DT["ship <b>cli.py</b> or <b>tool.py</b> as a service —<br/>never the PyQt5 GUI"]
+    C["<b>A.3 GitHub Actions</b>"] --> CT["Chapter 3's gate, on every push"]
+    M["<b>A.4 mypy</b>"] --> MT["<b>core.py</b> and <b>tool.py</b>, before they ever run"]
+    P["<b>A.5 pre-commit</b>"] --> PT["Chapter 3's gate, before a commit lands"]
+    T["<b>A.6 Typer</b>"] --> TT["<b>cli.py</b> alone — nothing below it changes"]
+    I["<b>A.8 PyInstaller</b>"] --> IT["<b>ui.py</b> alone — a double-clickable app"]
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->

@@ -12,12 +12,19 @@ A language model, at a basic level, is a program trained on enormous amounts of 
 
 ```mermaid
 flowchart TD
-    A[Language Model] --> B[Breaks input text into Tokens]
-    B --> C[Predicts the next token, one at a time]
-    C --> D["Context Window: how many tokens it can see at once"]
-    D --> E{Where does it run?}
-    E -->|Local| F[On your own machine]
-    E -->|Hosted| G[On someone else's servers]
+    IN["Your text"]
+    IN --> TOK["Split into <b>tokens</b><br/>whole words, or fragments of them"]
+    TOK --> WIN["The <b>context window</b><br/>every token it can see at once"]
+    WIN --> PRED["Predict the single<br/>most likely next token"]
+    PRED --> APP["Append it to the text"]
+    APP -->|"and look again"| WIN
+    APP -.->|"until it stops"| OUT["The reply you read"]
+
+    OLD(["Text that no longer fits"]) -.->|"cannot be seen"| WIN
+
+    OUT --> RUN{"And all of that<br/>happened where?"}
+    RUN -->|"<b>Local</b>"| L["your own machine<br/>private, free to re-run,<br/>bounded by your hardware"]
+    RUN -->|"<b>Hosted</b>"| H["someone else's servers<br/>more capable, paid per use,<br/>needs a network"]
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->

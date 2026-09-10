@@ -19,10 +19,10 @@ flowchart TD
     CLI["Chapter 8's CLI<br/>argparse reads the flags"]
     GUI["Chapter 9's window<br/>PyQt5 reads the fields"]
 
-    CLI --> VAL["MortgageInput"]
+    CLI --> VAL["<b>MortgageInput</b>"]
     GUI --> VAL
-    VAL --> ENTRY["calculate_validated_payment"]
-    ENTRY --> CORE["calculate_payment"]
+    VAL --> ENTRY["<b>calculate_validated_payment</b>"]
+    ENTRY --> CORE["<b>calculate_payment</b>"]
     CORE --> R["a payment"]
 ```
 
@@ -380,14 +380,14 @@ That extraction splits the click path into two halves with very different testin
 ```mermaid
 flowchart TD
     CLICK["Calculate.clicked<br/>a PyQt5 signal"]
-    SLOT["on_calculate<br/>the connected slot"]
+    SLOT["<b>on_calculate</b><br/>the connected slot"]
 
     subgraph TESTABLE[" Plain Python — tests/test_ui.py reaches this "]
-        PARSE["parse_form_values<br/>form text to typed values"]
+        PARSE["<b>parse_form_values</b><br/>form text to typed values"]
     end
 
-    MI["MortgageInput<br/>Chapter 7"]
-    CALC["calculate_validated_payment"]
+    MI["<b>MortgageInput</b><br/>Chapter 7"]
+    CALC["<b>calculate_validated_payment</b>"]
     LABEL["result_label.setText(...)"]
 
     CLICK --> SLOT --> PARSE

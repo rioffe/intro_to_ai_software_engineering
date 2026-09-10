@@ -161,14 +161,14 @@ Parsed arguments flow into `MortgageInput` (Chapter 7), which flows into `calcul
 ```mermaid
 flowchart TD
     ARGV["argv<br/>what the user typed"]
-    PARSE["build_parser().parse_args()<br/>argparse converts and checks types"]
-    MI["MortgageInput<br/>Chapter 7"]
+    PARSE["<b>build_parser</b>().parse_args()<br/>argparse converts and checks types"]
+    MI["<b>MortgageInput</b><br/>Chapter 7"]
     BAD["for each error:<br/>print to sys.stderr"]
     EXIT1["return 1"]
-    CALC["calculate_validated_payment<br/>Chapter 7, calling Chapter 6"]
+    CALC["<b>calculate_validated_payment</b><br/>Chapter 7, calling Chapter 6"]
     FMT{"--format"}
     TEXT["print to stdout:<br/>Fixed periodic payment: $1,199.10"]
-    JSON["print to stdout:<br/>json.dumps({payment: 1199.1})"]
+    JSON["print to stdout:<br/><b>json.dumps</b>({payment: 1199.1})"]
     EXIT0["return 0"]
 
     ARGV --> PARSE --> MI
@@ -488,7 +488,7 @@ flowchart TD
     end
 
     EXAMPLE -.->|"tells a new clone<br/>which file to create"| ENVF
-    ENVF --> CFG["config.py: load_dotenv(), then os.getenv"]
+    ENVF --> CFG["config.py: <b>load_dotenv</b>(), then os.getenv"]
     CFG --> USE["Chapter 11's hosted model call"]
 ```
 

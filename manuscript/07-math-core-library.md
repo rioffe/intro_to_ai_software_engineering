@@ -83,10 +83,10 @@ Drawn out, the module is the same picture as 4.3's inputs-and-derived-quantities
 
 ```mermaid
 flowchart TD
-    CALL["calculate_payment(principal, annual_rate,<br/>term_years, payments_per_year)"]
+    CALL["<b>calculate_payment</b>(principal, annual_rate,<br/>term_years, payments_per_year)"]
 
-    CALL --> H1["annual_rate_to_periodic()"]
-    CALL --> H2["total_payments()"]
+    CALL --> H1["<b>annual_rate_to_periodic</b>()"]
+    CALL --> H2["<b>total_payments</b>()"]
     H1 --> R["r"]
     H2 --> N["n"]
 

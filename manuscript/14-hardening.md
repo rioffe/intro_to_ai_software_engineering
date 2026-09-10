@@ -28,13 +28,13 @@ flowchart LR
         MODEL["Model's raw output"]
     end
 
-    CLI --> V[MortgageInput validation]
+    CLI --> V[<b>MortgageInput</b> validation]
     UI --> V
     MODEL --> PARSE[Parse tool call]
     PARSE --> TC[Tool-call arguments]
     TC --> V
 
-    V --> CORE[calculate_payment]
+    V --> CORE[<b>calculate_payment</b>]
     CORE --> R[Result]
 ```
 
@@ -125,10 +125,10 @@ flowchart TD
     Q2 -->|"yes"| A1["Return it: a legitimate answer<br/>with no calculation behind it"]
     Q2 -->|"no"| A2["13.4.3 fallback:<br/>'I wasn't able to generate a response'"]
 
-    Q1 -->|"yes"| Q3{"does json.loads succeed ?"}
+    Q1 -->|"yes"| Q3{"does <b>json.loads</b> succeed ?"}
     Q3 -->|"no"| A3["13.4.2: log a warning, return<br/>'I had trouble understanding those<br/>loan details' — and STOP.<br/>No second call to the model."]
-    Q3 -->|"yes"| CALL["call_tool(arguments)"]
-    CALL --> Q4{"does MortgageInput accept it ?"}
+    Q3 -->|"yes"| CALL["<b>call_tool</b>(arguments)"]
+    CALL --> Q4{"does <b>MortgageInput</b> accept it ?"}
     Q4 -->|"no"| A4["{error: ...} back to the model,<br/>which can explain or retry"]
     Q4 -->|"yes"| A5["{payment: ...} back to the model,<br/>then a plain-language answer"]
 ```
@@ -363,6 +363,21 @@ This section closes the loop on both of this project's living documents — SPEC
 This is the fourth time in the book SPEC.md has been opened and found wanting — worth seeing the whole pattern at once before adding to it again:
 
 ```mermaid
+---
+config:
+  themeVariables:
+    fontSize: 26px
+    cScale0: '#e8e6f7'
+    cScaleLabel0: '#1e1b33'
+    cScale1: '#e8e6f7'
+    cScaleLabel1: '#1e1b33'
+    cScale2: '#e8e6f7'
+    cScaleLabel2: '#1e1b33'
+    cScale3: '#e8e6f7'
+    cScaleLabel3: '#1e1b33'
+    cScale4: '#e8e6f7'
+    cScaleLabel4: '#1e1b33'
+---
 timeline
     title SPEC.md's Revision History
     Chapter 2 : First draft, deliberately gappy

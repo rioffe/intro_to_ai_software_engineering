@@ -161,17 +161,17 @@ cat ~/.ssh/id_ed25519.pub                   # copy this output
 Then, in a browser: GitHub → Settings → SSH and GPG keys → New SSH key, and paste what you copied.
 
 ```mermaid
-flowchart LR
-    KEYGEN["ssh-keygen"]
-    KEYGEN --> PRIV["Private key<br/>~/.ssh/id_ed25519<br/>stays on your machine"]
-    KEYGEN --> PUB["Public key<br/>~/.ssh/id_ed25519.pub<br/>safe to hand out"]
+flowchart TD
+    KEYGEN["<b>ssh-keygen</b>"]
+    KEYGEN --> PRIV["<b>Private key</b><br/>~/.ssh/id_ed25519<br/>stays on your machine"]
+    KEYGEN --> PUB["<b>Public key</b><br/>~/.ssh/id_ed25519.pub<br/>safe to hand out"]
 
-    PUB -->|"uploaded once"| GH["GitHub<br/>holds your public key"]
-    PRIV -->|"proves it's you,<br/>on every push"| PUSH["git push"]
+    PUB -->|"uploaded once"| GH["<b>GitHub</b><br/>holds your public key"]
+    PRIV -->|"proves it's you,<br/>on every push"| PUSH["<b>git push</b>"]
     PUSH --> GH
     GH --> OK["Keys match:<br/>push accepted"]
 
-    PRIV x--x|"never uploaded, never pasted,<br/>never shared"| GH
+    PRIV x--x|"never uploaded,<br/>never pasted, never shared"| GH
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->

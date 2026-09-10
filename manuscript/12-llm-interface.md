@@ -79,11 +79,11 @@ sequenceDiagram
     participant Tool as tool.py
 
     User->>LLM: "What would my payment be on<br/>a $200,000 loan at 6% over 30 years?"
-    LLM->>Model: chat call 1 — the question, plus get_tool_definition()
+    LLM->>Model: chat call 1 — the question, plus <b>get_tool_definition</b>()
     Note over Model: The model decides for itself<br/>whether calling the tool makes sense.
     alt the model calls the tool
         Model-->>LLM: tool_calls[0] with arguments
-        LLM->>Tool: call_tool(arguments)
+        LLM->>Tool: <b>call_tool</b>(arguments)
         Tool-->>LLM: {payment: 1199.1} or {error: ...}
         LLM->>Model: chat call 2 — the question, the model's own<br/>tool-call message, and the tool result
         Model-->>LLM: "Your monthly payment would be $1,199.10."
@@ -319,16 +319,16 @@ Closely, but not identically. Three things genuinely differ, and all three are t
 
 ```mermaid
 flowchart TD
-    L0["ask_local"]
+    L0["<b>ask_local</b>"]
     L0 --> L1["ollama.chat(tools=tools)"]
     L1 --> L2["arguments arrive<br/>as a dict — use them"]
     L2 --> L3["reply: role=tool,<br/>content=str(result)"]
     L3 --> L4["second ollama.chat"]
 
-    H0["ask_hosted"]
+    H0["<b>ask_hosted</b>"]
     H0 --> H1["client.chat.completions.create(tools=tools)"]
-    H1 --> H2["arguments arrive as a JSON<br/>string — json.loads first"]
-    H2 --> H3["reply: role=tool, content=json.dumps(result),<br/>PLUS a tool_call_id"]
+    H1 --> H2["arguments arrive as a JSON<br/>string — <b>json.loads</b> first"]
+    H2 --> H3["reply: role=tool, content=<b>json.dumps</b>(result),<br/>PLUS a <b>tool_call_id</b>"]
     H3 --> H4["second create call"]
 
     L2 -.->|"difference 1"| H2
@@ -522,11 +522,11 @@ flowchart TD
     BTN["GUI: Calculate button<br/>Chapter 9"]
     ASKBTN["GUI: Ask button<br/>Chapter 11.9.3"]
 
-    LLM["llm.py<br/>ask_local / ask_hosted"]
+    LLM["llm.py<br/><b>ask_local</b> / <b>ask_hosted</b>"]
     MODEL["A language model<br/>local via Ollama, or hosted via OpenRouter"]
-    TOOL["tool.py<br/>call_tool"]
-    VAL["MortgageInput<br/>Chapter 7"]
-    CORE["calculate_payment<br/>Chapter 6, still pure"]
+    TOOL["tool.py<br/><b>call_tool</b>"]
+    VAL["<b>MortgageInput</b><br/>Chapter 7"]
+    CORE["<b>calculate_payment</b><br/>Chapter 6, still pure"]
 
     ASK --> LLM
     ASKBTN --> LLM

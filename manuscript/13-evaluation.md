@@ -358,8 +358,8 @@ def summarize(results: list[dict[str, Any]]) -> str:
 
 ```mermaid
 flowchart TD
-    JSON["data/eval_set.json → load_eval_set()<br/>questions plus expected outcomes"]
-    JSON --> ASK["run_eval, one case at a time:<br/>ask_fn(question) → {answer, tool_called, arguments}"]
+    JSON["data/eval_set.json → <b>load_eval_set</b>()<br/>questions plus expected outcomes"]
+    JSON --> ASK["<b>run_eval</b>, one case at a time:<br/>ask_fn(question) → {answer, tool_called, arguments}"]
 
     ASK --> C1{"tool_called ==<br/>expected_tool_call ?"}
     C1 -->|"no"| F1["FAIL: 'tool_called mismatch'"]
@@ -369,7 +369,7 @@ flowchart TD
     C3 -->|"no"| F2["FAIL: 'argument mismatch: principal'"]
     C3 -->|"yes"| PASS
 
-    PASS --> SUM["summarize()<br/>'6/8 passed'"]
+    PASS --> SUM["<b>summarize</b>()<br/>'6/8 passed'"]
     F1 --> SUM
     F2 --> SUM
 ```

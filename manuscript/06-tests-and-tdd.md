@@ -20,24 +20,34 @@ Then repeat, for the next small piece of behavior.
 
 ```mermaid
 stateDiagram-v2
-    direction LR
+    direction TB
     [*] --> Red
 
-    Red: Red
-    Red: Write a test for behavior<br/>that does not exist yet
-    Green: Green
-    Green: Write the smallest code<br/>that makes it pass
-    Refactor: Refactor
-    Refactor: Clean up, with a passing<br/>test protecting you
+    Red: 🔴 Red
+    Red: Name one thing the system
+    Red: cannot do yet, as a test.
+    Green: 🟢 Green
+    Green: Write the least code
+    Green: that makes it true.
+    Refactor: 🔵 Refactor
+    Refactor: Now make it clean,
+    Refactor: with the test holding.
 
-    Red --> Green: you have watched it fail<br/>for the right reason
-    Green --> Refactor: the suite is green
-    Refactor --> Red: still green;<br/>next piece of behavior
+    Red --> Green: it failed — and for<br/>the reason you expected
+    Green --> Refactor: it passes, and you didn't<br/>weaken the test to get there
+    Refactor --> Red: still passing — so name<br/>the next thing it cannot do
+
+    classDef redState fill:#fbe4e6,stroke:#c0666f,color:#3a1216
+    classDef greenState fill:#e4f4e7,stroke:#4f9160,color:#12301a
+    classDef blueState fill:#e7ecf7,stroke:#6478ad,color:#161d33
+    class Red redState
+    class Green greenState
+    class Refactor blueState
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
 
-Read the transitions, not just the states: each one names what has to be *true* before you're allowed to move on. "You have watched it fail for the right reason" is the one people skip, and it's the one that catches a test which never actually ran. Both kinds of red look similar in the terminal and mean very different things — 5.5.2's `ModuleNotFoundError` is the correct failure, saying "the thing you're describing doesn't exist yet," while 5.6.4's collection error is a broken *test*, failing before it checks anything at all. Only reading the failure tells them apart.
+Read the transitions, not just the states: each one names what has to be *true* before you're allowed to move on. "It failed — and for the reason you expected" is the one people skip, and it's the one that catches a test which never actually ran. Both kinds of red look similar in the terminal and mean very different things — 5.5.2's `ModuleNotFoundError` is the correct failure, saying "the thing you're describing doesn't exist yet," while 5.6.4's collection error is a broken *test*, failing before it checks anything at all. Only reading the failure tells them apart.
 
 ### 5.2.2 Why Write the Test First
 
@@ -164,16 +174,21 @@ Any test function that takes `worked_example` as a parameter automatically recei
 That last clause is worth a picture, because nothing else in Python works this way:
 
 ```mermaid
-flowchart LR
-    CONF["tests/conftest.py<br/>@pytest.fixture<br/>def worked_example():"]
-    TEST["tests/test_core.py<br/>def test_matches_worked_example(worked_example):"]
-    PYTEST["pytest"]
+---
+config:
+  flowchart:
+    wrappingWidth: 420
+---
+flowchart TD
+    CONF["<b>tests/conftest.py</b><br/>@pytest.fixture<br/>def <b>worked_example</b>():"]
+    PYTEST["<b>pytest</b>"]
+    TEST["<b>tests/test_core.py</b><br/>def test_matches_worked_example(<b>worked_example</b>):"]
 
     CONF -->|"registers the name"| PYTEST
     TEST -->|"requests it, by parameter name"| PYTEST
-    PYTEST -->|"calls the fixture and passes<br/>the result in — no import anywhere"| TEST
+    PYTEST -->|"calls the fixture and passes the result in —<br/>no import anywhere"| TEST
 
-    PYTEST -.->|"the same mechanism, for fixtures<br/>pytest already ships"| BUILTIN["capsys, in Chapter 8.6.2<br/>monkeypatch, in Chapter 11.8.1"]
+    PYTEST -.->|"the same mechanism, for fixtures pytest already ships"| BUILTIN["<b>capsys</b>, in Chapter 8.6.2<br/><b>monkeypatch</b>, in Chapter 11.8.1"]
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->

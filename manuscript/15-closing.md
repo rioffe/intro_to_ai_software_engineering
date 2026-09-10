@@ -20,10 +20,10 @@ flowchart TD
 
     CLI --> VAL
     GUI --> VAL
-    LLMFE --> TOOL["tool.py: call_tool<br/>never raises"] --> VAL
+    LLMFE --> TOOL["tool.py: <b>call_tool</b><br/>never raises"] --> VAL
 
-    VAL["validation.py: MortgageInput<br/>Chapter 7 — the only path in"]
-    VAL --> CORE["core.py: calculate_payment<br/>Chapter 6 — pure"]
+    VAL["validation.py: <b>MortgageInput</b><br/>Chapter 7 — the only path in"]
+    VAL --> CORE["core.py: <b>calculate_payment</b><br/>Chapter 6 — pure"]
 
     SPEC["SPEC.md<br/>revised in Ch. 2, 4, 9, 11, 13"] -.->|"defines correct"| VAL
     TESTS["The test suite<br/>Chapters 5-12"] -.->|"proves correct"| CORE
@@ -61,41 +61,24 @@ Look at the right-hand column of that table as a whole, rather than row by row, 
 That's the front matter's diagram again, with fourteen chapters of real artifacts filled in where the abstractions were:
 
 ```mermaid
+---
+config:
+  flowchart:
+    wrappingWidth: 480
+---
 flowchart TD
-    subgraph YOURS[" What stayed yours "]
-        direction LR
-        A1["SPEC.md<br/>revised in Ch. 2, 4, 9, 11, 13"]
-        A2["the worked example<br/>1,199.10, computed by hand"]
-        A3["every expected value<br/>in every test"]
-        A4["the eval set<br/>and its expected outcomes"]
-        A5["the review checklist,<br/>run on every diff since 1.6"]
-    end
+    YOURS["<b>What stayed yours</b><br/><br/>SPEC.md, revised in Chapters 2, 4, 9, 11 and 13<br/>the worked example — 1,199.10, computed by hand<br/>every expected value in every test<br/>the eval set, and its expected outcomes<br/>the review checklist, run on every diff since 1.6"]
+    BOUNDARY{{"<b>What counts as working</b>"}}
+    PIS["<b>What Pi drafted</b><br/><br/>implementations — core, validation, tool, <b>ask_hosted</b><br/>wiring and boilerplate — widgets, flags, parsers<br/>documentation drafts — the README, twice"]
 
-    BOUNDARY{"What counts as working"}
-
-    subgraph PIS[" What Pi drafted "]
-        direction LR
-        B1["implementations<br/>core, validation, tool, ask_hosted"]
-        B2["wiring and boilerplate<br/>widgets, flags, parsers"]
-        B3["documentation drafts<br/>the README, twice"]
-    end
-
-    A1 --> BOUNDARY
-    A2 --> BOUNDARY
-    A3 --> BOUNDARY
-    A4 --> BOUNDARY
-    A5 --> BOUNDARY
-
-    BOUNDARY ==>|"Pi worked from these"| B1
-    BOUNDARY ==> B2
-    BOUNDARY ==> B3
-
-    PIS -.->|"never wrote them"| BOUNDARY
+    YOURS ==>|"settled it"| BOUNDARY
+    BOUNDARY ==>|"Pi worked from it"| PIS
+    PIS -.->|"never once wrote it"| BOUNDARY
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
 
-Every arrow still points the same way it did before Chapter 0. The top row got longer and more specific over fourteen chapters; the direction of the heavy arrows never changed once. That's the whole claim — not that the bottom row is small, but that nothing in it ever moved up.
+Every arrow still points the same way it did before Chapter 0. The top box got longer and far more specific over fourteen chapters; the direction of the heavy arrows never changed once. That's the whole claim — not that the bottom box is small, it plainly isn't, but that nothing in it ever moved up.
 
 
 That's the actual thesis of this book, stated plainly now that there's a whole system to point at rather than an abstract claim in the front matter: a hybrid system isn't defined by how much of the code an agent wrote. It's defined by who — or what — gets to decide what counts as working. Keep that decision yours, and an agent drafting most of your implementation code is a force multiplier. Let that decision drift to the agent, even a little at a time, across enough chapters, and "hybrid" quietly becomes "the agent did it," which was never the point.

@@ -145,15 +145,20 @@ Each `@field_validator` runs after Pydantic's own type checking, and raises a pl
 Three checks run in a fixed order, and any one of them can end the trip:
 
 ```mermaid
-flowchart LR
-    RAW["Raw input<br/>a dict from a CLI,<br/>a form, or a model"]
+---
+config:
+  flowchart:
+    wrappingWidth: 420
+---
+flowchart TD
+    RAW["Raw input — a dict from a CLI, a form, or a model"]
     RAW --> X{"a field the model<br/>doesn't declare?"}
-    X -->|"yes — extra='forbid'"| ERR["ValidationError<br/>carrying the message you wrote —<br/>what a Chapter 8 or 9 user reads on screen"]
+    X -->|"yes — extra='forbid'"| ERR["<b>ValidationError</b><br/>carrying the message you wrote —<br/>what a Chapter 8 or 9 user reads on screen"]
     X -->|"no"| T{"does each value match<br/>its declared type?"}
     T -->|"no — 'abc' is not a float"| ERR
-    T -->|"yes"| V{"does every @field_validator pass?"}
+    T -->|"yes"| V{"does every<br/>@<b>field_validator</b> pass?"}
     V -->|"no — principal must be positive"| ERR
-    V -->|"yes"| OK["A valid MortgageInput"]
+    V -->|"yes"| OK["a valid <b>MortgageInput</b>"]
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
@@ -323,9 +328,9 @@ That one function completes a shape this book keeps returning to:
 ```mermaid
 flowchart TD
     OUTSIDE["The outside world<br/>a person, a file, a model"]
-    VAL["MortgageInput<br/>is this input legal?"]
-    ENTRY["calculate_validated_payment<br/>the only supported entry point"]
-    CORE["calculate_payment<br/>pure: no I/O, no state, no opinions"]
+    VAL["<b>MortgageInput</b><br/>is this input legal?"]
+    ENTRY["<b>calculate_validated_payment</b><br/>the only supported entry point"]
+    CORE["<b>calculate_payment</b><br/>pure: no I/O, no state, no opinions"]
     RESULT["a payment"]
 
     OUTSIDE --> VAL

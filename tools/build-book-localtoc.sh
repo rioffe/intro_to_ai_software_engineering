@@ -183,6 +183,19 @@ printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' \
  '\AddToShipoutPictureBG*{\AtPageLowerLeft{\includegraphics[width=\paperwidth,height=\paperheight]{assets/book_cover.png}}}\null\clearpage%' \
  '\begingroup\let\cleardoublepage\clearpage\originalmaketitle\endgroup}' >"$HEADER"
 
+# needspace: reserve vertical space so a diagram is not split, across a page
+# break, from the sentence that introduces it (see tools/keep-with-diagram.lua).
+printf '%s\n' '\usepackage{needspace}' >>"$HEADER"
+
+# Long lines in fenced code blocks -- the eval set's questions, some help text --
+# otherwise run past the text block and into the margin.  fvextra's breaklines
+# wraps them instead.  This redefinition overrides the Highlighting environment
+# pandoc's own template defines earlier in the preamble.
+printf '%s\n%s\n%s\n' \
+ '\usepackage{fvextra}' \
+ '\DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,breaksymbolleft={},commandchars=\\\{\}}' \
+ '\DefineVerbatimEnvironment{verbatim}{Verbatim}{breaklines,breakanywhere,breaksymbolleft={}}' >>"$HEADER"
+
 # --margin: page margins on all sides via the geometry package (optional).
 # An empty MARGIN leaves pandoc's default page layout untouched.
 if [ -n "$MARGIN" ]; then
@@ -343,4 +356,5 @@ pandoc "$PROC" \
  --metadata "author=$AUTHOR" \
  --metadata "date=$DATE" \
  $mermaid_args \
+ --lua-filter="$ROOT/tools/keep-with-diagram.lua" \
  --output "$OUT" && echo "Success! Created '$OUT'."

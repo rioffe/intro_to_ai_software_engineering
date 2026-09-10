@@ -86,14 +86,14 @@ Four parts go into the finished definition, and it's worth being clear about whi
 
 ```mermaid
 flowchart TD
-    MI["MortgageInput<br/>Chapter 7"]
-    MI -->|"model_json_schema()"| PARAMS["parameters<br/>field names, types, required list,<br/>additionalProperties: false"]
+    MI["<b>MortgageInput</b><br/>Chapter 7"]
+    MI -->|"<b>model_json_schema</b>()"| PARAMS["parameters<br/>field names, types, required list,<br/>additionalProperties: false"]
 
     NAME["name<br/>'calculate_mortgage_payment'"]
     DESC["description<br/>what it computes, and when to reach for it"]
     OUT["output_schema<br/>the {payment: number} shape from 8.5.4"]
 
-    PARAMS --> DEF["get_tool_definition()"]
+    PARAMS --> DEF["<b>get_tool_definition</b>()"]
     NAME --> DEF
     DESC --> DEF
     OUT --> DEF
@@ -190,12 +190,12 @@ Those three tests describe a function with exactly two exits and no third one:
 ```mermaid
 flowchart TD
     ARGS["arguments: a dict<br/>from whatever a model decided to send"]
-    ARGS --> MI["MortgageInput(**arguments)"]
-    MI -->|"valid"| CALC["calculate_validated_payment"]
+    ARGS --> MI["<b>MortgageInput</b>(**arguments)"]
+    MI -->|"valid"| CALC["<b>calculate_validated_payment</b>"]
     CALC --> OK["return {payment: 1199.1}"]
     MI -->|"ValidationError, caught"| ERR["return {error: 'principal must be positive'}"]
 
-    MI -.->|"this path does not exist:<br/>no exception escapes call_tool"| RAISE(["raise"])
+    MI -.->|"this path does not exist:<br/>no exception escapes <b>call_tool</b>"| RAISE(["raise"])
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
@@ -283,7 +283,7 @@ flowchart TD
     CLIENT <-->|"list tools / call a tool"| SERVER
     SERVER --> DEF
 
-    DEF -.->|"this book's hand-built,<br/>single-tool version of the same idea"| TOOLPY["tool.py<br/>get_tool_definition() and call_tool()"]
+    DEF -.->|"this book's hand-built,<br/>single-tool version of the same idea"| TOOLPY["tool.py<br/><b>get_tool_definition</b>() and <b>call_tool</b>()"]
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->

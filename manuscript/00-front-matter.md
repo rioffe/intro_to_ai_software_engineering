@@ -36,39 +36,24 @@ A hybrid system, as this book means it, has two parts: a core that you design, w
 The boundary that definition draws is the one thing worth carrying through every chapter that follows, so here it is as a picture before it's a practice:
 
 ```mermaid
+---
+config:
+  flowchart:
+    wrappingWidth: 460
+---
 flowchart TD
-    subgraph YOURS[" Yours — where 'correct' gets decided "]
-        direction LR
-        SPEC["SPEC.md<br/>intent, in plain language"]
-        KEY["The worked example<br/>one exact answer key"]
-        TESTS["Tests<br/>intent, made executable"]
-        EVALSET["The eval set<br/>expected model behavior"]
-        REVIEW["Your review<br/>of every proposed change"]
-    end
+    YOURS["<b>Yours</b> — where 'correct' gets decided<br/><br/>SPEC.md · the worked example · the tests<br/>the eval set · your review of every diff"]
+    BOUNDARY{{"<b>What counts as working</b>"}}
+    ASSISTED["<b>AI-assisted</b> — where drafting happens<br/><br/>an agent drafts implementations and wiring<br/>a model reasons over a user's question"]
 
-    BOUNDARY{{"The decision that stays yours:<br/>what counts as working"}}
-
-    subgraph ASSISTED[" AI-assisted — where drafting happens "]
-        direction LR
-        AGENT["An agent drafts<br/>implementations and wiring"]
-        MODEL["A model reasons over<br/>a user's question"]
-    end
-
-    SPEC --> BOUNDARY
-    KEY --> BOUNDARY
-    TESTS --> BOUNDARY
-    EVALSET --> BOUNDARY
-    REVIEW --> BOUNDARY
-
-    BOUNDARY ==> AGENT
-    BOUNDARY ==> MODEL
-
-    ASSISTED -.->|"never flows back"| BOUNDARY
+    YOURS ==>|"decides"| BOUNDARY
+    BOUNDARY ==>|"is handed to"| ASSISTED
+    ASSISTED -.->|"never decides it"| BOUNDARY
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
 
-The heavy arrows run downward on purpose. Everything in the top row is something you write, and together they decide what "working" means; the assisted layer below works *from* that decision constantly. The dotted arrow going back up is the one this book spends fourteen chapters teaching you not to draw.
+The heavy arrows run downward on purpose. Everything in the top box is something you write, and together they settle what "working" means; the assisted layer at the bottom works *from* that settlement, constantly and usefully. The dotted arrow going back up is the one this book spends fourteen chapters teaching you not to draw.
 
 This split — human-verified core, AI-assisted layer — isn't a compromise or a hedge. It's the whole point. A book that taught you to let an agent write everything would be teaching you to trust something you can't yet evaluate. A book that banned AI assistance entirely would be pretending the tools in Chapter 1 don't exist, or don't matter. This book tries to do something more useful than either: show you exactly where the boundary between "yours" and "assisted" belongs, and give you enough practice drawing that line yourself that you can keep drawing it correctly long after you've finished the last chapter.
 
