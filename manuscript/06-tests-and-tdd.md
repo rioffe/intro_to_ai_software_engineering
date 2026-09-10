@@ -18,6 +18,27 @@ Test-driven development follows a three-step cycle, repeated over and over:
 
 Then repeat, for the next small piece of behavior.
 
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> Red
+
+    Red: Red
+    Red: Write a test for behavior<br/>that does not exist yet
+    Green: Green
+    Green: Write the smallest code<br/>that makes it pass
+    Refactor: Refactor
+    Refactor: Clean up, with a passing<br/>test protecting you
+
+    Red --> Green: you have watched it fail<br/>for the right reason
+    Green --> Refactor: the suite is green
+    Refactor --> Red: still green;<br/>next piece of behavior
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Read the transitions, not just the states: each one names what has to be *true* before you're allowed to move on. "You have watched it fail for the right reason" is the one people skip, and it's the one that catches a test which never actually ran. Both kinds of red look similar in the terminal and mean very different things — 5.5.2's `ModuleNotFoundError` is the correct failure, saying "the thing you're describing doesn't exist yet," while 5.6.4's collection error is a broken *test*, failing before it checks anything at all. Only reading the failure tells them apart.
+
 ### 5.2.2 Why Write the Test First
 
 This feels backwards the first time you do it — how can you test something that doesn't exist? But writing the test first forces you to answer a question you'd otherwise skip past: *what, exactly, does "working" mean here, before I've built anything and started rationalizing whatever I happened to build?* A test written after the code tends to describe what the code does. A test written before the code describes what the code is *supposed* to do — a small but real difference, and one that matters more, not less, once an agent might be the one writing the implementation.

@@ -111,6 +111,28 @@ If your hardware doesn't comfortably fit even the smallest row here, section 1.7
 
 Pi is a coding agent: a program that can read your project's files, propose changes, and — with your permission at each step — run commands and write to disk. The model from section 1.4 is Pi's reasoning engine; Pi itself is the framework that lets that reasoning act on a real codebase instead of just producing text in a chat window.
 
+Four separate pieces are involved, and it's worth seeing which one does what before you install any of them:
+
+```mermaid
+flowchart TD
+    YOU["You<br/>a prompt, in a terminal"]
+    PI["Pi<br/>reads files, proposes diffs,<br/>runs commands with permission"]
+    CFG["~/.pi/agent/settings.json<br/>defaultModel, defaultProvider"]
+    OLLAMA["Ollama<br/>serves the model locally"]
+    WEIGHTS["Model weights<br/>on your disk"]
+
+    YOU -->|"a prompt"| PI
+    CFG -.->|"read once, at startup"| PI
+    PI -->|"sends context, asks for text"| OLLAMA
+    OLLAMA --> WEIGHTS
+    OLLAMA -->|"predicted tokens"| PI
+    PI -->|"a proposed diff"| YOU
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Only the rightmost box does any predicting. Everything Pi adds — finding the right files, assembling context, applying an edit, running a command — sits between you and that prediction, which is why section 1.4's choice of model and this section's choice of agent are genuinely separate decisions.
+
 ### 1.5.2 Installation
 
 Follow the install instructions for your platform from Pi's documentation. Confirm it's available:
@@ -169,6 +191,28 @@ Running `pi` with no arguments starts an interactive session using the current d
 ## 1.6 Your First Agent-Assisted Interaction
 
 ### 1.6.1 A Deliberately Small Task
+
+Every agent-assisted change in this book — from this docstring through Chapter 13's error handling — runs the same short loop:
+
+```mermaid
+flowchart TD
+    PROMPT["You write a prompt<br/>a small, informal spec"]
+    PROPOSE["Pi proposes a diff"]
+    READ["You read the diff<br/>every line, every time"]
+    JUDGE{"Does it do what it claims,<br/>and nothing else?"}
+    FIX["Correct it, or reject it<br/>and re-prompt"]
+    COMMIT["git commit<br/>a checkpoint you stand behind"]
+
+    PROMPT --> PROPOSE --> READ --> JUDGE
+    JUDGE -->|"no"| FIX
+    FIX --> PROMPT
+    JUDGE -->|"yes"| COMMIT
+    COMMIT --> PROMPT
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+The loop never gets a step removed as the book goes on — the diffs just get bigger. When a later chapter says "review this the same way you reviewed Chapter 1.6's," this is the shape it means.
 
 Before trusting Pi with anything that matters, give it something safe and easy to check:
 

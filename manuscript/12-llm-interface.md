@@ -50,6 +50,36 @@ But a reasoning model like this one is just as likely to work through the whole 
 
 The pattern this section implements has four steps: a user asks a question; the model, given the Chapter 10 tool definition, decides whether to call it and with what arguments; your code executes the tool and gets a result; that result goes back to the model, which turns it into a plain-language answer.
 
+Those four steps take **two** round-trips to the model, not one, and that is the single detail most worth getting straight before reading the code:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User
+    participant LLM as llm.py
+    participant Model
+    participant Tool as tool.py
+
+    User->>LLM: "What would my payment be on<br/>a $200,000 loan at 6% over 30 years?"
+    LLM->>Model: chat call 1 — the question, plus get_tool_definition()
+    Note over Model: The model decides for itself<br/>whether calling the tool makes sense.
+    alt the model calls the tool
+        Model-->>LLM: tool_calls[0] with arguments
+        LLM->>Tool: call_tool(arguments)
+        Tool-->>LLM: {payment: 1199.1} or {error: ...}
+        LLM->>Model: chat call 2 — the question, the model's own<br/>tool-call message, and the tool result
+        Model-->>LLM: "Your monthly payment would be $1,199.10."
+    else the model answers without the tool
+        Model-->>LLM: plain content, no tool_calls
+        Note over LLM: Return it as-is. One round-trip,<br/>and no calculation happened.
+    end
+    LLM-->>User: a plain-language answer
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Three things this makes concrete that the prose has to say three separate times. The model never touches `call_tool` — it asks, your code executes, and the arrow from `tool.py` goes back to `llm.py`, not to the model. The second `chat` call replays the *whole* conversation, including the model's own tool-call message, because the model holds no memory between calls; leave that message out and the tool result arrives with nothing to attach itself to. And the `else` branch is not an error — a model choosing not to call the tool is normal behavior, which is why 11.4.3 treats it as something to expect and Chapter 12 makes it a scored outcome rather than a bug.
+
 ### 11.4.2 A Minimal Implementation
 
 ```bash
@@ -440,7 +470,36 @@ git push
 
 ## 11.9 Connecting This to the CLI and UI
 
-Everything so far has proven `ask_local` and `ask_hosted` work — but only from scratch files nobody else will ever run. The two front ends a real user would actually reach for, Chapter 8's CLI and Chapter 9's UI, still know nothing about either function. Close that gap now, the same way as everything else that's touched more than one file in this project: design it, write it down, then build it.
+Everything so far has proven `ask_local` and `ask_hosted` work — but only from scratch files nobody else will ever run. The two front ends a real user would actually reach for, Chapter 8's CLI and Chapter 9's UI, still know nothing about either function. Once that gap closes, the system this book has been assembling since Chapter 6 exists in full — every entry point a user has, landing on one core:
+
+```mermaid
+flowchart TD
+    FLAGS["CLI: --principal --annual-rate --term-years<br/>Chapter 8"]
+    ASK["CLI: --ask 'a question'<br/>Chapter 11.9.1"]
+    BTN["GUI: Calculate button<br/>Chapter 9"]
+    ASKBTN["GUI: Ask button<br/>Chapter 11.9.3"]
+
+    LLM["llm.py<br/>ask_local / ask_hosted"]
+    MODEL["A language model<br/>local via Ollama, or hosted via OpenRouter"]
+    TOOL["tool.py<br/>call_tool"]
+    VAL["MortgageInput<br/>Chapter 7"]
+    CORE["calculate_payment<br/>Chapter 6, still pure"]
+
+    ASK --> LLM
+    ASKBTN --> LLM
+    LLM <-->|"the two round-trips from 11.4.1"| MODEL
+    LLM --> TOOL --> VAL
+
+    FLAGS --> VAL
+    BTN --> VAL
+    VAL --> CORE
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Four ways in, one way through. Compare it against Chapter 7.7.1's two-box version and notice what changed: everything from `MortgageInput` rightward is identical, and every addition since has been another arrow arriving on the left. That's not a coincidence to admire in passing — it's the payoff for Chapter 6 refusing to print anything and Chapter 7 insisting on a single entry point, decisions that both looked like unnecessary ceremony at the time.
+
+Close the gap now, the same way as everything else that's touched more than one file in this project: design it, write it down, then build it.
 
 ### 11.9.1 The CLI: A Natural-Language Flag
 

@@ -79,6 +79,31 @@ def calculate_payment(
     return principal * (r * (1 + r) ** n) / ((1 + r) ** n - 1)
 ```
 
+Drawn out, the module is the same picture as 4.3's inputs-and-derived-quantities diagram, with the 4.4.3 edge case added as the one branch:
+
+```mermaid
+flowchart TD
+    CALL["calculate_payment(principal, annual_rate,<br/>term_years, payments_per_year)"]
+
+    CALL --> H1["annual_rate_to_periodic()"]
+    CALL --> H2["total_payments()"]
+    H1 --> R["r"]
+    H2 --> N["n"]
+
+    R --> Q{"r == 0 ?"}
+    N --> Q
+
+    Q -->|"yes — no interest"| ZERO["return principal / n"]
+    Q -->|"no — the general case"| GEN["return principal * (r * (1+r)**n)<br/>/ ((1+r)**n - 1)"]
+
+    ZERO --> OUT["a float, unrounded"]
+    GEN --> OUT
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Two helpers, one branch, one return type, and nothing else — no printing, no files, no network. That flatness is what "pure" bought you, and it's why 6.5.3's review checklist is only three items long: there are only three places this function can go wrong.
+
 Notice how closely this reads against the formula: `r * (1 + r) ** n` in the numerator, `(1 + r) ** n - 1` in the denominator — the same shape as $\dfrac{r(1+r)^n}{(1+r)^n-1}$ from 4.4.1, not an optimized or rearranged version of it. Clarity against the derivation matters more here than performance; this function will never be a bottleneck in this project.
 
 ### 6.5.2 Agent-Assisted Implementation

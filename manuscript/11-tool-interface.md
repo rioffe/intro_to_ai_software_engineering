@@ -82,6 +82,29 @@ One constraint *does* show up on its own, though, and it's worth noticing why: `
 
 A schema alone isn't a complete tool definition — a model also needs a **name** it can refer to, and a **description** written in prose that tells it what the tool is *for* and *when to use it*. Neither of those come from the Pydantic model; both are new content for this chapter.
 
+Four parts go into the finished definition, and it's worth being clear about which of them you already have:
+
+```mermaid
+flowchart TD
+    MI["MortgageInput<br/>Chapter 7"]
+    MI -->|"model_json_schema()"| PARAMS["parameters<br/>field names, types, required list,<br/>additionalProperties: false"]
+
+    NAME["name<br/>'calculate_mortgage_payment'"]
+    DESC["description<br/>what it computes, and when to reach for it"]
+    OUT["output_schema<br/>the {payment: number} shape from 8.5.4"]
+
+    PARAMS --> DEF["get_tool_definition()"]
+    NAME --> DEF
+    DESC --> DEF
+    OUT --> DEF
+
+    DEF --> MODEL["What a language model reads<br/>before deciding to call anything"]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Only the top branch is free. `parameters` falls out of a model you already wrote and already test, which is 7.2.3's foreshadowing paying off exactly as promised. The other three boxes are new writing — and of those, `description` is the only one in this entire project whose quality is judged by a language model rather than by a test, which is why 10.4.1 treats it as prompt engineering rather than documentation.
+
 ## 10.4 Defining the Tool Contract
 
 Everything in this section goes into one new file — `src/mortgage_calculator_book/tool.py`, sitting alongside `cli.py` and `ui.py` as a peer front end, not folded into either. Create it now:
@@ -161,6 +184,23 @@ def test_tool_definition_has_name_and_description():
     assert "properties" in definition["parameters"]
     assert "payment" in definition["output_schema"]["properties"]
 ```
+
+Those three tests describe a function with exactly two exits and no third one:
+
+```mermaid
+flowchart TD
+    ARGS["arguments: a dict<br/>from whatever a model decided to send"]
+    ARGS --> MI["MortgageInput(**arguments)"]
+    MI -->|"valid"| CALC["calculate_validated_payment"]
+    CALC --> OK["return {payment: 1199.1}"]
+    MI -->|"ValidationError, caught"| ERR["return {error: 'principal must be positive'}"]
+
+    MI -.->|"this path does not exist:<br/>no exception escapes call_tool"| RAISE(["raise"])
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+The dotted path is the whole point of this section. Chapter 6's core and Chapter 7's validation are both allowed to raise, because a human reading a traceback can act on it. Chapter 11's model-calling loop can't — it needs something to hand *back to the model* whichever way the call went, and an exception is not that. Two predictable dictionary shapes, always.
 
 Note the second test's name specifically: `call_tool` must return an **error dictionary**, not raise an exception — a meaningfully different contract than Chapter 6's core or Chapter 7's validation, both of which are allowed to raise. A model-calling layer in Chapter 11 needs to hand *something* back to the model on bad input; an uncaught exception isn't something a model-calling loop can pass along gracefully.
 

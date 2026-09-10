@@ -114,6 +114,29 @@ What if the model returns neither a tool call nor any content — an empty respo
         }
 ```
 
+Taken together, 13.4.2 and 13.4.3 turn the model's side of the pipeline into a tree with four distinct exits — worth seeing at once, since 13.3.1's diagram showed *where* this seam is without showing what happens inside it:
+
+```mermaid
+flowchart TD
+    RAW["The model's raw response"]
+    RAW --> Q1{"tool_calls present ?"}
+
+    Q1 -->|"no"| Q2{"is there any content ?"}
+    Q2 -->|"yes"| A1["Return it: a legitimate answer<br/>with no calculation behind it"]
+    Q2 -->|"no"| A2["13.4.3 fallback:<br/>'I wasn't able to generate a response'"]
+
+    Q1 -->|"yes"| Q3{"does json.loads succeed ?"}
+    Q3 -->|"no"| A3["13.4.2: log a warning, return<br/>'I had trouble understanding those<br/>loan details' — and STOP.<br/>No second call to the model."]
+    Q3 -->|"yes"| CALL["call_tool(arguments)"]
+    CALL --> Q4{"does MortgageInput accept it ?"}
+    Q4 -->|"no"| A4["{error: ...} back to the model,<br/>which can explain or retry"]
+    Q4 -->|"yes"| A5["{payment: ...} back to the model,<br/>then a plain-language answer"]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Only the bottom two exits reach the model a second time. That's not a detail of style — it's the reason 13.4.4's test asserts `call_count == 1` rather than `2`, and reading it off this tree is considerably easier than reconstructing it from the `return` statement's position in 13.4.2's code.
+
 ### 13.4.4 Agent-Assisted, Tests First
 
 For each seam above, the pattern is the same one this book has used throughout: write a failing test describing the bad input and the expected graceful behavior, then let Pi propose the handling, then review. 13.4.1 through 13.4.3 showed you the handling directly; here's the test half, for 13.4.2's malformed-JSON case specifically:

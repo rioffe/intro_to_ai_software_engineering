@@ -8,6 +8,33 @@ Fourteen chapters is a lot of ground covered one small step at a time. This chap
 
 Underneath everything — the terminal commands, the Pydantic models, the agent-reviewed diffs — one system exists now: a pure mathematical core (Chapter 6), wrapped in a validation layer that enforces what SPEC.md says is valid (Chapter 7), reachable through three genuinely different front ends that all share that same core without duplicating a line of its logic — a command line (Chapter 8), a graphical window (Chapter 9), and a language model that can operate it on a user's behalf (Chapters 10–11). Around all of that: an evaluation discipline that checks the model-facing layer honestly rather than anecdotally (Chapter 12), and a hardening pass that assumes the world outside your code is messier than your tests ever were (Chapter 13). One core, three front ends, held together by a spec that got checked against reality four times and corrected every time.
 
+That paragraph names eight chapters' worth of components in one breath. Here they are with the wiring visible:
+
+```mermaid
+flowchart TD
+    subgraph FRONT[" Three front ends "]
+        CLI["Command line<br/>Chapter 8"]
+        GUI["Desktop window<br/>Chapter 9"]
+        LLMFE["A language model<br/>Chapters 10-11"]
+    end
+
+    CLI --> VAL
+    GUI --> VAL
+    LLMFE --> TOOL["tool.py: call_tool<br/>never raises"] --> VAL
+
+    VAL["validation.py: MortgageInput<br/>Chapter 7 — the only path in"]
+    VAL --> CORE["core.py: calculate_payment<br/>Chapter 6 — pure"]
+
+    SPEC["SPEC.md<br/>revised in Ch. 2, 4, 9, 11, 13"] -.->|"defines correct"| VAL
+    TESTS["The test suite<br/>Chapters 5-12"] -.->|"proves correct"| CORE
+    EVAL["The eval set<br/>Chapter 12"] -.->|"measures behavior"| LLMFE
+    LOGS["Seam handling and logging<br/>Chapter 13"] -.->|"catches the rest"| FRONT
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+This is the same diagram Chapter 11.9 drew, with Chapters 12 and 13's contributions added around the outside. Nothing in the solid path changed after Chapter 11 — the last two chapters didn't extend the system, they made it honest about how well it works and how it fails. The dotted arrows are the ones the next section is about: every one of them starts at something you wrote.
+
 ## C.3 What Was Hand-Written vs. AI-Assisted, Chapter by Chapter
 
 | Chapter | Pi's role | What stayed yours |

@@ -356,6 +356,33 @@ And update `on_calculate` to call it:
         )
 ```
 
+That extraction splits the click path into two halves with very different testing stories:
+
+```mermaid
+flowchart TD
+    CLICK["Calculate.clicked<br/>a PyQt5 signal"]
+    SLOT["on_calculate<br/>the connected slot"]
+
+    subgraph TESTABLE[" Plain Python — tests/test_ui.py reaches this "]
+        PARSE["parse_form_values<br/>form text to typed values"]
+    end
+
+    MI["MortgageInput<br/>Chapter 7"]
+    CALC["calculate_validated_payment"]
+    LABEL["result_label.setText(...)"]
+
+    CLICK --> SLOT --> PARSE
+    PARSE -->|"typed values"| MI
+    MI -->|"valid"| CALC
+    CALC --> LABEL
+    PARSE -.->|"ValueError:<br/>'abc' is not a float"| LABEL
+    MI -.->|"ValidationError:<br/>principal must be positive"| LABEL
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Everything inside the box is ordinary Python with no window attached, which is why it can be tested for the price of an import. Everything outside it is widget behavior — a signal firing, a label's text changing — which 9.7.2 decides to check by clicking the button and looking, rather than by building the offscreen machinery Appendix A.7 describes. The diagram also shows why both error arrows land in the same place: 9.5.2's two exception types come from two different steps, but a user only ever needs one message in one spot.
+
 Now `parse_form_values` is a plain function, testable with no `QApplication` involved at all:
 
 ```python

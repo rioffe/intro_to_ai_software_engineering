@@ -24,6 +24,36 @@ Here's the part that surprises a lot of first-time borrowers: even though the pa
 
 Every payment calculation in this book comes down to four numbers.
 
+Two of them get used exactly as given; the other two get combined into a pair of derived quantities first, and it's that second pair the formula in 4.4 actually consumes:
+
+```mermaid
+flowchart LR
+    subgraph IN[" Inputs: what a borrower knows "]
+        P["principal<br/>the amount borrowed"]
+        AR["annual_rate<br/>as quoted, per year"]
+        TY["term_years<br/>length of the loan"]
+        PPY["payments_per_year<br/>usually 12"]
+    end
+
+    subgraph DERIVED[" Derived: what the formula needs "]
+        R["r = annual_rate / payments_per_year<br/>the periodic rate"]
+        N["n = term_years x payments_per_year<br/>total number of payments"]
+    end
+
+    AR --> R
+    PPY --> R
+    TY --> N
+    PPY --> N
+
+    P --> M["M<br/>the fixed periodic payment"]
+    R --> M
+    N --> M
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Notice `payments_per_year` feeding both derived quantities. That single fact is why Chapter 2's spec was wrong in two places at once rather than one: leaving payment frequency unstated didn't just make the rate ambiguous, it made the payment count ambiguous too. This same shape shows up three more times in this book — as SPEC.md's "Derived quantities" section in 4.7.4, as three functions in `core.py` in Chapter 6, and as `MortgageInput`'s four fields in Chapter 7.
+
 ### 4.3.1 Principal
 
 The amount actually borrowed. Everything else in the calculation exists to answer one question about this number: how do you pay it back, with interest, in equal installments?
@@ -75,6 +105,28 @@ $$M \cdot \frac{(1+r)^n - 1}{r}$$
 $$P(1+r)^n = M \cdot \frac{(1+r)^n - 1}{r}$$
 
 Solving for $M$ gives the formula from 4.4.1. Nothing about it is arbitrary — it's just "what's owed equals what's paid," stated at a single point in time to make the comparison fair, then rearranged.
+
+The whole derivation, on one page:
+
+```mermaid
+flowchart TD
+    START["One loan, viewed at payment n — the end of the term"]
+
+    START --> D1["Direction one: what the lender is owed<br/>Nothing is ever repaid, so the principal<br/>simply compounds for n periods"]
+    START --> D2["Direction two: what has been paid<br/>Each payment M grows for the periods<br/>remaining after it: n-1, n-2, ... 1, 0"]
+
+    D1 --> OWED["P(1+r)^n"]
+    D2 -->|"a geometric series,<br/>in closed form"| PAID["M x [(1+r)^n - 1] / r"]
+
+    OWED --> EQ{{"For the loan to be exactly paid off,<br/>at that same moment: owed = paid"}}
+    PAID --> EQ
+
+    EQ -->|"solve for M"| FORMULA["M = P x r(1+r)^n / [(1+r)^n - 1]"]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+The reason both branches have to be measured at the same moment is the part most worth holding onto. Money at payment 1 and money at payment 360 aren't comparable amounts; carrying both sides forward to the same end point is what makes setting them equal a fair comparison rather than a sleight of hand.
 
 ### 4.4.3 Two Edge Cases Worth Naming Now
 

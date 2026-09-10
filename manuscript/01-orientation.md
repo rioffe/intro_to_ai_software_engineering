@@ -85,6 +85,29 @@ git add .                       # stage everything that's changed
 git commit -m "Initial commit"  # save a checkpoint, with a message
 ```
 
+Those commands move your work between three distinct places, and keeping the three straight is most of what makes git click:
+
+```mermaid
+flowchart TD
+    WD["Working directory<br/>the files you actually edit"]
+    IDX["Staging area<br/>what the next commit will contain"]
+    REPO["Local repository<br/>your history of checkpoints"]
+    GH["GitHub<br/>the copy other machines can reach"]
+
+    WD -->|"git add"| IDX
+    IDX -->|"git commit -m"| REPO
+    REPO -->|"git push"| GH
+
+    LOOK["git status: what is staged, changed, untracked<br/>git diff: what changed, line by line<br/>git log --oneline: every checkpoint so far"]
+    WD -.- LOOK
+    IDX -.- LOOK
+    REPO -.- LOOK
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+The solid arrows move things forward; the dotted ones only look. Nothing skips a step: a file you edited isn't in a commit until it has been through staging, which is exactly why `git add` and `git commit` are two commands rather than one.
+
 `git status` is the command you'll run constantly — more than any other in this book. It tells you what's staged, what's changed but unstaged, and what git doesn't know about yet. Run it often; there's no penalty for checking.
 
 ### 0.3.4 Reading a Commit Log

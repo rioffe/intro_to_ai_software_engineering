@@ -299,6 +299,29 @@ def calculate_validated_payment(data: MortgageInput) -> float:
 
 ### 7.7.2 Confirming the Boundary
 
+That one function completes a shape this book keeps returning to:
+
+```mermaid
+flowchart TD
+    OUTSIDE["The outside world<br/>a person, a file, a model"]
+    VAL["MortgageInput<br/>is this input legal?"]
+    ENTRY["calculate_validated_payment<br/>the only supported entry point"]
+    CORE["calculate_payment<br/>pure: no I/O, no state, no opinions"]
+    RESULT["a payment"]
+
+    OUTSIDE --> VAL
+    VAL -.->|"invalid: ValidationError"| OUTSIDE
+    VAL -->|"valid"| ENTRY
+    ENTRY --> CORE
+    CORE --> RESULT
+
+    OUTSIDE x--x|"there is no such path"| CORE
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+The crossed-out arrow down the side is the actual rule: there is no path from the outside world to the core that skips validation. Everything Chapters 8 through 11 add gets added at the *top* — a CLI, a window, a language model, each one a new arrow into `MortgageInput` — and nothing below it changes again for the rest of the book. Keep this picture; the next four chapters are all footnotes to it.
+
 `calculate_payment` still never sees raw, unvalidated input — it only ever receives values that have already passed through `MortgageInput`. And `MortgageInput` never performs any mortgage math itself — it only validates. Each piece does exactly one job, which is the same separation-of-concerns idea from Chapter 6.2, now applied one layer further out.
 
 ### 7.7.3 Running Everything

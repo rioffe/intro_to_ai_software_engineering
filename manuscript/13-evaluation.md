@@ -334,6 +334,30 @@ def summarize(results: list[dict[str, Any]]) -> str:
     return f"{passed}/{len(results)} passed"
 ```
 
+`score_case` is the piece worth tracing carefully, because it checks two different things in a fixed order and gives up at the first one that fails:
+
+```mermaid
+flowchart TD
+    JSON["data/eval_set.json → load_eval_set()<br/>questions plus expected outcomes"]
+    JSON --> ASK["run_eval, one case at a time:<br/>ask_fn(question) → {answer, tool_called, arguments}"]
+
+    ASK --> C1{"tool_called ==<br/>expected_tool_call ?"}
+    C1 -->|"no"| F1["FAIL: 'tool_called mismatch'"]
+    C1 -->|"yes"| C2{"was a call expected,<br/>with expected_arguments ?"}
+    C2 -->|"no — an out-of-scope<br/>or ambiguous case"| PASS["PASS"]
+    C2 -->|"yes"| C3{"every expected argument<br/>within 0.001 of what was sent ?"}
+    C3 -->|"no"| F2["FAIL: 'argument mismatch: principal'"]
+    C3 -->|"yes"| PASS
+
+    PASS --> SUM["summarize()<br/>'6/8 passed'"]
+    F1 --> SUM
+    F2 --> SUM
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+The early exit at the first check is deliberate, not an optimization: if the model didn't call the tool when it should have, there are no arguments to compare, and a failure reason of "tool_called mismatch" is a more useful thing to read in the output than a cascade of missing-argument complaints. The middle branch is where `out-of-scope-1` and `ambiguous-1` pass — those cases expect *no* call, so correctly declining is the whole test.
+
 Deliberately simple pass/fail scoring — no partial credit, no weighting. At this scale, that's a feature, not a limitation: results stay easy to read and easy to reason about.
 
 Worth noticing that `run_eval` prints, unlike `calculate_payment` back in Chapter 6.2 — not a contradiction of that chapter's purity rule, just a different kind of function. `calculate_payment` is the domain core, meant to be composed into a CLI, a UI, and a tool interface without dragging any of them along; `run_eval` already isn't that pure, since `ask_fn` itself does real network I/O every time it's called. Given that, reporting progress on an operation that can take minutes is a reasonable, honest thing for this specific function to do — set `verbose=False` if you want the old silent behavior back.

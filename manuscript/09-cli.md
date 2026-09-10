@@ -158,6 +158,30 @@ At this point `cli.py` has two imports blocks worth of content (`argparse` from 
 
 Parsed arguments flow into `MortgageInput` (Chapter 7), which flows into `calculate_validated_payment` (also Chapter 7, which itself calls Chapter 6's `calculate_payment`) — three chapters of work, connected for the first time.
 
+```mermaid
+flowchart TD
+    ARGV["argv<br/>what the user typed"]
+    PARSE["build_parser().parse_args()<br/>argparse converts and checks types"]
+    MI["MortgageInput<br/>Chapter 7"]
+    BAD["for each error:<br/>print to sys.stderr"]
+    EXIT1["return 1"]
+    CALC["calculate_validated_payment<br/>Chapter 7, calling Chapter 6"]
+    FMT{"--format"}
+    TEXT["print to stdout:<br/>Fixed periodic payment: $1,199.10"]
+    JSON["print to stdout:<br/>json.dumps({payment: 1199.1})"]
+    EXIT0["return 0"]
+
+    ARGV --> PARSE --> MI
+    MI -->|"ValidationError"| BAD --> EXIT1
+    MI -->|"valid"| CALC --> FMT
+    FMT -->|"text (default)"| TEXT --> EXIT0
+    FMT -->|"json"| JSON --> EXIT0
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Two details in that picture are worth more attention than they usually get, because both are things a test has to check deliberately rather than notice by accident. First, the two exits carry different codes — `1` on failure, `0` on success — which is how any script calling this command knows whether to trust the output. Second, the failure path writes to `stderr` while both success paths write to `stdout`; they are genuinely different streams, and getting them backwards produces a CLI that looks fine to a human and breaks every program that tries to read it. 8.6.2's `test_invalid_input_returns_error` checks `captured.err` specifically for exactly this reason.
+
 ### 8.4.2 Handling Validation Failure Gracefully
 
 Notice what the `except ValidationError` block does *not* do: it doesn't let Pydantic's default error formatting — which is detailed, but written for developers, not end users — reach the terminal directly. It extracts just the message from each error and prints it the way a person asked to fix their input actually wants to read it.

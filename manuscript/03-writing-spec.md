@@ -26,6 +26,27 @@ SPEC.md serves three different readers, and it's worth writing with all three in
 
 > **Process concept: same contract, three altitudes.** SPEC.md is the first of three places this book will write down what "correct" means for this system. Chapter 5's tests are the second — the same intent, made executable. Chapter 7 and Chapter 10's schemas are the third — the same intent again, made machine-readable enough for a language model to call. You're not writing three different things across the book; you're writing one idea, at three different levels of formality, for three different audiences.
 
+```mermaid
+flowchart LR
+    IDEA["What 'correct' means<br/>for this calculator"]
+
+    SPEC["SPEC.md<br/>Chapter 2"]
+    TESTS["tests/test_core.py<br/>Chapter 5"]
+    SCHEMA["JSON Schema<br/>Chapters 7 and 10"]
+
+    IDEA --> SPEC
+    IDEA --> TESTS
+    IDEA --> SCHEMA
+
+    SPEC --> R1["Read by: you, a collaborator, Pi<br/>Checked by: a careful human"]
+    TESTS --> R2["Read by: pytest<br/>Checked by: running the suite"]
+    SCHEMA --> R3["Read by: a language model<br/>Checked by: validation, every call"]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Three arrows out of one box, not a chain of three — that's the part worth getting right. The tests in Chapter 5 aren't derived from SPEC.md by some mechanical translation, and Chapter 10's schema isn't derived from the tests. All three are you, writing down the same decision, for a reader that needs it in a different form.
+
 ## 2.3 Anatomy of a Lightweight SPEC.md
 
 A spec at this scale needs four things, no more:
