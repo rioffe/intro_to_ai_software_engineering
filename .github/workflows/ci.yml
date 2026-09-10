@@ -34,7 +34,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install -g mermaid-filter
+      # mermaid-filter pins its bundled mermaid-cli to ^10, which silently
+      # ignores look/theme from .mermaid-config.json.  Install a >=11 mmdc
+      # alongside it; both build scripts prefer the one on PATH.
+      - run: npm install -g mermaid-filter @mermaid-js/mermaid-cli
       - name: mermaid / puppeteer setup for CI
         run: |
           printf '%s\n' '{"args":["--no-sandbox","--disable-setuid-sandbox"]}' > .puppeteer.json
@@ -58,7 +61,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install -g mermaid-filter
+      # mermaid-filter pins its bundled mermaid-cli to ^10, which silently
+      # ignores look/theme from .mermaid-config.json.  Install a >=11 mmdc
+      # alongside it; both build scripts prefer the one on PATH.
+      - run: npm install -g mermaid-filter @mermaid-js/mermaid-cli
       - name: TeX (xelatex + latexmk) and poppler (pdfimages/pdftotext)
         run: |
           sudo apt-get update

@@ -68,6 +68,10 @@ All three are assembled from the Markdown in `manuscript/`.
   `assets/book_cover.png`, followed by the title page.
 - `assets/book_cover.png`: The cover image used as the first page of the generated PDF.
 - [`book.html`](book.html): The self-contained HTML edition of the same book — a single file with a **two-level, in-page table of contents** (a master list *plus* a compact per-chapter "Contents" box of in-page anchor links), the same **clickable in-prose cross-references** as the PDF, and math, mermaid diagrams, the cover, and its CSS all **inlined**. It opens **offline** in any modern browser and publishes cleanly to **GitHub Pages**. Tracked on purpose, like `book.pdf`.
+- `.mermaid-config.json`: the Mermaid config both builds hand to `mmdc`, giving
+  every diagram in the book one look (`neo`) and one theme (`redux-color`)
+  without repeating it in forty diagram blocks. Needs an `mmdc` ≥ 11 — see the
+  prerequisites below.
 - `index.html` + `.nojekyll`: the GitHub Pages entry point — `index.html` is a
   one-line redirect to `book.html`; `.nojekyll` tells Pages to serve every file
   verbatim (no Jekyll). See *Publishing to GitHub Pages* below.
@@ -111,11 +115,17 @@ Common to both builds:
   (`tools/crossref-links.lua`, and for HTML `tools/local-toc-html.lua`).
   Developed and CI-tested against **pandoc 3.11**; the HTML build needs
   `--math-method` / `--embed-resources`, so a recent 3.x (≳ 3.1.7).
-- **Chrome / Chromium** — the manuscript embeds Mermaid diagrams (Chapter 1 and
-  Chapter 13), rendered via `mermaid-filter` → `mmdc`, which drives a headless
+- **Chrome / Chromium** — the manuscript embeds Mermaid diagrams throughout,
+  rendered via `mermaid-filter` → `mmdc`, which drives a headless
   browser. The build auto-detects Chrome, Chrome Canary, Chromium, or Edge, or
   honours `PUPPETEER_EXECUTABLE_PATH`.
-- **`mermaid-filter`** on `PATH` (`npm install -g mermaid-filter`).
+- **`mermaid-filter`** and **`@mermaid-js/mermaid-cli`** on `PATH`
+  (`npm install -g mermaid-filter @mermaid-js/mermaid-cli`). Both are needed:
+  `mermaid-filter` pins its own bundled `mermaid-cli` to `^10`, which silently
+  ignores the `look` and `theme` in `.mermaid-config.json` — no error, just the
+  old default styling. Each build script therefore prefers an `mmdc` of version
+  11 or newer found on `PATH`, and prints which one it used; set
+  `MERMAID_FILTER_CMD_MMDC` to override the choice.
 
 For `make book` (PDF):
 

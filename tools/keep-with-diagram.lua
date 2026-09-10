@@ -15,9 +15,12 @@
 -- 600pt down to \linewidth (345pt).  After that double reduction the labels in
 -- a wide diagram are markedly smaller than those in a narrow one -- text size
 -- runs as \linewidth / natural-width.  This book's page carries 267pt of
--- margin around a 345pt text block, so a wide figure can be set slightly wider
--- than the measure, centred, and still sit comfortably inside the paper.  Only
--- diagrams that would otherwise be shrunk are widened, and never past MAXWIDTH.
+-- margin around a 345pt text block, so a wide figure can be set a little wider
+-- than the measure, centred, and still sit well inside the paper.  MAXWIDTH
+-- reaches about 17pt into each margin: enough to recover some label size,
+-- while the figure still reads as sitting within the text block rather than
+-- breaking out of it.  Only diagrams that would otherwise be shrunk are
+-- widened, and never past MAXWIDTH.
 --
 -- Both need the image's real dimensions, read with pdfinfo, so this filter must
 -- run AFTER mermaid-filter.  LaTeX-only: the HTML build scrolls and has neither
@@ -27,7 +30,7 @@ if FORMAT ~= 'latex' and FORMAT ~= 'beamer' then return {} end
 
 local LINEWIDTH  = 345.0             -- \the\linewidth  (documentclass=book, letter)
 local TEXTHEIGHT = 550.0             -- \the\textheight for the same
-local MAXWIDTH   = LINEWIDTH * 1.20  -- 414pt: 45pt into each 133pt margin
+local MAXWIDTH   = LINEWIDTH * 1.10  -- 380pt: 17pt into each 133pt margin
 
 local function page_size(src)
   local ok, out = pcall(pandoc.pipe, 'pdfinfo', { src }, '')
@@ -99,12 +102,14 @@ function Blocks(blocks)
         local tw, th = typeset_size(w, h)
         local want = th + para_height(this) + 6.0
 
-        -- A heading immediately above belongs to the same unit: reserving after
-        -- it would break the bond LaTeX keeps between a heading and its first
-        -- line, stranding the heading alone at the foot of the page.
-        local header = nil
-        if #out > 0 and out[#out].t == 'Header' then
-          header = table.remove(out)
+        -- Headings immediately above belong to the same unit: reserving after
+        -- one would break the bond LaTeX keeps between a heading and its first
+        -- line, stranding it alone at the foot of the page.  A section can open
+        -- straight into a subsection ("## 11.2" then "### 11.2.1"), so lift the
+        -- whole run, not just the last one.
+        local headers = {}
+        while #out > 0 and out[#out].t == 'Header' do
+          table.insert(headers, 1, table.remove(out))
           want = want + 2.2 * BASELINESKIP
         end
 
@@ -112,7 +117,7 @@ function Blocks(blocks)
           out[#out + 1] = pandoc.RawBlock('latex',
             string.format('\\needspace{%.1fpt}', want))
         end
-        if header then out[#out + 1] = header end
+        for _, h in ipairs(headers) do out[#out + 1] = h end
         out[#out + 1] = this
         out[#out + 1] = pandoc.RawBlock('latex', '\\nopagebreak')
         out[#out + 1] = (w > LINEWIDTH) and sized_image(image, tw, th) or after

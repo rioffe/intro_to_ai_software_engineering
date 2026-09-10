@@ -216,6 +216,22 @@ if grep -q '^```mermaid' "$SRC"; then
   else
     echo "build-book-html: WARNING: no Chrome/Chromium found; mermaid diagrams may fail." >&2
   fi
+  # mermaid-filter invokes the mermaid-cli in its OWN node_modules, which it
+  # pins to ^10.  That renderer silently ignores `look` and the redux themes in
+  # .mermaid-config.json -- no error, just the old default styling.  Prefer a
+  # newer mmdc from PATH when one is installed, and say which is being used so
+  # a styling surprise is traceable.  An explicit MERMAID_FILTER_CMD_MMDC wins.
+  if [ -z "${MERMAID_FILTER_CMD_MMDC:-}" ] && command -v mmdc >/dev/null 2>&1; then
+   mmdc_major="$(mmdc --version 2>/dev/null | sed 's/[^0-9.].*//;s/\..*//')"
+   case "$mmdc_major" in
+    ''|*[!0-9]*) : ;;
+    *) if [ "$mmdc_major" -ge 11 ]; then
+      MERMAID_FILTER_CMD_MMDC="$(command -v mmdc)"
+      export MERMAID_FILTER_CMD_MMDC
+      echo "build-book-html: using mmdc $(mmdc --version) from PATH (bundled one is ^10; look/redux themes need >=11)"
+     fi ;;
+   esac
+  fi
   mermaid_args="--filter mermaid-filter"
 fi
 
