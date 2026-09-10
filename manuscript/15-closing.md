@@ -69,11 +69,18 @@ config:
 flowchart TD
     YOURS["<b>What stayed yours</b><br/><br/>SPEC.md, revised in Chapters 2, 4, 9, 11 and 13<br/>the worked example — 1,199.10, computed by hand<br/>every expected value in every test<br/>the eval set, and its expected outcomes<br/>the review checklist, run on every diff since 1.6"]
     BOUNDARY{{"<b>What counts as working</b>"}}
-    PIS["<b>What Pi drafted</b><br/><br/>implementations — core, validation, tool, <b>ask_hosted</b><br/>wiring and boilerplate — widgets, flags, parsers<br/>documentation drafts — the README, twice"]
+    PIS["<b>What Pi drafted</b><br/><br/>implementations — core, validation, tool, ask_hosted<br/>wiring and boilerplate — widgets, flags, parsers<br/>documentation drafts — the README, twice"]
 
     YOURS ==>|"settled it"| BOUNDARY
     BOUNDARY ==>|"Pi worked from it"| PIS
     PIS -.->|"never once wrote it"| BOUNDARY
+
+    classDef yours fill:#dcecdf,stroke:#4f9160,color:#12301a
+    classDef gate fill:#f6ecd6,stroke:#a8842f,color:#3a2c11
+    classDef pis fill:#e7e5f5,stroke:#6f68ad,color:#1e1b33
+    class YOURS yours
+    class BOUNDARY gate
+    class PIS pis
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->

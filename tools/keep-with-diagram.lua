@@ -69,6 +69,23 @@ local function sized_image(image, tw, th)
     tw, th, image.src))
 end
 
+-- Rough height of a paragraph of body text at this measure, so the reservation
+-- covers the introducing sentence and not just the diagram under it.
+local CHARS_PER_LINE = 66
+local BASELINESKIP   = 12.0
+
+local function para_height(block)
+  local n = #pandoc.utils.stringify(block)
+  local lines = math.max(1, math.ceil(n / CHARS_PER_LINE))
+  return lines * BASELINESKIP
+end
+
+-- A reservation is only worth making if it can actually be met.  Demanding
+-- close to \textheight is worse than demanding nothing: the request can never
+-- be satisfied part-way down a page, so LaTeX sets one line, breaks, and leaves
+-- a nearly blank page behind.  Past this ceiling, let the diagram flow.
+local MAXRESERVE = TEXTHEIGHT * 0.80
+
 function Blocks(blocks)
   local out, i = {}, 1
   while i <= #blocks do
@@ -80,9 +97,22 @@ function Blocks(blocks)
       local w, h = page_size(image.src)
       if w then
         local tw, th = typeset_size(w, h)
-        -- Room for the diagram plus the sentence that introduces it.
-        out[#out + 1] = pandoc.RawBlock('latex',
-          string.format('\\needspace{%.1fpt}', math.min(th + 36.0, TEXTHEIGHT)))
+        local want = th + para_height(this) + 6.0
+
+        -- A heading immediately above belongs to the same unit: reserving after
+        -- it would break the bond LaTeX keeps between a heading and its first
+        -- line, stranding the heading alone at the foot of the page.
+        local header = nil
+        if #out > 0 and out[#out].t == 'Header' then
+          header = table.remove(out)
+          want = want + 2.2 * BASELINESKIP
+        end
+
+        if want <= MAXRESERVE then
+          out[#out + 1] = pandoc.RawBlock('latex',
+            string.format('\\needspace{%.1fpt}', want))
+        end
+        if header then out[#out + 1] = header end
         out[#out + 1] = this
         out[#out + 1] = pandoc.RawBlock('latex', '\\nopagebreak')
         out[#out + 1] = (w > LINEWIDTH) and sized_image(image, tw, th) or after

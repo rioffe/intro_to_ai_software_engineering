@@ -374,16 +374,16 @@ This is the fourth time in the book SPEC.md has been opened and found wanting â€
 config:
   themeVariables:
     fontSize: 26px
-    cScale0: '#e8e6f7'
-    cScaleLabel0: '#1e1b33'
-    cScale1: '#e8e6f7'
-    cScaleLabel1: '#1e1b33'
-    cScale2: '#e8e6f7'
-    cScaleLabel2: '#1e1b33'
-    cScale3: '#e8e6f7'
-    cScaleLabel3: '#1e1b33'
-    cScale4: '#e8e6f7'
-    cScaleLabel4: '#1e1b33'
+    cScale0: '#dfe4f5'
+    cScaleLabel0: '#1b2340'
+    cScale1: '#dcecdf'
+    cScaleLabel1: '#17331d'
+    cScale2: '#f6ecd6'
+    cScaleLabel2: '#3a2c11'
+    cScale3: '#efdfe9'
+    cScaleLabel3: '#361a2d'
+    cScale4: '#dbe9ee'
+    cScaleLabel4: '#122c36'
 ---
 timeline
     title SPEC.md's Revision History

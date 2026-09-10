@@ -48,16 +48,23 @@ config:
 ---
 flowchart LR
     D["<b>A.2 Docker</b>"] --> DT["ship <b>cli.py</b> or <b>tool.py</b> as a service —<br/>never the PyQt5 GUI"]
-    C["<b>A.3 GitHub Actions</b>"] --> CT["Chapter 3's gate, on every push"]
-    M["<b>A.4 mypy</b>"] --> MT["<b>core.py</b> and <b>tool.py</b>, before they ever run"]
-    P["<b>A.5 pre-commit</b>"] --> PT["Chapter 3's gate, before a commit lands"]
     T["<b>A.6 Typer</b>"] --> TT["<b>cli.py</b> alone — nothing below it changes"]
     I["<b>A.8 PyInstaller</b>"] --> IT["<b>ui.py</b> alone — a double-clickable app"]
+    M["<b>A.4 mypy</b>"] --> MT["<b>core.py</b> and <b>tool.py</b>, before they ever run"]
+    C["<b>A.3 GitHub Actions</b>"] --> CT["Chapter 3's gate, on every push"]
+    P["<b>A.5 pre-commit</b>"] --> PT["Chapter 3's gate, before a commit lands"]
+
+    classDef front fill:#dfe4f5,stroke:#5a6ba8,color:#1b2340
+    classDef core fill:#dcecdf,stroke:#4f9160,color:#12301a
+    classDef gate fill:#f6ecd6,stroke:#a8842f,color:#3a2c11
+    class DT,TT,IT front
+    class MT core
+    class CT,PT gate
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
 
-Two of them attach to the same place, which is the appendix's own hint about ordering: pre-commit and GitHub Actions both automate Chapter 3's quality gate, one before a commit lands and one after it's pushed. Adding either is a smaller step than it sounds, and A.3 is the most natural first one, since Chapter 0.4 already built the GitHub account and repository it needs.
+The colours group them by what they attach to: a front end, the core, or Chapter 3's quality gate. The last pair is the appendix's own hint about ordering — pre-commit and GitHub Actions both automate that same gate, one before a commit lands and one after it's pushed. Adding either is a smaller step than it sounds, and A.3 is the most natural first one, since Chapter 0.4 already built the GitHub account and repository it needs.
 
 
 Worth sitting with before you close this book: what domain do you understand well enough to write a Chapter 4-style primer for — one you could hand-derive a formula from, verify an example against, and build the same fourteen-chapter shape around? That's the transferable skill this book was really about, more than any formula or tool.

@@ -31,7 +31,7 @@ config:
       plotColorPalette: "#8a5a00, #10214a"
 ---
 xychart-beta
-    title "Where each fixed $1,199.10 payment actually goes"
+    title "Interest (dashed) and principal (solid), per $1,199.10 payment"
     x-axis "Payment number" [1, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360]
     y-axis "Dollars of that payment" 0 --> 1200
     line [1000, 969, 932, 889, 839, 780, 713, 634, 543, 437, 315, 172, 6]

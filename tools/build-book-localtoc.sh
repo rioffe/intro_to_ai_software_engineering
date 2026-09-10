@@ -183,6 +183,10 @@ printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' \
  '\AddToShipoutPictureBG*{\AtPageLowerLeft{\includegraphics[width=\paperwidth,height=\paperheight]{assets/book_cover.png}}}\null\thispagestyle{\CoverPageStyle}\clearpage%' \
  '\begingroup\let\cleardoublepage\clearpage\originalmaketitle\endgroup}' >"$HEADER"
 
+# No widows or orphans: LaTeX's defaults (150) are weak enough to leave a lone
+# first line at the foot of a page, or a lone last line at the top of the next.
+printf '%s\n%s\n' '\widowpenalty=10000' '\clubpenalty=10000' >>"$HEADER"
+
 # The cover is a full-bleed image; a page number and licence line printed over
 # it just interfere with the artwork.  \CoverPageStyle names the page style the
 # cover uses -- plain "empty" here, upgraded by license-footer.tex when the
