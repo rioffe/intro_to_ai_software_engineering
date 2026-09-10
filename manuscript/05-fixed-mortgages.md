@@ -37,7 +37,7 @@ flowchart LR
 
     subgraph DERIVED[" Derived: what the formula needs "]
         R["r = annual_rate / payments_per_year<br/>the periodic rate"]
-        N["n = term_years x payments_per_year<br/>total number of payments"]
+        N["n = term_years × payments_per_year<br/>total number of payments"]
     end
 
     AR --> R
@@ -115,13 +115,13 @@ flowchart TD
     START --> D1["Direction one: what the lender is owed<br/>Nothing is ever repaid, so the principal<br/>simply compounds for n periods"]
     START --> D2["Direction two: what has been paid<br/>Each payment M grows for the periods<br/>remaining after it: n-1, n-2, ... 1, 0"]
 
-    D1 --> OWED["P(1+r)^n"]
-    D2 -->|"a geometric series,<br/>in closed form"| PAID["M x [(1+r)^n - 1] / r"]
+    D1 --> OWED["$$P(1+r)^n$$"]
+    D2 -->|"a geometric series,<br/>in closed form"| PAID["$$M \cdot \frac{(1+r)^n - 1}{r}$$"]
 
     OWED --> EQ{{"For the loan to be exactly paid off,<br/>at that same moment: owed = paid"}}
     PAID --> EQ
 
-    EQ -->|"solve for M"| FORMULA["M = P x r(1+r)^n / [(1+r)^n - 1]"]
+    EQ -->|"solve for M"| FORMULA["$$M = P \cdot \frac{r(1+r)^n}{(1+r)^n - 1}$$"]
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
