@@ -373,17 +373,8 @@ This is the fourth time in the book SPEC.md has been opened and found wanting â€
 ---
 config:
   themeVariables:
-    fontSize: 26px
-    cScale0: '#dfe4f5'
-    cScaleLabel0: '#1b2340'
-    cScale1: '#dcecdf'
-    cScaleLabel1: '#17331d'
-    cScale2: '#f6ecd6'
-    cScaleLabel2: '#3a2c11'
-    cScale3: '#efdfe9'
-    cScaleLabel3: '#361a2d'
-    cScale4: '#dbe9ee'
-    cScaleLabel4: '#122c36'
+    fontSize: 32px
+  themeCSS: ".section--1 rect, .section--1 circle, .section--1 path { fill: #dfe4f5 !important; stroke: #28253D !important; stroke-width: 1.5px !important; } .section-0 rect, .section-0 circle, .section-0 path { fill: #dcecdf !important; stroke: #28253D !important; stroke-width: 1.5px !important; } .section-1 rect, .section-1 circle, .section-1 path { fill: #f6ecd6 !important; stroke: #28253D !important; stroke-width: 1.5px !important; } .section-2 rect, .section-2 circle, .section-2 path { fill: #efdfe9 !important; stroke: #28253D !important; stroke-width: 1.5px !important; } .section-3 rect, .section-3 circle, .section-3 path { fill: #dbe9ee !important; stroke: #28253D !important; stroke-width: 1.5px !important; } .section--1 text, .section-0 text, .section-1 text, .section-2 text, .section-3 text { fill: #28253D !important; }"
 ---
 timeline
     title SPEC.md's Revision History
