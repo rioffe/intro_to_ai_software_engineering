@@ -34,8 +34,8 @@ xychart-beta
     title "Interest (dashed) and principal (solid), per $1,199.10 payment"
     x-axis "Payment number" [1, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360]
     y-axis "Dollars of that payment" 0 --> 1200
-    line [1000, 969, 932, 889, 839, 780, 713, 634, 543, 437, 315, 172, 6]
-    line [199, 230, 267, 310, 360, 419, 486, 565, 656, 762, 885, 1027, 1193]
+    line "interest" [1000, 969, 932, 889, 839, 780, 713, 634, 543, 437, 315, 172, 6]
+    line "principal" [199, 230, 267, 310, 360, 419, 486, 565, 656, 762, 885, 1027, 1193]
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
