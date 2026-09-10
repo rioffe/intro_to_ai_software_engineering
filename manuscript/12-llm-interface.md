@@ -10,6 +10,24 @@ Chapter 10 proved the tool works when called manually, with arguments you typed 
 
 Two different local language models will exist in this project by the end of this chapter, and it's worth being precise about why: the model behind Pi (Chapter 1) helped *build* the system — reading code, proposing diffs, drafting tests. The model this chapter adds helps *run* the system — reading a user's plain-language question and deciding whether and how to call the Chapter 10 tool. Same underlying technology, genuinely different jobs.
 
+```mermaid
+flowchart TD
+    PI["The model behind Pi<br/>Chapter 1"]
+    PI --> PIA["reads your source code"]
+    PIA --> PIB["proposes diffs you review"]
+    PIB --> PIC["helps BUILD the system"]
+
+    EN["The intelligence-engine model<br/>this chapter"]
+    EN --> ENA["reads your users' questions"]
+    ENA --> ENB["decides whether to call the tool,<br/>and with what arguments"]
+    ENB --> ENC["helps RUN the system"]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Two lanes that never touch. They're judged on different things too, which is 11.2.2's point: the top lane is judged on reasoning across several files of code, the bottom on producing well-formed tool arguments reliably. A model that's excellent at one has told you nothing about the other, which is why this chapter pulls a second model rather than reusing the one already installed.
+
+
 ### 11.2.2 Why the Same Model Isn't Necessarily Right for Both
 
 A model chosen for coding assistance is judged on things like how well it reads and reasons about source code across multiple files. A model chosen for this chapter's job is judged on something narrower and more specific: how reliably it calls a tool with correctly formatted arguments, and how sensibly it responds once it has a result back. A model that's excellent at one of these isn't guaranteed to be excellent at the other — which is exactly why this chapter pulls a second model rather than reusing Pi's.
@@ -296,6 +314,31 @@ def ask_hosted(question: str) -> str:
 ```
 
 Notice how closely this mirrors `ask_local` from 11.4.2 — same four-step shape, same `call_tool` function reused without modification. That's the tool contract from Chapter 10 doing exactly the job it was built for: one interface, usable from more than one model-calling client.
+
+Closely, but not identically. Three things genuinely differ, and all three are the kind that fail quietly:
+
+```mermaid
+flowchart TD
+    L0["ask_local"]
+    L0 --> L1["ollama.chat(tools=tools)"]
+    L1 --> L2["arguments arrive<br/>as a dict — use them"]
+    L2 --> L3["reply: role=tool,<br/>content=str(result)"]
+    L3 --> L4["second ollama.chat"]
+
+    H0["ask_hosted"]
+    H0 --> H1["client.chat.completions.create(tools=tools)"]
+    H1 --> H2["arguments arrive as a JSON<br/>string — json.loads first"]
+    H2 --> H3["reply: role=tool, content=json.dumps(result),<br/>PLUS a tool_call_id"]
+    H3 --> H4["second create call"]
+
+    L2 -.->|"difference 1"| H2
+    L3 -.->|"differences 2 and 3"| H3
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Everything not touched by a dotted arrow is the same in both. Those three are worth memorising before 11.8.2 asks you to review Pi's version of `ask_hosted`, because none of them raises an exception when you get it wrong — a forgotten `json.loads` hands `call_tool` a string, a missing `tool_call_id` gets the second call rejected, and `str()` where `json.dumps()` belongs produces almost-JSON the model may or may not read correctly.
+
 
 Try it the same way as 11.4.2, with a scratch file of its own:
 

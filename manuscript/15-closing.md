@@ -58,6 +58,46 @@ This is the same diagram Chapter 11.9 drew, with Chapters 12 and 13's contributi
 
 Look at the right-hand column of that table as a whole, rather than row by row, and a pattern emerges: Pi drafted implementations, wiring, and boilerplate — real, useful work — but it never once decided what "correct" meant. That decision stayed encoded in things you wrote yourself: SPEC.md's revisions, the worked example's exact numbers, the eval set's expected outcomes, the review checklists you ran every proposed change against. Pi worked *from* those artifacts. It never got to write them.
 
+That's the front matter's diagram again, with fourteen chapters of real artifacts filled in where the abstractions were:
+
+```mermaid
+flowchart TD
+    subgraph YOURS[" What stayed yours "]
+        direction LR
+        A1["SPEC.md<br/>revised in Ch. 2, 4, 9, 11, 13"]
+        A2["the worked example<br/>1,199.10, computed by hand"]
+        A3["every expected value<br/>in every test"]
+        A4["the eval set<br/>and its expected outcomes"]
+        A5["the review checklist,<br/>run on every diff since 1.6"]
+    end
+
+    BOUNDARY{"What counts as working"}
+
+    subgraph PIS[" What Pi drafted "]
+        direction LR
+        B1["implementations<br/>core, validation, tool, ask_hosted"]
+        B2["wiring and boilerplate<br/>widgets, flags, parsers"]
+        B3["documentation drafts<br/>the README, twice"]
+    end
+
+    A1 --> BOUNDARY
+    A2 --> BOUNDARY
+    A3 --> BOUNDARY
+    A4 --> BOUNDARY
+    A5 --> BOUNDARY
+
+    BOUNDARY ==>|"Pi worked from these"| B1
+    BOUNDARY ==> B2
+    BOUNDARY ==> B3
+
+    PIS -.->|"never wrote them"| BOUNDARY
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Every arrow still points the same way it did before Chapter 0. The top row got longer and more specific over fourteen chapters; the direction of the heavy arrows never changed once. That's the whole claim — not that the bottom row is small, but that nothing in it ever moved up.
+
+
 That's the actual thesis of this book, stated plainly now that there's a whole system to point at rather than an abstract claim in the front matter: a hybrid system isn't defined by how much of the code an agent wrote. It's defined by who — or what — gets to decide what counts as working. Keep that decision yours, and an agent drafting most of your implementation code is a force multiplier. Let that decision drift to the agent, even a little at a time, across enough chapters, and "hybrid" quietly becomes "the agent did it," which was never the point.
 
 That risk doesn't expire when the book does. Every project you build after this one will offer the same quiet trade — accept a plausible-looking output instead of actually understanding it — and the tools available for making that trade easier will only get better, not worse. The habits this book tried to build — reading every diff since Chapter 1.6, writing the test before the implementation since Chapter 5, catching a spec against reality since Chapter 4.7 — are worth keeping specifically because the temptation they're guarding against isn't going away.

@@ -12,6 +12,25 @@ By the end, you'll have a working PyQt5 window that takes the same four inputs a
 
 Chapter 6.2 established that the core has no I/O. Chapter 7.7 established that `MortgageInput` and `calculate_validated_payment` are the one supported path into it. Nothing in this chapter changes either of those. This chapter only adds a new way to *call* that existing path — not a new way to compute anything.
 
+Chapter 7.7.1's diagram, with exactly one thing added:
+
+```mermaid
+flowchart TD
+    CLI["Chapter 8's CLI<br/>argparse reads the flags"]
+    GUI["Chapter 9's window<br/>PyQt5 reads the fields"]
+
+    CLI --> VAL["MortgageInput"]
+    GUI --> VAL
+    VAL --> ENTRY["calculate_validated_payment"]
+    ENTRY --> CORE["calculate_payment"]
+    CORE --> R["a payment"]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+The new box is the one on the right of the top row. Everything below `MortgageInput` is character-for-character the same code Chapter 8 was already calling — not a parallel implementation, not a shared helper extracted after the fact, just the same functions called from somewhere new. If this chapter ends with anything below that line having changed, something has gone wrong.
+
+
 ### 9.2.2 What's Allowed to Change, and What Isn't
 
 Allowed: how input is collected, how output is displayed, anything about layout, styling, and interaction. Not allowed: reimplementing any part of the payment calculation, or duplicating validation logic that already exists in `MortgageInput`. If you notice yourself writing an `if` statement that checks whether a number is positive, that's a sign you've drifted into re-doing Chapter 7's job instead of reusing it.

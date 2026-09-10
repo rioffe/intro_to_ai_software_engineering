@@ -142,6 +142,25 @@ class MortgageInput(BaseModel):
 
 Each `@field_validator` runs after Pydantic's own type checking, and raises a plain `ValueError` with a message written for a human to read — not a generic type error. Notice `rate_must_be_plausible` allows exactly zero (`v < 0` rejects negative, but zero passes through) while rejecting anything at or above 100% — matching 7.3.2's requirement precisely.
 
+Three checks run in a fixed order, and any one of them can end the trip:
+
+```mermaid
+flowchart LR
+    RAW["Raw input<br/>a dict from a CLI,<br/>a form, or a model"]
+    RAW --> X{"a field the model<br/>doesn't declare?"}
+    X -->|"yes — extra='forbid'"| ERR["ValidationError<br/>carrying the message you wrote —<br/>what a Chapter 8 or 9 user reads on screen"]
+    X -->|"no"| T{"does each value match<br/>its declared type?"}
+    T -->|"no — 'abc' is not a float"| ERR
+    T -->|"yes"| V{"does every @field_validator pass?"}
+    V -->|"no — principal must be positive"| ERR
+    V -->|"yes"| OK["A valid MortgageInput"]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Order matters more than it looks. Type checking runs *before* your validators, which is why `principal_must_be_positive` can assume it has a float and never needs an `isinstance` check of its own. And `extra="forbid"` runs first of all, which is what makes 7.5.1's warning about a silently dropped field a real protection rather than a nicety.
+
+
 ### 7.5.3 Error Messages as a User-Facing Surface
 
 The strings inside each `raise ValueError(...)` aren't incidental — they're what a user of Chapter 8's CLI or Chapter 9's UI will actually see when they enter something invalid. Write them the way you'd want to read them yourself: specific about what's wrong, not just "invalid input."

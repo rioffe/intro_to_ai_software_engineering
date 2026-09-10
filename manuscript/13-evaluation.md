@@ -16,6 +16,26 @@ A language model's behavior isn't deterministic in that same sense — ask it th
 
 > **Process concept: evaluation as its own discipline, distinct from unit testing.** This is the chapter's central distinction, worth stating plainly before writing any eval code: a unit test checks that *code* does what it's supposed to, exactly, every time. An evaluation checks that a *model's behavior*, which varies, stays within acceptable bounds often enough to trust. Both matter. They are not the same tool, and conflating them — expecting eval-style tolerance from a unit test, or unit-test-style exactness from an eval — leads to the wrong kind of disappointment in both.
 
+```mermaid
+flowchart TD
+    T0["A unit test"]
+    T0 --> T1["one fixed input"]
+    T1 --> T2["deterministic code"]
+    T2 --> T3["one exact expected output"]
+    T3 --> T4["pass or fail —<br/>identically, every run"]
+
+    E0["An evaluation"]
+    E0 --> E1["one question, in plain language"]
+    E1 --> E2["a model whose wording and<br/>choices vary between runs"]
+    E2 --> E3["a rule for what counts<br/>as acceptable behavior"]
+    E3 --> E4["a pass rate<br/>across a set of cases"]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Same shape, three substituted parts — and the substitution in the middle is what forces the other two. Because the thing being checked doesn't repeat itself exactly, the expected value has to become a rule rather than a literal, and a single result has to become a rate. Ask a unit test to tolerate that variation and it stops catching regressions; ask an eval for exactness and every run looks like a failure.
+
+
 ## 12.3 What to Evaluate
 
 ### 12.3.1 Tool-Call Correctness

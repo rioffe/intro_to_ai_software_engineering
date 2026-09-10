@@ -80,6 +80,36 @@ The first is **tools of the trade** — the terminal, git, Python, a coding agen
 
 The second is **one system, built in stages**: a hybrid mortgage calculator, extended chapter by chapter from an empty repository to a working application with three different front ends — a command line, a graphical interface, and a language model that can operate it on your behalf. Every chapter leaves that system a little more complete, and a little more trustworthy, than it found it.
 
+Braided, the two threads look like this — each group of tools arriving just before the stage of the system that needs it:
+
+```mermaid
+flowchart TD
+    TOOLS["Tools of<br/>the trade"]
+    T1["terminal, git, GitHub,<br/>Python, uv, an agent, Ruff"]
+    T2["pytest, pdb, Pydantic"]
+    T3["argparse, python-dotenv,<br/>PyQt5, Ollama, OpenRouter"]
+    T4["an eval harness, loguru"]
+
+    SYSTEM["One system,<br/>in stages"]
+    S1["an empty repository,<br/>then a first SPEC.md"]
+    S2["the domain, a red test suite,<br/>core.py, validation.py"]
+    S3["a CLI, a GUI, a tool schema,<br/>and a model that calls it"]
+    S4["measured behavior, handled<br/>seams, a reconciled spec"]
+
+    TOOLS --> T1 --> T2 --> T3 --> T4
+    SYSTEM --> S1 --> S2 --> S3 --> S4
+
+    T1 -.->|"Chapters 0-3"| S1
+    T2 -.->|"Chapters 4-7"| S2
+    T3 -.->|"Chapters 8-11"| S3
+    T4 -.->|"Chapters 12-13"| S4
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+The dotted arrows are the braid: no tool appears in the top row until the bottom row has a use for it. That's why Pydantic shows up in the same group as validation rather than in a setup chapter, and why loguru waits until there are seams worth logging.
+
+
 Most build chapters follow the same shape: a goal, the design decisions behind it, a test-driven development cycle, an implementation (often agent-assisted), an honest look at what the agent's role actually was, and a checkpoint — a clear statement of what should be true about your system right now. We're naming that shape once, here, so that by Chapter 3 it feels familiar instead of repetitive. Alongside it, you'll see two recurring devices: a **definition of done** checklist that grows a line or two with each chapter, and **process concept** callout boxes marking ideas — like TDD, or "the spec was wrong, not the code" — that matter well beyond the chapter they first appear in.
 
 ## How to Use This Book

@@ -24,6 +24,19 @@ SPEC.md serves three different readers, and it's worth writing with all three in
 - **A classmate or collaborator** — who needs to understand the project without reading every line of code first.
 - **Pi** — which will read this file as context for later tasks, the same way it read your one-line instruction in Chapter 1, just at greater length and with more precision.
 
+```mermaid
+flowchart TD
+    SPEC["SPEC.md"]
+    SPEC --> R1["You, in three weeks<br/>needs: what you decided, and why —<br/>after you've forgotten"]
+    SPEC --> R2["A classmate or collaborator<br/>needs: the point of the project,<br/>without reading every line of code"]
+    SPEC --> R3["Pi<br/>needs: context it can actually reach —<br/>it reads the repository, not this book"]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+The third reader is the one that changes how you write. Pi has no access to the conversation you had while deciding something, or to the chapter you're reading right now — only to files in the repository. That constraint comes back twice more, in 4.7.3 when the derivation has to be written into `docs/derivation.md`, and in 9.6.2 when the UI sketch has to become `docs/ui.md`.
+
+
 > **Process concept: same contract, three altitudes.** SPEC.md is the first of three places this book will write down what "correct" means for this system. Chapter 5's tests are the second — the same intent, made executable. Chapter 7 and Chapter 10's schemas are the third — the same intent again, made machine-readable enough for a language model to call. You're not writing three different things across the book; you're writing one idea, at three different levels of formality, for three different audiences.
 
 ```mermaid

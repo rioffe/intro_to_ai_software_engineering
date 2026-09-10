@@ -470,7 +470,32 @@ __pycache__/
 
 Only that last line, `.env`, is actually new here — everything above it should already be sitting in the file from 0.7.3; this just confirms what you're adding to, rather than asking you to retype the whole thing from memory.
 
-The rule this section wants you to leave with: `.env.example` is checked into git so anyone cloning the project knows what variables they need; `.env` itself, containing your actual key once you have one, never is. Confirm `.env` really is ignored before you ever put a real key in it:
+The rule this section wants you to leave with: `.env.example` is checked into git so anyone cloning the project knows what variables they need; `.env` itself, containing your actual key once you have one, never is.
+
+```mermaid
+---
+config:
+  flowchart:
+    wrappingWidth: 420
+---
+flowchart TD
+    subgraph GIT[" Committed — everyone who clones gets this "]
+        EXAMPLE[".env.example<br/>OPENROUTER_API_KEY=your-key-here"]
+    end
+
+    subgraph NEVER[" Git-ignored — only ever on your machine "]
+        ENVF[".env<br/>OPENROUTER_API_KEY=sk-or-v1-a-real-key"]
+    end
+
+    EXAMPLE -.->|"tells a new clone<br/>which file to create"| ENVF
+    ENVF --> CFG["config.py: load_dotenv(), then os.getenv"]
+    CFG --> USE["Chapter 11's hosted model call"]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Two files with nearly the same name and opposite rules. The committed one carries the *shape* of the secret and none of its value; the ignored one carries the value and is never seen by anyone else. Everything downstream of them reads through `config.py` and never learns which file the value came from, which is what lets Chapter 11 use a real key without a single line of code changing.
+ Confirm `.env` really is ignored before you ever put a real key in it:
 
 ```bash
 git check-ignore .env

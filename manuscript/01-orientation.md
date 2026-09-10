@@ -160,6 +160,25 @@ cat ~/.ssh/id_ed25519.pub                   # copy this output
 
 Then, in a browser: GitHub → Settings → SSH and GPG keys → New SSH key, and paste what you copied.
 
+```mermaid
+flowchart LR
+    KEYGEN["ssh-keygen"]
+    KEYGEN --> PRIV["Private key<br/>~/.ssh/id_ed25519<br/>stays on your machine"]
+    KEYGEN --> PUB["Public key<br/>~/.ssh/id_ed25519.pub<br/>safe to hand out"]
+
+    PUB -->|"uploaded once"| GH["GitHub<br/>holds your public key"]
+    PRIV -->|"proves it's you,<br/>on every push"| PUSH["git push"]
+    PUSH --> GH
+    GH --> OK["Keys match:<br/>push accepted"]
+
+    PRIV x--x|"never uploaded, never pasted,<br/>never shared"| GH
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+One key of the pair is designed to be published and the other is designed never to leave — that asymmetry is the entire trick. GitHub never learns your private key; it only ever checks that whoever is pushing holds the one matching the public key you uploaded. The crossed-out arrow is the mistake to never make, and it's the reason `cat`-ing the wrong one of those two files into a browser is worth slowing down for.
+
+
 <!-- SCREENSHOT: GitHub's SSH keys settings page (Settings -> SSH and GPG keys) with a key listed -- blur/redact the actual key fingerprint -->
 
 Either way — automatic or manual — verify it worked:

@@ -161,6 +161,26 @@ def worked_example():
 
 Any test function that takes `worked_example` as a parameter automatically receives this dictionary — pytest matches it by name, no import needed.
 
+That last clause is worth a picture, because nothing else in Python works this way:
+
+```mermaid
+flowchart LR
+    CONF["tests/conftest.py<br/>@pytest.fixture<br/>def worked_example():"]
+    TEST["tests/test_core.py<br/>def test_matches_worked_example(worked_example):"]
+    PYTEST["pytest"]
+
+    CONF -->|"registers the name"| PYTEST
+    TEST -->|"requests it, by parameter name"| PYTEST
+    PYTEST -->|"calls the fixture and passes<br/>the result in — no import anywhere"| TEST
+
+    PYTEST -.->|"the same mechanism, for fixtures<br/>pytest already ships"| BUILTIN["capsys, in Chapter 8.6.2<br/>monkeypatch, in Chapter 11.8.1"]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+The parameter name *is* the wiring. Rename the fixture and every test that asked for it stops working; rename the parameter and pytest will tell you it doesn't recognise the name. That's also why `capsys` and `monkeypatch` later need no import — they're the same mechanism with pytest supplying the fixture instead of your `conftest.py`.
+
+
 ### 5.4.3 Scope-Setting
 
 pytest's fixture system goes considerably further than this — different scopes, fixtures that depend on other fixtures, fixtures shared across an entire test session. This book uses exactly the pattern above and nothing more; if you want the fuller picture later, pytest's own documentation is thorough and well-written.

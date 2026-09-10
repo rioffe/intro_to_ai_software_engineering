@@ -38,4 +38,33 @@ PyInstaller bundles a Python application — the interpreter, every dependency, 
 
 Strip away the mortgage-specific details and what's left is a pattern with nothing to do with mortgages: a pure, human-verified core; a validation layer wrapping it; multiple front ends on top — some for humans, one for a model; an evaluation discipline that checks the model-facing layer honestly, not anecdotally; and a hardening pass that assumes the world outside your code is messier than your tests — a pattern reusable well beyond a fixed-rate payment calculation.
 
+Every entry above named the place it would attach to. Collected onto the finished system, they stop being six separate essays and become one map of a next project:
+
+```mermaid
+flowchart TD
+    CLI["Command line<br/>cli.py"]
+    GUI["Desktop window<br/>ui.py"]
+    TOOL["Tool interface<br/>tool.py"]
+
+    CLI --> VAL["validation.py"]
+    GUI --> VAL
+    TOOL --> VAL
+    VAL --> CORE["core.py"]
+
+    TYPER["A.6 Typer<br/>replaces argparse, touches cli.py alone"] -.-> CLI
+    PYI["A.8 PyInstaller<br/>a double-clickable app"] -.-> GUI
+    DOCKER["A.2 Docker<br/>ship these as a service — not the GUI"] -.-> TOOL
+    DOCKER -.-> CLI
+    MYPY["A.4 mypy<br/>where a type slip is easiest to make"] -.-> CORE
+    MYPY -.-> TOOL
+
+    PRECOMMIT["A.5 pre-commit<br/>runs Chapter 3's gate for you"] -.-> GATE["ruff check, ruff format, pytest"]
+    CI["A.3 GitHub Actions<br/>runs the same gate on every push"] -.-> GATE
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Two of them attach to the same place, which is the appendix's own hint about ordering: pre-commit and GitHub Actions both automate Chapter 3's quality gate, one before a commit lands and one after it's pushed. Adding either is a smaller step than it sounds, and A.3 is the most natural first one, since Chapter 0.4 already built the GitHub account and repository it needs.
+
+
 Worth sitting with before you close this book: what domain do you understand well enough to write a Chapter 4-style primer for — one you could hand-derive a formula from, verify an example against, and build the same fourteen-chapter shape around? That's the transferable skill this book was really about, more than any formula or tool.

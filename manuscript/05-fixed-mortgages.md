@@ -20,6 +20,28 @@ A **fixed-rate** mortgage has an interest rate that stays the same for the entir
 
 Here's the part that surprises a lot of first-time borrowers: even though the payment amount is fixed, what that payment is *made of* changes every period. Early payments are mostly interest, with a small amount going toward the actual principal. Late payments are the reverse — mostly principal, a small amount of interest. Why: interest is charged on whatever principal is still outstanding, and outstanding principal is highest at the start and lowest at the end. We won't build a full amortization schedule until it's needed, but understanding this shape now will make the formula in section 4.4 feel like it's describing something real, not just producing a number.
 
+That shape, for the exact loan section 4.5 works out by hand:
+
+```mermaid
+---
+config:
+  themeVariables:
+    xyChart:
+      plotColorPalette: "#8b7bb8, #2f2f4f"
+---
+xychart-beta
+    title "Where each fixed $1,199.10 payment actually goes"
+    x-axis "Payment number" [1, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360]
+    y-axis "Dollars of that payment" 0 --> 1200
+    line [1000, 969, 932, 889, 839, 780, 713, 634, 543, 437, 315, 172, 6]
+    line [199, 230, 267, 310, 360, 419, 486, 565, 656, 762, 885, 1027, 1193]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+The pale line falling from left to right is interest; the dark line rising to meet it is principal. At every point along the x-axis the two add to the same \$1,199.10 — the payment never changes, only its composition does. The first payment is \$1,000 interest and \$199 principal; the last is \$6 and \$1,193. They cross at payment 223, a little past year 18 of 30, which is the concrete version of "early payments are mostly interest": on a 30-year loan, more than half of what you pay goes to interest for the first eighteen years.
+
+
 ## 4.3 The Four Core Quantities
 
 Every payment calculation in this book comes down to four numbers.
@@ -134,6 +156,22 @@ The reason both branches have to be measured at the same moment is the part most
 
 **A single payment.** When $n = 1$, there's no series to sum — just one payment that has to cover the principal plus one period's interest: $M = P(1+r)$. This is worth checking against the general formula directly (it works out to the same thing when you substitute $n=1$), which makes it a useful sanity check on the formula itself, not just a case to handle in code.
 
+
+
+Only one of the two actually needs a branch, which is the distinction worth carrying into Chapter 6:
+
+```mermaid
+flowchart TD
+    IN["principal, r, n"]
+    IN --> Q{"r == 0 ?"}
+    Q -->|"yes"| ZERO["M = P / n<br/>the general formula would<br/>divide by zero here"]
+    Q -->|"no"| GEN["The general formula<br/>from 4.4.1"]
+    GEN --> N1["n == 1 lands here too,<br/>and comes out as P(1+r)<br/>with no special case needed"]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Zero interest needs its own branch because the formula genuinely breaks there — division by `r`. A single payment does not, because the general formula already gives the right answer at `n = 1`. Adding a branch for the second case would be a real mistake, not a harmless precaution: if `n = 1` ever needs special-casing, something upstream is wrong and the branch would hide it. Chapter 6.6.2 makes exactly this point again, standing over the code.
 Both of these become explicit tests in Chapter 5, and explicit branches in Chapter 6's implementation.
 
 ## 4.5 A Worked Example, By Hand

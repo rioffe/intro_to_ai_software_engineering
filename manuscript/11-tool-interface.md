@@ -267,6 +267,30 @@ What `get_tool_definition` and `call_tool` implement by hand — a name, a descr
 
 At a high level: an MCP **server** exposes one or more tools, each described the way `TOOL_DESCRIPTION` and `get_input_schema()` describe this one. An MCP **client** — the thing actually talking to a language model — discovers what tools are available and handles calling them when the model asks. This book doesn't implement MCP itself; building `tool.py` by hand, understanding exactly what each piece is for, is meant to make the real protocol legible later rather than an opaque black box the first time you encounter it.
 
+```mermaid
+---
+config:
+  flowchart:
+    wrappingWidth: 420
+---
+flowchart TD
+    MODEL["A language model — decides which tool, and when"]
+    CLIENT["MCP client — discovers what's available, invokes it, hands back the result"]
+    SERVER["MCP server — exposes one or more tools"]
+    DEF["Each tool: a name, a description, an input schema"]
+
+    MODEL <-->|"a conversation"| CLIENT
+    CLIENT <-->|"list tools / call a tool"| SERVER
+    SERVER --> DEF
+
+    DEF -.->|"this book's hand-built,<br/>single-tool version of the same idea"| TOOLPY["tool.py<br/>get_tool_definition() and call_tool()"]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Read the dotted arrow as the whole point of this sidebar. Nothing in this project speaks MCP, and nothing needs to — but the four boxes it points at are the same four you assembled by hand in 10.4, which is why the protocol should read as familiar rather than novel the first time you meet it in a real project.
+
+
 ### 10.6.3 Why This Matters
 
 Connecting this chapter's exercise to something real, standardized, and widely used means what you've built here isn't just a toy pattern specific to this book — it's a smaller version of an approach you're likely to run into again.

@@ -117,6 +117,23 @@ Review that diff exactly the way you reviewed Chapter 1.6's — Pi fixing a lint
 
 From this point forward, run `ruff check .` and `ruff format .` before every commit, for the rest of the book. This isn't automated yet — Appendix A.5 covers pre-commit hooks, which would do this for you — but doing it by hand for now is deliberate: understanding *why* you run it matters more, this early, than automating it away before you've felt the reason for it.
 
+```mermaid
+flowchart TD
+    CHANGE["A change exists<br/>you wrote it, or Pi did"]
+    CHANGE --> CHECK["ruff check ."]
+    CHECK --> Q{"anything reported?"}
+    Q -->|"yes"| FIX["ruff check --fix .<br/>then fix by hand whatever is left"]
+    FIX --> CHECK
+    Q -->|"no"| FMT["ruff format ."]
+    FMT --> TEST["pytest"]
+    TEST --> COMMIT["git commit"]
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Every chapter from 6 onward ends by running this loop and says so in a single line. This is the loop those lines mean. The `--fix` arrow going back rather than forward is the part worth noticing: fixing lint findings can introduce new ones, so the check runs again rather than being assumed clean.
+
+
 ### 3.6.2 Looking Ahead
 
 Chapter 13's Hardening chapter revisits standards again, but at the level of the whole system — error handling, logging, a final consistency check. This chapter is the per-commit version of that same instinct: catch problems small and early, rather than all at once at the end.

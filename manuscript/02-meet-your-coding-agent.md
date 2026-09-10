@@ -105,6 +105,33 @@ As a rough guide — not a precise spec, just enough to self-select before insta
 
 If your hardware doesn't comfortably fit even the smallest row here, section 1.7's escape hatch is exactly for you — don't force a model that's too large for your machine just to stay "local" on principle.
 
+The whole decision, including the escape hatch, as one path:
+
+```mermaid
+flowchart TD
+    RAM{"How much RAM does<br/>your machine actually have?"}
+    RAM -->|"8 GB"| M1["3-4B parameters, quantized"]
+    RAM -->|"16 GB"| M2["7-8B parameters, quantized"]
+    RAM -->|"32 GB"| M3["13-14B parameters"]
+    RAM -->|"64 GB or more"| M4["27B or larger"]
+
+    M1 --> PULL["ollama pull the matching tag"]
+    M2 --> PULL
+    M3 --> PULL
+    M4 --> PULL
+
+    PULL --> TRY{"Does it answer a simple<br/>prompt in reasonable time?"}
+    TRY -->|"yes"| GO["Point Pi at it in settings.json<br/>and carry on with Chapter 2"]
+    TRY -->|"no: constant swapping, minutes<br/>per reply, or it won't load at all"| ESC["Section 1.7's escape hatch:<br/>a hosted model via OpenRouter"]
+
+    ESC -.->|"not permanent — come back with a<br/>smaller model whenever you like"| RAM
+```
+
+<!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
+
+Notice that the escape hatch loops back rather than terminating. Taking it isn't a failure state or a one-way door; it's a way to keep moving today, with the local path still open tomorrow.
+
+
 ## 1.5 Installing and Configuring Pi
 
 ### 1.5.1 What Pi Actually Does
