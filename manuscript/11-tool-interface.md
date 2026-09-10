@@ -85,20 +85,20 @@ A schema alone isn't a complete tool definition — a model also needs a **name*
 Four parts go into the finished definition, and it's worth being clear about which of them you already have:
 
 ```mermaid
+---
+config:
+  flowchart:
+    wrappingWidth: 330
+---
 flowchart TD
     MI["<b>MortgageInput</b><br/>Chapter 7"]
-    MI -->|"<b>model_json_schema</b>()"| PARAMS["parameters<br/>field names, types, required list,<br/>additionalProperties: false"]
+    MI -->|"<b>model_json_schema</b>()"| PARAMS["<b>parameters</b> — free<br/>field names, types, the required list,<br/>additionalProperties: false"]
 
-    NAME["name<br/>'calculate_mortgage_payment'"]
-    DESC["description<br/>what it computes, and when to reach for it"]
-    OUT["output_schema<br/>the {payment: number} shape from 8.5.4"]
+    NEW["<b>name</b> · <b>description</b> · <b>output_schema</b> — new<br/>what to call it, when to reach for it,<br/>and the shape it hands back"]
 
     PARAMS --> DEF["<b>get_tool_definition</b>()"]
-    NAME --> DEF
-    DESC --> DEF
-    OUT --> DEF
-
-    DEF --> MODEL["What a language model reads<br/>before deciding to call anything"]
+    NEW --> DEF
+    DEF --> MODEL["what a language model reads<br/>before deciding to call anything"]
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->

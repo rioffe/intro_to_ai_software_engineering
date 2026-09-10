@@ -25,9 +25,10 @@ That shape, for the exact loan section 4.5 works out by hand:
 ```mermaid
 ---
 config:
+  themeCSS: ".line-plot-0 { stroke-dasharray: 10 6; stroke-width: 3px; } .line-plot-1 { stroke-width: 3px; }"
   themeVariables:
     xyChart:
-      plotColorPalette: "#8b7bb8, #2f2f4f"
+      plotColorPalette: "#8a5a00, #10214a"
 ---
 xychart-beta
     title "Where each fixed $1,199.10 payment actually goes"
@@ -39,7 +40,7 @@ xychart-beta
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->
 
-The pale line falling from left to right is interest; the dark line rising to meet it is principal. At every point along the x-axis the two add to the same \$1,199.10 — the payment never changes, only its composition does. The first payment is \$1,000 interest and \$199 principal; the last is \$6 and \$1,193. They cross at payment 223, a little past year 18 of 30, which is the concrete version of "early payments are mostly interest": on a 30-year loan, more than half of what you pay goes to interest for the first eighteen years.
+The dashed amber line falling from left to right is interest; the solid navy line rising to meet it is principal. At every point along the x-axis the two add to the same \$1,199.10 — the payment never changes, only its composition does. The first payment is \$1,000 interest and \$199 principal; the last is \$6 and \$1,193. They cross at payment 223, a little past year 18 of 30, which is the concrete version of "early payments are mostly interest": on a 30-year loan, more than half of what you pay goes to interest for the first eighteen years.
 
 
 ## 4.3 The Four Core Quantities

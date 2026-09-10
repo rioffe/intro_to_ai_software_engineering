@@ -1,41 +1,50 @@
--- keep-with-diagram.lua -- stop a diagram from being separated, across a page
--- break, from the sentence that introduces it.
+-- keep-with-diagram.lua -- two PDF-only fixes for mermaid diagrams.
 --
--- Pandoc renders a mermaid diagram as a paragraph containing a single image,
--- immediately after the paragraph of prose that introduces it ("The whole
--- derivation, on one page:").  Those are two ordinary paragraphs, so LaTeX is
--- free to break between them -- which strands the introducing sentence alone at
--- the foot of a page while its diagram starts the next one.
+-- (1) KEEP A DIAGRAM WITH ITS INTRODUCING SENTENCE.
+-- Pandoc renders a mermaid diagram as a paragraph holding a single image,
+-- straight after the prose that introduces it ("The whole derivation, on one
+-- page:").  Those are two ordinary paragraphs, so LaTeX may break between them,
+-- stranding the sentence at the foot of one page and starting the diagram on
+-- the next.  \needspace reserves room for BOTH before the sentence is set; if
+-- the page cannot supply it, the break falls before the sentence instead and
+-- the pair travels together.
 --
--- The fix is \needspace: reserve, before the introducing paragraph, enough
--- vertical space for that paragraph AND the image.  If the page cannot supply
--- it, the break happens *before* the sentence and the pair travels together.
+-- (2) LET A WIDE DIAGRAM USE A LITTLE OF THE MARGIN.
+-- mermaid-cli renders every diagram into a 600pt-wide page, so a wide diagram
+-- is already squeezed once before LaTeX sees it; \pandocbounded then squeezes
+-- 600pt down to \linewidth (345pt).  After that double reduction the labels in
+-- a wide diagram are markedly smaller than those in a narrow one -- text size
+-- runs as \linewidth / natural-width.  This book's page carries 267pt of
+-- margin around a 345pt text block, so a wide figure can be set slightly wider
+-- than the measure, centred, and still sit comfortably inside the paper.  Only
+-- diagrams that would otherwise be shrunk are widened, and never past MAXWIDTH.
 --
--- The reserved height has to be the image's height AS TYPESET, not its natural
--- height: pandoc wraps every image in \pandocbounded, which scales it down to
--- fit \linewidth (345pt in this book) and \textheight (550pt), never up.  So we
--- read the real page size out of the image file with pdfinfo and apply the same
--- clamp arithmetic here.
---
--- LaTeX-only: the HTML build renders SVG into a scrolling page and has no page
--- breaks to protect against.  Runs AFTER mermaid-filter, so the images exist.
+-- Both need the image's real dimensions, read with pdfinfo, so this filter must
+-- run AFTER mermaid-filter.  LaTeX-only: the HTML build scrolls and has neither
+-- page breaks nor a measure to overflow.
 
 if FORMAT ~= 'latex' and FORMAT ~= 'beamer' then return {} end
 
-local LINEWIDTH  = 345.0   -- \the\linewidth  for documentclass=book, letter
-local TEXTHEIGHT = 550.0   -- \the\textheight for the same
+local LINEWIDTH  = 345.0             -- \the\linewidth  (documentclass=book, letter)
+local TEXTHEIGHT = 550.0             -- \the\textheight for the same
+local MAXWIDTH   = LINEWIDTH * 1.20  -- 414pt: 45pt into each 133pt margin
 
--- Height in points that a given image file will actually occupy, or nil if the
--- file cannot be measured (a missing file, or a raster format pdfinfo refuses).
-local function typeset_height(src)
+local function page_size(src)
   local ok, out = pcall(pandoc.pipe, 'pdfinfo', { src }, '')
   if not ok or not out then return nil end
   local w, h = out:match 'Page size:%s+([%d%.]+) x ([%d%.]+) pts'
   if not w then return nil end
   w, h = tonumber(w), tonumber(h)
-  if not w or not h or w <= 0 then return nil end
-  local scale = math.min(1.0, LINEWIDTH / w)
-  return math.min(h * scale, TEXTHEIGHT)
+  if not w or not h or w <= 0 or h <= 0 then return nil end
+  return w, h
+end
+
+-- The width and height this image will actually be set at.
+local function typeset_size(w, h)
+  local target = math.min(math.max(w, 0), MAXWIDTH)
+  local scale  = target / w
+  if h * scale > TEXTHEIGHT then scale = TEXTHEIGHT / h end
+  return w * scale, h * scale
 end
 
 local function lone_image(block)
@@ -52,27 +61,51 @@ local function lone_image(block)
   return found
 end
 
+-- Replace pandoc's \pandocbounded wrapper, which can only ever shrink to the
+-- measure, with an explicitly sized box centred on it.
+local function sized_image(image, tw, th)
+  return pandoc.RawBlock('latex', string.format(
+    '\\noindent\\makebox[\\linewidth][c]{\\includegraphics[width=%.1fpt,height=%.1fpt,keepaspectratio]{%s}}',
+    tw, th, image.src))
+end
+
 function Blocks(blocks)
   local out, i = {}, 1
   while i <= #blocks do
-    local this, next_block = blocks[i], blocks[i + 1]
-    local image = next_block and lone_image(next_block) or nil
+    local this, after = blocks[i], blocks[i + 1]
+    local image = after and lone_image(after) or nil
+    local handled = false
+
     if image and this.t == 'Para' and not lone_image(this) then
-      local height = typeset_height(image.src)
-      if height then
-        -- The image, plus a little room for the introducing sentence itself.
-        local reserve = math.min(height + 36.0, TEXTHEIGHT)
+      local w, h = page_size(image.src)
+      if w then
+        local tw, th = typeset_size(w, h)
+        -- Room for the diagram plus the sentence that introduces it.
         out[#out + 1] = pandoc.RawBlock('latex',
-          string.format('\\needspace{%.1fpt}', reserve))
+          string.format('\\needspace{%.1fpt}', math.min(th + 36.0, TEXTHEIGHT)))
         out[#out + 1] = this
         out[#out + 1] = pandoc.RawBlock('latex', '\\nopagebreak')
-        out[#out + 1] = next_block
+        out[#out + 1] = (w > LINEWIDTH) and sized_image(image, tw, th) or after
         i = i + 2
-        goto continue
+        handled = true
       end
     end
-    out[#out + 1] = this
-    i = i + 1
+
+    if not handled then
+      -- A diagram with no introducing paragraph still deserves the extra width.
+      local solo = lone_image(this)
+      if solo then
+        local w, h = page_size(solo.src)
+        if w and w > LINEWIDTH then
+          local tw, th = typeset_size(w, h)
+          out[#out + 1] = sized_image(solo, tw, th)
+          i = i + 1
+          goto continue
+        end
+      end
+      out[#out + 1] = this
+      i = i + 1
+    end
     ::continue::
   end
   return out

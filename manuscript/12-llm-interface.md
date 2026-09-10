@@ -78,17 +78,17 @@ sequenceDiagram
     participant Model
     participant Tool as tool.py
 
-    User->>LLM: "What would my payment be on<br/>a $200,000 loan at 6% over 30 years?"
-    LLM->>Model: chat call 1 — the question, plus <b>get_tool_definition</b>()
-    Note over Model: The model decides for itself<br/>whether calling the tool makes sense.
+    User->>LLM: "What would my payment be on a<br/>$200,000 loan at 6% over 30 years?"
+    LLM->>Model: chat call 1 —<br/>the question, plus<br/>get_tool_definition()
+    Note over Model: The model decides for itself<br/>whether calling the tool<br/>makes sense.
     alt the model calls the tool
-        Model-->>LLM: tool_calls[0] with arguments
-        LLM->>Tool: <b>call_tool</b>(arguments)
-        Tool-->>LLM: {payment: 1199.1} or {error: ...}
-        LLM->>Model: chat call 2 — the question, the model's own<br/>tool-call message, and the tool result
-        Model-->>LLM: "Your monthly payment would be $1,199.10."
+        Model-->>LLM: tool_calls[0],<br/>with arguments
+        LLM->>Tool: call_tool(arguments)
+        Tool-->>LLM: {payment: 1199.1}<br/>or {error: ...}
+        LLM->>Model: chat call 2 —<br/>the question, the model's own<br/>tool-call message, and the result
+        Model-->>LLM: "Your monthly payment<br/>would be $1,199.10."
     else the model answers without the tool
-        Model-->>LLM: plain content, no tool_calls
+        Model-->>LLM: plain content,<br/>no tool_calls
         Note over LLM: Return it as-is. One round-trip,<br/>and no calculation happened.
     end
     LLM-->>User: a plain-language answer

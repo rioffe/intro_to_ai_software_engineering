@@ -21,21 +21,28 @@ Docker, CI/CD, and the rest of Appendix A remain out of scope here too — harde
 Four places in this system currently receive input from something outside your own tested code: the CLI (Chapter 8), the UI (Chapter 9), tool-call arguments arriving from a model (Chapter 10–11), and the model's own raw output (Chapter 11). Each is a **seam** — a place where this project's trusted, tested code meets something less predictable.
 
 ```mermaid
-flowchart LR
-    subgraph Seams[" Seams: untrusted input "]
-        CLI[CLI arguments]
-        UI[UI fields]
-        MODEL["Model's raw output"]
+---
+config:
+  flowchart:
+    wrappingWidth: 300
+---
+flowchart TD
+    subgraph SEAMS[" Seams — untrusted input "]
+        CLI["CLI arguments"]
+        UI["UI fields"]
+        MODEL["The model's raw output"]
     end
 
-    CLI --> V[<b>MortgageInput</b> validation]
+    MODEL --> PARSE["Parse the tool call"]
+    PARSE --> TC["Tool-call arguments"]
+
+    CLI --> V
     UI --> V
-    MODEL --> PARSE[Parse tool call]
-    PARSE --> TC[Tool-call arguments]
     TC --> V
 
-    V --> CORE[<b>calculate_payment</b>]
-    CORE --> R[Result]
+    V["<b>MortgageInput</b> validation"]
+    V --> CORE["<b>calculate_payment</b>"]
+    CORE --> R["Result"]
 ```
 
 <!-- DIAGRAM BUILD NOTE: render this mermaid block to an image (e.g. via mermaid-cli) for the print/PDF build -- most PDF pipelines won't render mermaid syntax directly. -->

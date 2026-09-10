@@ -180,8 +180,14 @@ printf '%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n' \
  '\usepackage{etoc}' \
  '\let\originalmaketitle\maketitle' \
  '\renewcommand{\maketitle}{%' \
- '\AddToShipoutPictureBG*{\AtPageLowerLeft{\includegraphics[width=\paperwidth,height=\paperheight]{assets/book_cover.png}}}\null\clearpage%' \
+ '\AddToShipoutPictureBG*{\AtPageLowerLeft{\includegraphics[width=\paperwidth,height=\paperheight]{assets/book_cover.png}}}\null\thispagestyle{\CoverPageStyle}\clearpage%' \
  '\begingroup\let\cleardoublepage\clearpage\originalmaketitle\endgroup}' >"$HEADER"
+
+# The cover is a full-bleed image; a page number and licence line printed over
+# it just interfere with the artwork.  \CoverPageStyle names the page style the
+# cover uses -- plain "empty" here, upgraded by license-footer.tex when the
+# per-page licence footer is switched on (it redefines "empty" for other pages).
+printf '%s\n' '\newcommand{\CoverPageStyle}{empty}' >>"$HEADER"
 
 # needspace: reserve vertical space so a diagram is not split, across a page
 # break, from the sentence that introduces it (see tools/keep-with-diagram.lua).
