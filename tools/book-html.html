@@ -15,12 +15,9 @@
    $for(include-before)$
    $include-before$
    $endfor$
-   $if(toc)$
-   <nav class="master-toc" aria-label="Contents">
-      <p class="toc-title">$toc-title$</p>
-      $toc$
-   </nav>
-   $endif$
+   <!-- No $toc$ here: tools/local-toc-html.lua builds the master "Contents"
+        itself and places it in the rail beside the front matter, so that it
+        sits to the LEFT of the text like every chapter's local Contents. -->
    $body$
 </body>
 </html>

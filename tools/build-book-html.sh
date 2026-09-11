@@ -8,11 +8,17 @@
 # (tools/math-fence.awk, guarded by tests/test_math_fence.sh), and its mermaid
 # browser detection.  What differs, and why:
 #
-#   Two-level TOC.  The PDF uses LaTeX etoc \localtableofcontents per chapter and
-#   Pandoc --toc for the master list.  HTML has no etoc, so a pandoc Lua filter
-#   (tools/local-toc-html.lua) inserts a per-chapter "Contents" box right after
-#   each chapter's H1, built from pandoc's OWN heading identifiers in the same
-#   run that assigns them.  The master list is pandoc's native --toc.
+#   Two-level TOC, in a rail to the LEFT of the text.  The PDF uses LaTeX etoc
+#   \localtableofcontents per chapter and Pandoc --toc for the master list.
+#   HTML has no etoc, so a pandoc Lua filter (tools/local-toc-html.lua) builds
+#   BOTH lists from pandoc's OWN heading identifiers in the same run that
+#   assigns them, and wraps each chapter (H1 + its Contents + body) in a
+#   <section class="chapter"> that tools/style.css lays out as a two-column
+#   grid: the Contents in a sticky left rail, the chapter's text beside it.
+#   The master "Contents" (chapters only) rides in the front matter's rail --
+#   i.e. at the beginning of the book -- and every other chapter's rail holds
+#   its own local "Contents".  (Pandoc's native --toc is NOT used: it can only
+#   land above the body, never beside it.)
 #
 #   Self-contained (offline + GitHub Pages).  Math is rendered by KaTeX and the
 #   whole document is inlined with --embed-resources, and mermaid is rendered to
@@ -25,12 +31,13 @@
 #   "Chapter 6", "section 1.4", a bare "2.4.1", the Closing's C.3 table -- into
 #   in-page #anchor links, using pandoc's own heading ids.
 #
-# Layout produced at the top of the book:
+# Layout produced (wide screens; narrow screens and print stack the rail above):
 #       cover image (embedded)  ->  title / subtitle / author / date
-#       ->  master "Contents" (chapters, in-page anchors)
-#       ->  each chapter: its H1, a local "Contents" box, then the body
+#       ->  front matter: its H1, then  [master "Contents" | front-matter text]
+#       ->  each chapter:  its H1, then  [local "Contents"  | chapter text]
 #  The first file (00-front-matter.md) is front matter: it sits at the top of the
-#  master Contents but, like the PDF NOLOCAL, earns NO local "Contents" box.
+#  master Contents and, like the PDF NOLOCAL, earns NO local "Contents" box --
+#  its rail carries the master list instead.
 #
 #   tools/build-book-html.sh                 -> book.html at repo root
 #   tools/build-book-html.sh out.html        -> custom output
@@ -124,10 +131,11 @@ fi
 
 # ---- front-matter handling: mirror build-book-localtoc.sh's FRONTMATTER -------
 # The first file (00-front-matter.md) is the book's front matter: it sits at the
-# top of the master "Contents" but earns NO per-chapter "Contents" box.  The PDF
-# build picks a single NOLOCAL file the same way; we translate that file to its
-# 1-based position and hand it to local-toc-html.lua as local_toc_skip_nth
-# (0 = every chapter gets a box).
+# top of the master "Contents" and earns NO per-chapter "Contents" box -- the
+# master list rides in its rail instead.  The PDF build picks a single NOLOCAL
+# file the same way; we translate that file to its 1-based position and hand it
+# to local-toc-html.lua as local_toc_skip_nth (0 = every chapter gets a box and
+# the master list stands alone ahead of chapter 1).
 NOLOCAL=""
 case "${FRONTMATTER:-first}" in
 0 | off | no | "") NOLOCAL="" ;;
@@ -255,19 +263,18 @@ COVER_B64="$(base64 <"$COVER_IMAGE" 2>/dev/null | tr -d '\n' || true)"
   echo '</div>'
 } >"$COVER"
 
-echo "build-book-html: building $OUT (master TOC via pandoc --toc; per-chapter local TOC depth=$TOC_DEPTH via local-toc-html.lua; offline via KaTeX + --embed-resources)"
+echo "build-book-html: building $OUT (master + per-chapter TOC in a left rail via local-toc-html.lua, local depth=$TOC_DEPTH; offline via KaTeX + --embed-resources)"
 
-#     --toc --toc-depth=1          -> master "Contents" lists the chapters only.
 #     --lua-filter crossref-links.lua -> plain-prose cross-references become links.
-#     --lua-filter local-toc-html.lua -> per-chapter "Contents" box after each H1
+#     --lua-filter local-toc-html.lua -> master "Contents" (chapters only, titled
+#         by toc-title) beside the front matter, a local "Contents" beside every
+#         other chapter, each chapter wrapped for the rail layout
 #         (local_toc_depth / local_toc_skip_nth mirror the PDF's LOCAL_DEPTH /
 #          FRONTMATTER); it reads headers only, so it runs after crossref-links.
 #     --math-method=katex --embed-resources -> inlined, offline math (no CDN).
 # $mermaid_args (when set) -> crisp, embeddable SVG diagrams.
 # shellcheck disable=SC2086
 pandoc "$PROC" \
-  --toc \
-  --toc-depth=1 \
   --lua-filter "$ROOT/tools/crossref-links.lua" \
   --lua-filter "$ROOT/tools/local-toc-html.lua" \
   --metadata "local_toc_depth=$TOC_DEPTH" \

@@ -7,7 +7,10 @@
  */
 
 :root {
-   --page-max: 46rem;
+   --page-max: 46rem; /* the reading column */
+   --rail: 30rem; /* the TOC rail to its left */
+   --gutter: 2.5rem; /* between rail and column */
+   --book-max: calc(var(--rail) + var(--gutter) + var(--page-max));
    --ink: #1a1a1a;
    --muted: #555;
    --link: #0057b8;
@@ -17,7 +20,8 @@
    --toc-border: #dcdcdc;
 }
 
-/* Reading column: narrow and centered like a page. */
+/* Page: a TOC rail plus a narrow reading column, centered.  Each chapter is a
+ * two-column grid (see .chapter below); everything else spans both columns. */
 html {
    font-family: Georgia, "Times New Roman", serif;
    font-size: 1.06rem;
@@ -27,7 +31,7 @@ html {
 }
 
 body {
-   max-width: var(--page-max);
+   max-width: var(--book-max);
    margin: 0 auto;
    padding: 2rem 1.25rem 4rem;
 }
@@ -73,7 +77,7 @@ a:hover {
    margin-bottom: 1.5rem;
 }
 .cover img {
-   max-width: 100%;
+   max-width: min(100%, var(--page-max));
    height: auto;
    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
 }
@@ -99,29 +103,40 @@ a:hover {
    font-family: "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Master table of contents (top of the book). */
-.master-toc {
-   margin: 2rem 0 3rem;
-   padding: 1rem 1.5rem;
-   background: var(--toc-bg);
-   border: 1px solid var(--toc-border);
-   border-radius: 6px;
+/* Chapter layout (tools/local-toc-html.lua wraps each chapter as
+ *   <section class="chapter">  h1  [.master-toc | .local-toc]  .chapter-body
+ * ): the H1 rules across both columns, the Contents box sits in the left rail
+ * and STICKS while its chapter scrolls, the text flows in the column beside it.
+ * The front matter's rail carries the master (chapters-only) list, so the
+ * book-level Contents floats beside the beginning of the book and each
+ * chapter-level Contents beside its own chapter. */
+.chapter {
+   display: grid;
+   grid-template-columns: var(--rail) minmax(0, 1fr);
+   column-gap: var(--gutter);
+   align-items: start; /* so the rail box keeps its own height and can stick */
 }
-.master-toc .toc-title {
-   font-family: "Helvetica Neue", Arial, sans-serif;
-   font-weight: 600;
-   margin: 0 0 0.5rem;
+.chapter > h1 {
+   grid-column: 1 / -1;
 }
-.master-toc ul {
-   list-style: none;
-   margin: 0.15rem 0;
-   padding-left: 0;
+.chapter > .master-toc,
+.chapter > .local-toc {
+   grid-column: 1;
+   position: sticky;
+   top: 1rem;
+   max-height: calc(100vh - 2rem);
+   overflow-y: auto;
 }
-.master-toc a {
-   color: var(--ink);
+.chapter > .chapter-body {
+   grid-column: 2;
+   min-width: 0; /* let wide code blocks scroll instead of widening the column */
+}
+.chapter-body > :first-child {
+   margin-top: 0;
 }
 
-/* Per-chapter local table of contents (injected after each chapter's H1). */
+/* The two Contents boxes share one look. */
+.master-toc,
 .local-toc {
    margin: 1rem 0 1.75rem;
    padding: 0.85rem 1.25rem;
@@ -130,20 +145,28 @@ a:hover {
    border-radius: 6px;
    font-size: 0.95rem;
 }
+.master-toc .toc-title,
 .local-toc .local-toc-title {
    font-family: "Helvetica Neue", Arial, sans-serif;
    font-weight: 600;
    margin: 0 0 0.35rem;
 }
+.master-toc ul,
 .local-toc ul,
 .local-toc ul ul {
    list-style: none;
    margin: 0;
    padding-left: 1rem;
 }
+.master-toc > ul,
 .local-toc > ul {
    padding-left: 0;
 }
+.master-toc li,
+.local-toc li {
+   margin: 0.15rem 0;
+}
+.master-toc a,
 .local-toc a {
    color: var(--ink);
 }
@@ -186,7 +209,22 @@ figcaption {
    margin-top: 0.35rem;
 }
 
-/* Print: drop screen chrome, keep page-ish. */
+/* Narrow screens: no room for a rail -- stack each Contents box above its
+ * chapter's text (the pre-rail layout) and let it scroll with the page.  The
+ * breakpoint is roughly the rail plus a still-readable text column. */
+@media (max-width: 72rem) {
+   .chapter {
+      display: block;
+   }
+   .chapter > .master-toc,
+   .chapter > .local-toc {
+      position: static;
+      max-height: none;
+      overflow: visible;
+   }
+}
+
+/* Print: drop screen chrome, keep page-ish; the rail stacks as on narrow screens. */
 @page {
    margin: 2cm;
 }
@@ -195,6 +233,15 @@ figcaption {
       max-width: none;
       padding: 0;
       font-size: 11pt;
+   }
+   .chapter {
+      display: block;
+   }
+   .chapter > .master-toc,
+   .chapter > .local-toc {
+      position: static;
+      max-height: none;
+      overflow: visible;
    }
    a {
       color: var(--ink);

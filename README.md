@@ -67,7 +67,7 @@ All three are assembled from the Markdown in `manuscript/`.
   `make book LICENSE=0`). The first page is the cover image from
   `assets/book_cover.png`, followed by the title page.
 - `assets/book_cover.png`: The cover image used as the first page of the generated PDF.
-- [`book.html`](book.html): The self-contained HTML edition of the same book — a single file with a **two-level, in-page table of contents** (a master list *plus* a compact per-chapter "Contents" box of in-page anchor links), the same **clickable in-prose cross-references** as the PDF, and math, mermaid diagrams, the cover, and its CSS all **inlined**. It opens **offline** in any modern browser and publishes cleanly to **GitHub Pages**. Tracked on purpose, like `book.pdf`.
+- [`book.html`](book.html): The self-contained HTML edition of the same book — a single file with a **two-level, in-page table of contents** that floats in a sticky rail to the left of the text (the master list beside the front matter, a compact per-chapter "Contents" beside each chapter; stacked on narrow screens), the same **clickable in-prose cross-references** as the PDF, and math, mermaid diagrams, the cover, and its CSS all **inlined**. It opens **offline** in any modern browser and publishes cleanly to **GitHub Pages**. Tracked on purpose, like `book.pdf`.
 - `.mermaid-config.json`: the Mermaid config both builds hand to `mmdc`, giving
   every diagram in the book one look (`neo`) and one theme (`redux-color`)
   without repeating it in forty diagram blocks. Needs an `mmdc` ≥ 11 — see the
@@ -78,16 +78,16 @@ All three are assembled from the Markdown in `manuscript/`.
 - `tests/`: `make test` runs all of these (also what CI runs):
   - `test_math_fence.sh` — the shared `[`/`]`→`$$` preprocessor is fence-aware.
   - `test_crossref_links.sh` — `crossref-links.lua` is wired into both builds; references link, quantities (`0.5%`, `Python 3.12`) don't, every target resolves (HTML and LaTeX).
-  - `test_local_toc.sh` — `local-toc-html.lua` is wired in; boxes, `skip_nth`, depth nesting, and anchor resolution are correct.
+  - `test_local_toc.sh` — `local-toc-html.lua` is wired in; chapter wrappers, master-list placement, boxes, `skip_nth`, depth nesting, and anchor resolution are correct.
   - `test_book_html.sh` — full `book.html` build: two-level in-page TOC, all anchors resolve, math present, self-contained (no external JS/CSS).
   - `test_book_cover.sh` — full `book.pdf` build: cover art on page 1, title page on page 2.
 - `.github/workflows/ci.yml`: runs the `tests/` on every push and PR — a fast `filters` job (pandoc only) plus `html` and `pdf` jobs for the full builds.
 - `Makefile`: The build driver — the normal way to generate the PDF and the HTML, and to run the tests (see below).
 - `tools/build-book-localtoc.sh`: Assembles `book.pdf` — concatenates every
   `manuscript/*.md` in order and runs pandoc once.
-- `tools/build-book-html.sh`: Assembles `book.html` — the HTML sibling of the PDF build — reusing that build's ordering, fence-aware math preprocessor, and mermaid detection, then rendering with two Pandoc Lua filters (cross-references and per-chapter "Contents" boxes).
+- `tools/build-book-html.sh`: Assembles `book.html` — the HTML sibling of the PDF build — reusing that build's ordering, fence-aware math preprocessor, and mermaid detection, then rendering with two Pandoc Lua filters (cross-references, and the two-level TOC + chapter rail layout).
 - `tools/crossref-links.lua`: Shared Pandoc filter (both builds) that turns the manuscript's plain-prose cross-references into internal links, using pandoc's own heading ids.
-- `tools/local-toc-html.lua`: Pandoc filter for the HTML build that inserts a per-chapter "Contents" box after each chapter's H1, built from pandoc's heading ids (the AST-level analogue of the PDF's per-chapter etoc TOC).
+- `tools/local-toc-html.lua`: Pandoc filter for the HTML build that builds both levels of the TOC from pandoc's heading ids (the AST-level analogue of the PDF's `--toc` + per-chapter etoc TOC) and wraps each chapter as `<section class="chapter">` so `style.css` can float the master list beside the front matter and each chapter's "Contents" beside its own text, sticky as the chapter scrolls.
 - `tools/math-fence.awk`: The shared, fence-aware `[`/`]`→`$$` display-math
   preprocessor, run by both builds (guarded by `tests/test_math_fence.sh`).
 - `tools/book-html.html` + `tools/style.css`: the HTML5 pandoc template and its readable stylesheet.
