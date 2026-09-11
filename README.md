@@ -67,7 +67,7 @@ All three are assembled from the Markdown in `manuscript/`.
   `make book LICENSE=0`). The first page is the cover image from
   `assets/book_cover.png`, followed by the title page.
 - `assets/book_cover.png`: The cover image used as the first page of the generated PDF.
-- [`book.html`](book.html): The self-contained HTML edition of the same book — a single file with a **two-level, in-page table of contents** that floats in a sticky rail to the left of the text (the master list beside the front matter, a compact per-chapter "Contents" beside each chapter; stacked on narrow screens), the same **clickable in-prose cross-references** as the PDF, and math, mermaid diagrams, the cover, and its CSS all **inlined**. It opens **offline** in any modern browser and publishes cleanly to **GitHub Pages**. Tracked on purpose, like `book.pdf`.
+- [`book.html`](book.html): The self-contained HTML edition of the same book — a single file with a **two-level, in-page table of contents** that floats in a sticky rail to the left of the text (the master list beside the front matter, a compact per-chapter "Contents" beside each chapter; drag the gutter to resize the rail, double-click it to reset; stacked on narrow screens), the same **clickable in-prose cross-references** as the PDF, and math, mermaid diagrams, the cover, and its CSS all **inlined**. It opens **offline** in any modern browser and publishes cleanly to **GitHub Pages**. Tracked on purpose, like `book.pdf`.
 - `.mermaid-config.json`: the Mermaid config both builds hand to `mmdc`, giving
   every diagram in the book one look (`neo`) and one theme (`redux-color`)
   without repeating it in forty diagram blocks. Needs an `mmdc` ≥ 11 — see the
@@ -90,7 +90,7 @@ All three are assembled from the Markdown in `manuscript/`.
 - `tools/local-toc-html.lua`: Pandoc filter for the HTML build that builds both levels of the TOC from pandoc's heading ids (the AST-level analogue of the PDF's `--toc` + per-chapter etoc TOC) and wraps each chapter as `<section class="chapter">` so `style.css` can float the master list beside the front matter and each chapter's "Contents" beside its own text, sticky as the chapter scrolls.
 - `tools/math-fence.awk`: The shared, fence-aware `[`/`]`→`$$` display-math
   preprocessor, run by both builds (guarded by `tests/test_math_fence.sh`).
-- `tools/book-html.html` + `tools/style.css`: the HTML5 pandoc template and its readable stylesheet.
+- `tools/book-html.html` + `tools/style.css` + `tools/rail-resize.js`: the HTML5 pandoc template, its readable stylesheet, and the small inlined script that makes the TOC rail drag-resizable (width remembered in `localStorage`).
 - `tools/ascii-cleanup.py`: A helper that swaps Unicode box-drawing characters
   for ASCII (the `lmmono` PDF code font lacks them); not part of the automated build.
 - `tools/license-footer.tex`: The LaTeX preamble the PDF build (`make book`)

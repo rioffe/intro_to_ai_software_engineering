@@ -8,8 +8,9 @@
 #   * every in-page #anchor the build generates actually resolves to an id the
 #     document defines -- the core correctness guarantee of building the local
 #     TOCs from pandoc's own heading identifiers; and
-#   * the math survives into the HTML (class="math" spans are present); and
-#   * the file is self-contained -- no <script>/<link> to an external host.
+#   * the math survives into the HTML (class="math" spans are present);
+#   * the file is self-contained -- no <script>/<link> to an external host; and
+#   * the rail-resize script is inlined.
 # It also asserts the builder wires the shared, drift-proof pieces
 # (tools/math-fence.awk, tools/local-toc-html.lua, tools/crossref-links.lua)
 # into the HTML path.
@@ -109,4 +110,11 @@ if grep -Eiq '<(script|link)\b[^>]*\b(src|href)="https?://' "$out"; then
  exit 1
 fi
 
-echo "PASS: book.html built with a two-level in-page TOC; all in-page anchors resolve; math present; self-contained; shared pieces wired."
+# (9) The rail-resize script is inlined (the template must render include-after,
+#     else pandoc silently drops it and the rail is not resizable).
+grep -Fq 'tools/rail-resize.js' "$out" || {
+ echo "FAIL: tools/rail-resize.js was not inlined into $out (template missing include-after?)" >&2
+ exit 1
+}
+
+echo "PASS: book.html built with a two-level in-page TOC; all in-page anchors resolve; math present; self-contained; resize script inlined; shared pieces wired."

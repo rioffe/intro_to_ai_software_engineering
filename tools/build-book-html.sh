@@ -108,6 +108,7 @@ DATE="${DATE:-$(date +%Y)}"
 COVER_IMAGE="$ROOT/assets/book_cover.png"
 TEMPLATE="$ROOT/tools/book-html.html"
 CSS="$ROOT/tools/style.css"
+JS="$ROOT/tools/rail-resize.js"
 
 if [ ! -f "$COVER_IMAGE" ]; then
   echo "build-book-html: cover image not found: $COVER_IMAGE" >&2
@@ -156,8 +157,9 @@ SRC="$(mktemp /tmp/bbh-src.XXXXXX.md)"
 PROC="$(mktemp /tmp/bbh-proc.XXXXXX.md)"
 COVER="$(mktemp /tmp/bbh-cover.XXXXXX.html)"
 STYLE="$(mktemp /tmp/bbh-style.XXXXXX.html)"
+SCRIPT="$(mktemp /tmp/bbh-script.XXXXXX.html)"
 LIST="$(mktemp /tmp/bbh-list.XXXXXX.txt)"
-trap 'rm -f "$SRC" "$PROC" "$COVER" "$STYLE" "$LIST"' EXIT
+trap 'rm -f "$SRC" "$PROC" "$COVER" "$STYLE" "$SCRIPT" "$LIST"' EXIT
 
 # Concatenate every manuscript file in filename (= book) order, blank-line
 # separated.  No markers and no H1 hunting: the per-chapter "Contents" boxes are
@@ -246,6 +248,11 @@ fi
 # ---- style: inline the stylesheet as a <style> in the document head -------------
 printf '<style>\n%s\n</style>\n' "$(cat "$CSS")" >"$STYLE"
 
+# ---- script: inline the rail-resize script as a <script> at the end of the body --
+# (after the content it decorates, so it needs no load event; inline, so the
+# book stays self-contained -- tests/test_book_html.sh rejects external <script>s).
+printf '<script>\n%s\n</script>\n' "$(cat "$JS")" >"$SCRIPT"
+
 # ---- cover: embedded image + a title block, injected before the body -----------
 # The cover PNG is base64-inlined so book.html is a single offline file (no request
 # for the image even when --embed-resources is a no-op for it).  Title-block lines
@@ -271,6 +278,7 @@ echo "build-book-html: building $OUT (master + per-chapter TOC in a left rail vi
 #         other chapter, each chapter wrapped for the rail layout
 #         (local_toc_depth / local_toc_skip_nth mirror the PDF's LOCAL_DEPTH /
 #          FRONTMATTER); it reads headers only, so it runs after crossref-links.
+#     --include-after-body -> tools/rail-resize.js, inlined: drag-to-resize rail.
 #     --math-method=katex --embed-resources -> inlined, offline math (no CDN).
 # $mermaid_args (when set) -> crisp, embeddable SVG diagrams.
 # shellcheck disable=SC2086
@@ -287,6 +295,7 @@ pandoc "$PROC" \
   --template "$TEMPLATE" \
   --include-in-header "$STYLE" \
   --include-before-body "$COVER" \
+  --include-after-body "$SCRIPT" \
   --math-method=katex \
   --embed-resources \
   $mermaid_args \

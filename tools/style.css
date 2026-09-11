@@ -112,8 +112,8 @@ a:hover {
  * chapter-level Contents beside its own chapter. */
 .chapter {
    display: grid;
-   grid-template-columns: var(--rail) minmax(0, 1fr);
-   column-gap: var(--gutter);
+   /* rail | gutter (holds the resize handle) | text */
+   grid-template-columns: var(--rail) var(--gutter) minmax(0, 1fr);
    align-items: start; /* so the rail box keeps its own height and can stick */
 }
 .chapter > h1 {
@@ -128,8 +128,39 @@ a:hover {
    overflow-y: auto;
 }
 .chapter > .chapter-body {
-   grid-column: 2;
+   grid-column: 3;
    min-width: 0; /* let wide code blocks scroll instead of widening the column */
+}
+
+/* Resize handle (inserted into the gutter by tools/rail-resize.js): the whole
+ * gutter is draggable; a thin bar in its middle lights up on hover/drag. */
+.chapter > .rail-handle {
+   grid-column: 2;
+   align-self: stretch;
+   position: relative;
+   cursor: col-resize;
+   touch-action: none;
+}
+.chapter > .rail-handle::after {
+   content: "";
+   position: absolute;
+   top: 1rem;
+   bottom: 0;
+   left: 50%;
+   width: 3px;
+   margin-left: -1.5px;
+   border-radius: 2px;
+   background: transparent;
+   transition: background 0.15s;
+}
+.chapter > .rail-handle:hover::after,
+.rail-dragging .chapter > .rail-handle::after {
+   background: var(--toc-border);
+}
+.rail-dragging,
+.rail-dragging * {
+   cursor: col-resize !important;
+   user-select: none;
 }
 .chapter-body > :first-child {
    margin-top: 0;
@@ -216,6 +247,9 @@ figcaption {
    .chapter {
       display: block;
    }
+   .chapter > .rail-handle {
+      display: none;
+   }
    .chapter > .master-toc,
    .chapter > .local-toc {
       position: static;
@@ -236,6 +270,9 @@ figcaption {
    }
    .chapter {
       display: block;
+   }
+   .chapter > .rail-handle {
+      display: none;
    }
    .chapter > .master-toc,
    .chapter > .local-toc {
